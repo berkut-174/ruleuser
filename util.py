@@ -387,7 +387,9 @@ def get_desktops(out, data):
 	if ( len(x.split()) < 2 ):
 	    continue
         list = x.split()
-	if (  "kded4" in list[1] ):
+	if (  "kded5" in list[1] ):
+	    desktops.append(list[0]+" kde5")
+	elif (  "kded4" in list[1] ):
 	    desktops.append(list[0]+" kde4")
 	elif (  "kded" in list[1] ):
 	    desktops.append(list[0]+" kde3")

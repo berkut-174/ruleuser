@@ -358,12 +358,13 @@ class cfg():
 	self.netstat_command = "netstat "
     	
 
-	self.known_desktop = ["kde3", "kde4", "gnome2", "gnome3", "lxde", "xfce", "linux", "windows", "unknown"]
+	self.known_desktop = ["kde3", "kde4", "kde5", "gnome2", "gnome3", "lxde", "xfce", "linux", "windows", "unknown"]
 	self.unknown_desktop = ["windows", "unknown"]
 
 	self.message_system = {
 		'kde3': 'kdialog --msgbox ',
 		'kde4': 'kdialog --msgbox ',
+		'kde5': '/usr/lib/kf5/bin/kdialog --msgbox ',
 		'gnome2': 'zenity --info --text ',
 		'gnome3': 'zenity --info --text ',
 		'lxde': 'zenity --info --text ',
@@ -375,6 +376,7 @@ class cfg():
 	self.lock = {
 		'kde3': 'dcop kdesktop KScreensaverIface lock',
 		'kde4': 'qdbus org.freedesktop.ScreenSaver /ScreenSaver Lock;qdbus org.freedesktop.ScreenSaver /ScreenSaver SetActive 1',
+		'kde5': '/usr/libexec/kf5/kscreenlocker_greet',
 		'gnome2': 'gnome-screensaver;gnome-screensaver-command -a',
 		'gnome3': 'gnome-screensaver;gnome-screensaver-command -a',
 		'lxde': 'xscreensaver-command -lock',
@@ -384,7 +386,8 @@ class cfg():
 
 	self.unlock = {
 		'kde3': 'killall -s 15 -u $USER kdesktop_lock',
-		'kde4': 'killall -s 15 -u $USER kscreenlocker',
+		'kde4': 'killall -s 15 -u $USER kscreenlocker_greet',
+		'kde5': 'killall -s 15 -u $USER kscreenlocker_greet',
 		'gnome2': 'killall -s 15 -u $USER gnome-screensaver',
 		'gnome3': 'killall -s 15 -u $USER gnome-screensaver',
 		'lxde': 'killall -s 15 -u $USER xscreensaver;xscreensaver &',
@@ -396,6 +399,7 @@ class cfg():
 	self.logout = {
 		'kde3': 'dcop ksmserver default logout 0 0 0',
 		'kde4': 'qdbus org.kde.ksmserver /KSMServer logout 0 0 0',
+		'kde5': 'qdbus org.kde.ksmserver /KSMServer logout 0 0 0',
 		'gnome2': 'killall gnome-session',
 		'gnome3': 'gnome-session-quit --logout --force --no-prompt',
 		'lxde': 'pkill -9 -u $USER',

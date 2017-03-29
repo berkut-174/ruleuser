@@ -124,7 +124,7 @@ class timers:
 	# desktop
 	if ( cfg.userList.get_value(iter, dn['desktop']) == "kde3" ):
     	    cfg.userList.set(iter, 108, cfg.pixbuf_status_kde3_16)
-	elif ( cfg.userList.get_value(iter, dn['desktop']) == "kde4"  ):
+	elif ( (cfg.userList.get_value(iter, dn['desktop']) == "kde4") or (cfg.userList.get_value(iter, dn['desktop']) == "kde5")  ):
     	    cfg.userList.set(iter, 108, cfg.pixbuf_status_kde4_16)
 	elif ( cfg.userList.get_value(iter, dn['desktop']) == "gnome2"  ):
     	    cfg.userList.set(iter, 108, cfg.pixbuf_status_gnome2_16)
