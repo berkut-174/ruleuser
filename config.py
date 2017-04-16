@@ -498,7 +498,7 @@ class cfg:
         ##########################################
 
         self.messageList.clear()
-        for i in range(20):
+        for i in range(self.CountCommands):
             text = self.read_config("command", "f" + str(i + 1))
             if text != "":
                 self.messageList.append([text])
@@ -539,8 +539,9 @@ class cfg:
         self.checkDhcp = self.read_config("tree", "check_dhcp")
         self.checkStatusInterval = self.read_config("tree", "check_status_interval")
 
-        for i in range(1, self.CountCommands):
-            self.f.append(self.read_config("command", "f" + str(i)))
+        self.f=[]
+        for i in range(self.CountCommands):
+            self.f.append(self.read_config("command", "f" + str(i+1)))
         # self.f1 = self.read_config("command", "f1")
         # self.f2 = self.read_config("command", "f2")
         # self.f3 = self.read_config("command", "f3")

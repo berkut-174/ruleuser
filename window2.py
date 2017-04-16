@@ -249,7 +249,7 @@ class timersUi:
         textBox = gtk.ListStore(str)
         self.entryBox = gtk.ComboBoxEntry(textBox, column=0)
         textBox.append([""])
-        for i in range(20):
+        for i in range(self.cfg.CountCommands):
             if self.cfg.read_config("command", "f" + str(i + 1)) != "":
                 textBox.append([self.cfg.read_config("command", "f" + str(i + 1))])
 
@@ -701,7 +701,7 @@ class demoUi:
 
         # file
         demoEntryList = gtk.ListStore(str)
-        for i in range(20):
+        for i in range(self.cfg.CountCommands):
             text = self.cfg.read_config("command", "f" + str(i + 1))
             if text != "":
                 demoEntryList.append([text])
@@ -3424,7 +3424,7 @@ class settings:
 
         vbox = gtk.VBox(False, 1)
         self.entryF=[]
-        for i in range(0, self.cfg.CountCommands-1):
+        for i in range(self.cfg.CountCommands):
             self.entryF.append(gtk.Entry())
             self.entryF[i].set_text(self.cfg.f[i])
             vbox.pack_start(self.entryF[i], expand=False, fill=False, padding=0)
@@ -3733,8 +3733,9 @@ class settings:
             res = "ssh"
         self.cfg.write_config("system", "ltspinfo", res)
 
-        for i in range(1,self.cfg.CountCommands):
-            self.cfg.write_config("command", "f"+int(i), self.entryF[i-1].get_text())
+        for i in range(self.cfg.CountCommands):
+            self.cfg.write_config("command", "f"+str(i+1), self.entryF[i].get_text())
+            # self.cfg.f[i]=self.entryF[i].get_text()
         # self.cfg.write_config("command", "f1", self.entryF1.get_text())
         # self.cfg.write_config("command", "f2", self.entryF2.get_text())
         # self.cfg.write_config("command", "f3", self.entryF3.get_text())
