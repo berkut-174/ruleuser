@@ -68,7 +68,7 @@ def ssh_tunnel(cfg, ssh_key, ssh_port, ssh_user, ip, server, port, mode="-fL"):
 
 ####################################################################################################
 
-def popen_sub(cfg, cmd, shell=False, error=True, timeout=3, timeout_exit=0.5, name=None):
+def popen_sub(cfg, cmd, shell=False, error=True, timeout=10, timeout_exit=0.5, name=None):
     try:
         proc = subprocess.Popen(cmd, shell=shell, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except:
