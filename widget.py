@@ -32,10 +32,12 @@
 #
 ###################################################################################################
 
+import gi
+from gi.repository import Pango
+
 import shlex
 import shutil
 import urllib
-import pango
 from dialogs import *
 from tree import *
 from util import *
@@ -47,16 +49,16 @@ _ = gettext.gettext
 ####################################################################################################
 
 def toolbar_button(pixbuf=None, tooltips=None, tooltip=None, toggle=None):
-    image = gtk.Image()
+    image = Gtk.Image()
     image.set_from_pixbuf(pixbuf)
     if toggle:
-        button = gtk.ToggleToolButton()
+        button = Gtk.ToggleToolButton()
     else:
-        button = gtk.ToolButton()
+        button = Gtk.ToolButton()
     button.set_icon_widget(image)
-    button.unset_flags(gtk.CAN_FOCUS)
+    button.unset_flags(Gtk.CAN_FOCUS)
     if tooltips and tooltip:
-        if gtk.pygtk_version < (2, 12, 0):
+        if Gtk.pygtk_version < (2, 12, 0):
             button.set_tooltip(tooltips, tooltip)
         else:
             button.set_tooltip_text(tooltip)
@@ -66,8 +68,8 @@ def toolbar_button(pixbuf=None, tooltips=None, tooltip=None, toggle=None):
 ####################################################################################################
 
 def menu_image_button(pixbuf, label):
-    button = gtk.ImageMenuItem(label)
-    image = gtk.Image()
+    button = Gtk.ImageMenuItem(label)
+    image = Gtk.Image()
     image.set_from_pixbuf(pixbuf)
     button.set_image(image)
     return button
@@ -77,16 +79,16 @@ def menu_image_button(pixbuf, label):
 
 def image_button(pixbuf=None, label=None, tooltips=None, tooltip=None, toggle=None):
     if toggle:
-        button = gtk.ToggleButton(label)
+        button = Gtk.ToggleButton(label)
     else:
-        button = gtk.Button(label)
-    button.unset_flags(gtk.CAN_FOCUS)
+        button = Gtk.Button(label)
+    button.unset_flags(Gtk.CAN_FOCUS)
     # button.set_can_focus(False)
-    image = gtk.Image()
+    image = Gtk.Image()
     image.set_from_pixbuf(pixbuf)
     button.set_image(image)
     if tooltips and tooltip:
-        if gtk.pygtk_version < (2, 12, 0):
+        if Gtk.pygtk_version < (2, 12, 0):
             tooltips.set_tip(button, tooltip)
         else:
             button.set_tooltip_text(tooltip)
@@ -95,14 +97,14 @@ def image_button(pixbuf=None, label=None, tooltips=None, tooltip=None, toggle=No
 
 ####################################################################################################
 
-class menu_tool_button(gtk.ToolButton):
+class menu_tool_button(Gtk.ToolButton):
     def __init__(self, pixbuf, tooltips, tooltip=None):
-        gtk.ToolButton.__init__(self, None)
+        Gtk.ToolButton.__init__(self, None)
 
-        image = gtk.Image()
+        image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
         self.set_icon_widget(image)
-        if gtk.pygtk_version < (2, 12, 0):
+        if Gtk.pygtk_version < (2, 12, 0):
             self.set_tooltip(tooltips, tooltip)
         else:
             self.set_tooltip_text(tooltip)
@@ -110,7 +112,7 @@ class menu_tool_button(gtk.ToolButton):
         self.button = self.get_child()
         self.button.connect("button-press-event", self.event)
 
-        self.menu = gtk.Menu()
+        self.menu = Gtk.Menu()
 
     def append(self, item):
         self.menu.append(item)
@@ -126,18 +128,18 @@ class menu_tool_button(gtk.ToolButton):
 
 ####################################################################################################
 
-class label_entry(gtk.Fixed):
+class label_entry(Gtk.Fixed):
     def __init__(self, label_text, entry_text, width, length, x1, x2, editable=True, visibility=True):
-        gtk.Fixed.__init__(self)
+        Gtk.Fixed.__init__(self)
 
         self.set_size_request(int(width * 7.4), 26)
-        label = gtk.Label(label_text)
+        label = Gtk.Label(label_text)
         label.set_alignment(0, 0.5)
-        self.entry = gtk.Entry()
+        self.entry = Gtk.Entry()
         self.entry.set_max_length(length)
         self.entry.set_text(entry_text)
         self.entry.set_property('width-chars', width)
-        self.entry_base_color = self.entry.get_style().copy().base[gtk.STATE_NORMAL]
+        self.entry_base_color = self.entry.get_style().copy().base[Gtk.STATE_NORMAL]
         self.set_editable(editable)
         if visibility == False:
             self.entry.set_visibility(False)
@@ -150,22 +152,22 @@ class label_entry(gtk.Fixed):
     def set_editable(self, editable):
         if editable == False:
             self.entry.set_property("editable", False)
-            self.entry.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse("light gray"))
+            self.entry.modify_base(Gtk.STATE_NORMAL, Gdk.color_parse("light gray"))
         else:
             self.entry.set_property("editable", True)
-            self.entry.modify_base(gtk.STATE_NORMAL, self.entry_base_color)
+            self.entry.modify_base(Gtk.STATE_NORMAL, self.entry_base_color)
 
 
 ####################################################################################################
 
-class file_entry(gtk.Fixed):
+class file_entry(Gtk.Fixed):
     def __init__(self, pixbuf, label_text, entry_text, width, x1, x2, editable=True, folder=None):
-        gtk.Fixed.__init__(self)
+        Gtk.Fixed.__init__(self)
 
         self.set_size_request(int(width * 7.4), 26)
-        label = gtk.Label(label_text)
+        label = Gtk.Label(label_text)
         label.set_alignment(0, 0.5)
-        self.entry = gtk.Entry()
+        self.entry = Gtk.Entry()
         self.entry.set_text(entry_text)
         self.entry.set_property('width-chars', width)
         self.button = image_button(pixbuf, "")
@@ -174,7 +176,7 @@ class file_entry(gtk.Fixed):
 
         if editable == False:
             self.entry.set_property("editable", False)
-            self.entry.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse("light gray"))
+            self.entry.modify_base(Gtk.STATE_NORMAL, Gdk.color_parse("light gray"))
 
         self.put(label, x1, 0)
         self.put(self.entry, x2, 0)
@@ -187,9 +189,9 @@ class file_entry(gtk.Fixed):
 ####################################################################################################
 
 def file_chooser_dialog(self, entry, label_text, folder=None, action=None):
-    dialog = gtk.FileChooserDialog(label_text, None, gtk.FILE_CHOOSER_ACTION_OPEN,
-                                   (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-    dialog.set_default_response(gtk.RESPONSE_OK)
+    dialog = Gtk.FileChooserDialog(label_text, None, Gtk.FILE_CHOOSER_ACTION_OPEN,
+                                   (Gtk.STOCK_CANCEL, Gtk.RESPONSE_CANCEL, Gtk.STOCK_OPEN, Gtk.RESPONSE_OK))
+    dialog.set_default_response(Gtk.RESPONSE_OK)
     if folder:
         dialog.set_current_folder(os.path.expanduser(folder))
     else:
@@ -197,10 +199,10 @@ def file_chooser_dialog(self, entry, label_text, folder=None, action=None):
     if action:
         dialog.set_action(action)
     response = dialog.run()
-    if response == gtk.RESPONSE_OK:
-        if "gtk.Entry" in str(entry):
+    if response == Gtk.RESPONSE_OK:
+        if "Gtk.Entry" in str(entry):
             entry.set_text(dialog.get_filename())
-        elif "gtk.ComboBox" in str(entry):
+        elif "Gtk.ComboBox" in str(entry):
             entry.insert_text(0, dialog.get_filename())
             entry.set_active(0)
     dialog.destroy()
@@ -208,9 +210,9 @@ def file_chooser_dialog(self, entry, label_text, folder=None, action=None):
 
 ####################################################################################################
 
-class file_browser(gtk.VBox):
+class file_browser(Gtk.VBox):
     def __init__(self, cfg, folder, folder_name):
-        gtk.VBox.__init__(self, False, 1)
+        Gtk.VBox.__init__(self, False, 1)
 
         self.cfg = cfg
         self.folder = folder
@@ -222,15 +224,15 @@ class file_browser(gtk.VBox):
         vbox = self
 
         # pb, file, filestat.st_size, modified, type_, sort_key
-        self.fileList = gtk.ListStore(gtk.gdk.Pixbuf, str, str, str, str, str)
+        self.fileList = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str, str, str)
         self.fileList.set_default_sort_func(None)
 
-        self.treeView = gtk.TreeView(self.fileList)
+        self.treeView = Gtk.TreeView(self.fileList)
         self.treeView.set_rules_hint(True)
         self.treeView.set_headers_visible(True)
         self.treeView.set_headers_clickable(True)
-        self.treeView.set_grid_lines(gtk.TREE_VIEW_GRID_LINES_VERTICAL)
-        self.treeView.modify_font(pango.FontDescription(self.cfg.fontTree))
+        self.treeView.set_grid_lines(Gtk.TREE_VIEW_GRID_LINES_VERTICAL)
+        self.treeView.modify_font(Pango.FontDescription(self.cfg.fontTree))
         self.treeView.connect("button-press-event", self.tree_button_press_event)
         self.TARGETS = [
             ('application/x-kde-urilist', 0, 0),
@@ -238,58 +240,58 @@ class file_browser(gtk.VBox):
             ('text/uri-list', 0, 0), ]
 
         self.treeView.connect("drag_data_get", self.drag_data_get_data, self.cfg)
-        self.treeView.enable_model_drag_source(gtk.gdk.BUTTON1_MASK, self.TARGETS, gtk.gdk.ACTION_COPY)
+        self.treeView.enable_model_drag_source(Gdk.BUTTON1_MASK, self.TARGETS, Gdk.ACTION_COPY)
 
         self.treeView.connect("drag_data_received", self.drag_data_received_data, self.cfg)
-        self.treeView.enable_model_drag_dest(self.TARGETS, gtk.gdk.ACTION_COPY)
+        self.treeView.enable_model_drag_dest(self.TARGETS, Gdk.ACTION_COPY)
 
         self.treeSelection = self.treeView.get_selection()
-        self.treeSelection.set_mode(gtk.SELECTION_MULTIPLE)
+        self.treeSelection.set_mode(Gtk.SELECTION_MULTIPLE)
 
         ######################
 
-        self.cellpb = gtk.CellRendererPixbuf()
-        self.cell1 = gtk.CellRendererText()
+        self.cellpb = Gtk.CellRendererPixbuf()
+        self.cell1 = Gtk.CellRendererText()
         self.cell1.connect('edited', self.rename_file)
-        self.cell2 = gtk.CellRendererText()
-        self.cell3 = gtk.CellRendererText()
+        self.cell2 = Gtk.CellRendererText()
+        self.cell3 = Gtk.CellRendererText()
 
-        column = gtk.TreeViewColumn(_("Name"))
+        column = Gtk.TreeViewColumn(_("Name"))
         column.set_expand(True)
         column.set_resizable(True)
-        column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        column.set_sizing(Gtk.TREE_VIEW_COLUMN_FIXED)
         column.pack_start(self.cellpb, False)
         column.pack_start(self.cell1, True)
         column.set_attributes(self.cellpb, pixbuf=0)
         column.set_attributes(self.cell1, text=1)
         self.treeView.append_column(column)
 
-        column = gtk.TreeViewColumn(_("Size"))
+        column = Gtk.TreeViewColumn(_("Size"))
         column.set_expand(False)
         column.pack_start(self.cell2, True)
         column.set_attributes(self.cell2, text=2)
         self.treeView.append_column(column)
 
-        column = gtk.TreeViewColumn(_("Modified"))
+        column = Gtk.TreeViewColumn(_("Modified"))
         column.set_expand(False)
         column.pack_start(self.cell3, True)
         column.set_attributes(self.cell3, text=3)
         self.treeView.append_column(column)
 
-        sw = gtk.ScrolledWindow()
-        sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        sw = Gtk.ScrolledWindow()
+        sw.set_shadow_type(Gtk.SHADOW_ETCHED_IN)
+        sw.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
         sw.add(self.treeView)
 
         ##########################################
 
-        self.label = gtk.Label(self.folder_name)
+        self.label = Gtk.Label(self.folder_name)
         self.label.set_alignment(0, 0.5)
         vbox.pack_start(self.label, expand=False, fill=False, padding=5)
 
-        toolbar = gtk.Toolbar()
-        toolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
-        toolbar.set_style(gtk.TOOLBAR_ICONS)
+        toolbar = Gtk.Toolbar()
+        toolbar.set_orientation(Gtk.ORIENTATION_HORIZONTAL)
+        toolbar.set_style(Gtk.TOOLBAR_ICONS)
         toolbar.set_border_width(0)
         toolbar.set_tooltips(True)
 
@@ -301,7 +303,7 @@ class file_browser(gtk.VBox):
         button.connect('clicked', self.up)
         toolbar.insert(button, -1)
 
-        separator = gtk.SeparatorToolItem()
+        separator = Gtk.SeparatorToolItem()
         toolbar.insert(separator, -1)
 
         button = toolbar_button(self.cfg.pixbuf_list_folder_add_16, self.cfg.tooltips, _("New folder"))
@@ -324,9 +326,9 @@ class file_browser(gtk.VBox):
         button.connect('clicked', self.remove)
         toolbar.insert(button, -1)
 
-        space = gtk.SeparatorToolItem()
+        space = Gtk.SeparatorToolItem()
         space.set_draw(False)
-        space.set_expand(gtk.EXPAND)
+        space.set_expand(Gtk.EXPAND)
         toolbar.insert(space, -1)
 
         button = toolbar_button(self.cfg.pixbuf_list_file_hide_16, self.cfg.tooltips, _("Show hidden files"), True)
@@ -412,7 +414,7 @@ class file_browser(gtk.VBox):
     ##############################################
 
     def copy(self, data=None):
-        clipboard = gtk.clipboard_get()
+        clipboard = Gtk.clipboard_get()
         clipboard.set_with_data(self.TARGETS, self.copy_files, self.clear_files)
 
     def copy_files(self, clipboard, selectiondata, info, data):
@@ -431,7 +433,7 @@ class file_browser(gtk.VBox):
     ##############################################
 
     def paste(self, data=None):
-        clipboard = gtk.clipboard_get()
+        clipboard = Gtk.clipboard_get()
         # clipboard.request_targets(self.get_targets, user_data=None)
         clipboard.request_contents("x-special/gnome-copied-files", self.paste_files)
         clipboard.request_contents("application/x-kde-urilist", self.paste_files)
@@ -564,7 +566,7 @@ class file_browser(gtk.VBox):
     def tree_button_press_event(self, data=None, event=None):
         if event.button == 3:
             self.context_menu(event)
-        if event.type == gtk.gdk._2BUTTON_PRESS:
+        if event.type == Gdk._2BUTTON_PRESS:
             self.open_file()
 
     def open_file(self, data=None):
@@ -590,13 +592,13 @@ class file_browser(gtk.VBox):
             return
 
     def context_menu(self, event):
-        mouseMenu = gtk.Menu()
+        mouseMenu = Gtk.Menu()
 
         item = menu_image_button(self.cfg.pixbuf_list_file_up_16, _("Open"))
         item.connect('activate', self.open_file)
         mouseMenu.append(item)
 
-        item = gtk.SeparatorMenuItem()
+        item = Gtk.SeparatorMenuItem()
         mouseMenu.append(item)
 
         item = menu_image_button(self.cfg.pixbuf_list_folder_add_16, _("New folder"))
@@ -639,14 +641,14 @@ class file_browser(gtk.VBox):
 ####################################################################################################
 
 
-class tooltips_(gtk.Window):
+class tooltips_(Gtk.Window):
     def __init__(self):
-        gtk.Window.__init__(self, gtk.WINDOW_POPUP)
+        Gtk.Window.__init__(self, Gtk.WINDOW_POPUP)
         self.set_resizable(False)
         self.set_border_width(5)
         self.set_app_paintable(True)
 
-        self.label = label = gtk.Label()
+        self.label = label = Gtk.Label()
         label.set_line_wrap(True)
         label.set_alignment(0.5, 0.5)
         self.add(label)
@@ -685,15 +687,15 @@ def entry_error(cfg, entry):
 ####################################################################################################
 
 def entry_error_t(cfg, entry):
-    base_color = entry.child.get_style().copy().base[gtk.STATE_NORMAL]
+    base_color = entry.child.get_style().copy().base[Gtk.STATE_NORMAL]
     for i in range(3):
-        gtk.gdk.threads_enter()
-        entry.child.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse("gray"))
-        gtk.gdk.threads_leave()
+        Gdk.threads_enter()
+        entry.child.modify_base(Gtk.STATE_NORMAL, Gdk.color_parse("gray"))
+        Gdk.threads_leave()
         time.sleep(0.3)
-        gtk.gdk.threads_enter()
-        entry.child.modify_base(gtk.STATE_NORMAL, base_color)
-        gtk.gdk.threads_leave()
+        Gdk.threads_enter()
+        entry.child.modify_base(Gtk.STATE_NORMAL, base_color)
+        Gdk.threads_leave()
         time.sleep(0.3)
     cfg.entry_error_busy = False
 

@@ -32,9 +32,10 @@
 #
 ###################################################################################################
 
-import gettext
+import gi
+from gi.repository import GObject
 
-import gobject
+import gettext
 import threading
 import time
 import os
@@ -68,15 +69,15 @@ class thread_command(threading.Thread):
 ####################################################################################################
 
 # поток для функции + gobject
-class thread_gfunc(threading.Thread, gobject.GObject):
+class thread_gfunc(threading.Thread, GObject.Object):
     __gsignals__ = {
-        "completed": (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, []),
-        "data": (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))
+        "completed": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, []),
+        "data": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,))
     }
 
     def __init__(self, cfg, cursor, sensitive, func, *args):
         threading.Thread.__init__(self)
-        gobject.GObject.__init__(self)
+        GObject.Object.__init__(self)
 
         self.cond = threading.Condition()
         self.stopthread = threading.Event()
@@ -118,12 +119,12 @@ class thread_gfunc(threading.Thread, gobject.GObject):
 
 ####################################################################################################
 
-class _IdleObject(gobject.GObject):
+class _IdleObject(GObject.Object):
     def __init__(self):
-        gobject.GObject.__init__(self)
+        GObject.Object.__init__(self)
 
     def emit(self, *args):
-        gobject.idle_add(gobject.GObject.emit, self, *args)
+        GObject.idle_add(GObject.Object.emit, self, *args)
 
 
 ####################################################################################################

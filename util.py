@@ -32,18 +32,20 @@
 #
 ###################################################################################################
 
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Gdk
+
 import os
 import socket
 import subprocess
 import time
 
 import gettext
-import gtk
 import re
 import string
 
 _ = gettext.gettext
-
 
 ####################################################################################################
 
@@ -157,19 +159,19 @@ def cursor_wait(cfg, wait, widget=None):
         widget = cfg.window
     if wait:
         if not cfg.cursor_wait_status and widget.window:
-            # pixbuf = gtk.gdk.pixbuf_new_from_file("/home/admin/.vnc/icons/cursor_watch.gif")
-            # widget.window.set_cursor(gtk.gdk.Cursor(widget.get_display(), pixbuf, 30, 30))
-            gtk.gdk.threads_enter()
-            gtk.gdk.display_get_default().sync()
-            widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
-            gtk.gdk.threads_leave()
+            # pixbuf = GdkPixbuf.Pixbuf.new_from_file("/home/admin/.vnc/icons/cursor_watch.gif")
+            # widget.window.set_cursor(Gdk.Cursor(widget.get_display(), pixbuf, 30, 30))
+            Gdk.threads_enter()
+            Gdk.display_get_default().sync()
+            widget.window.set_cursor(Gdk.Cursor(Gdk.WATCH))
+            Gdk.threads_leave()
             cfg.cursor_wait_status = True
     else:
         if cfg.cursor_wait_status and widget.window:
-            gtk.gdk.threads_enter()
-            gtk.gdk.display_get_default().sync()
+            Gdk.threads_enter()
+            Gdk.display_get_default().sync()
             widget.window.set_cursor(None)
-            gtk.gdk.threads_leave()
+            Gdk.threads_leave()
             cfg.cursor_wait_status = False
 
 
@@ -308,8 +310,8 @@ def nmap_os(cfg, ip, port=None, timeout="100", closed=None, ssh_key=None, ssh_po
 ####################################################################################################
 
 def get_workspace(cfg=None):
-    w = gtk.gdk.get_default_root_window()
-    p = gtk.gdk.atom_intern('_NET_WORKAREA')
+    w = Gdk.get_default_root_window()
+    p = Gdk.atom_intern('_NET_WORKAREA')
     x = w.property_get(p)[2][2:4][0] - 10
     y = w.property_get(p)[2][2:4][1] - 30
     if cfg:

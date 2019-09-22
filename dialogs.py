@@ -55,11 +55,11 @@ def message_dialog(window, text, list, buttons_ok=None, list_type="list"):
         for item in list:
             text = text + "\n" + item
 
-    dialog = gtk.MessageDialog(window, 0, gtk.MESSAGE_INFO, gtk.BUTTONS_NONE, text)
+    dialog = Gtk.MessageDialog(window, 0, Gtk.MESSAGE_INFO, Gtk.BUTTONS_NONE, text)
     if buttons_ok:
-        dialog.add_button(_("Ok"), gtk.BUTTONS_OK)
-    dialog.add_button(_("Cancel"), gtk.BUTTONS_CANCEL)
-    if dialog.run() == gtk.BUTTONS_OK:
+        dialog.add_button(_("Ok"), Gtk.BUTTONS_OK)
+    dialog.add_button(_("Cancel"), Gtk.BUTTONS_CANCEL)
+    if dialog.run() == Gtk.BUTTONS_OK:
         dialog.destroy()
         return True
     else:
@@ -70,7 +70,7 @@ def message_dialog(window, text, list, buttons_ok=None, list_type="list"):
 ####################################################################################################            
 
 def about_dialog(data=None):
-    about = gtk.AboutDialog()
+    about = Gtk.AboutDialog()
     about.set_name("RuleUser")
     about.set_comments(_("Computer management and monitoring users") + "\n"+_("Developed specially for ALT Linux School") + "\n"+_("Поддерживается в Школе №830 г. Москва"))
 
@@ -79,7 +79,7 @@ def about_dialog(data=None):
     about.set_website("http://www.altlinux.org/LTSP/")
     about.set_authors(["Тестирование:" + "\n" + "	Александр Шеметов berkut_174@altlinux.org" + "\n"])
     about.set_license("GPLv3")
-    about.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.expanduser("icons/ruleuser2_48.png")))
+    about.set_logo(GdkPixbuf.Pixbuf.new_from_file(os.path.expanduser("icons/ruleuser2_48.png")))
     about.run()
     about.destroy()
 

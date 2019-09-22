@@ -44,12 +44,12 @@ _ = gettext.gettext
 ####################################################################################################
 
 def create_userList(cfg):
-    gtk.gdk.threads_enter()
+    Gdk.threads_enter()
     try:
         cfg.userList.clear()
         create_tree_group(cfg)
     finally:
-        gtk.gdk.threads_leave()
+        Gdk.threads_leave()
 
     # список псевдонимов для серверов
     alias_list = load_aliasList(cfg)
@@ -63,7 +63,7 @@ def create_userList(cfg):
     for z_server in servers:
 
         # Добавить сервер
-        gtk.gdk.threads_enter()
+        Gdk.threads_enter()
         try:
             server_iter = cfg.userList.append(None)
             for x in range(len(z_server)):
@@ -72,7 +72,7 @@ def create_userList(cfg):
                 cfg.userList.set(server_iter, x, z_server[x])
             cfg.userList.set(server_iter, 100, cfg.pixbuf_status_server_16)
         finally:
-            gtk.gdk.threads_leave()
+            Gdk.threads_leave()
 
         thread_server_group = thread_gfunc(cfg, False, True, create_tree_server_group, cfg, server_iter, z_server,
                                            alias_list)
@@ -252,7 +252,7 @@ def create_tree_server_group(cfg, server_iter, z_server=None, alias_list=None):
                 break
 
         # Добавить клиента в userList
-        gtk.gdk.threads_enter()
+        Gdk.threads_enter()
         try:
             # Поиск в группах пары user+server
             if find_tree(cfg, cfg.userList, client_id=du['client_id'], group=True) == False:
@@ -263,7 +263,7 @@ def create_tree_server_group(cfg, server_iter, z_server=None, alias_list=None):
                         cfg.userList.set(iter, x, du[cfg.z[x]])
                     cfg.userList.set(iter, 100, cfg.pixbuf_status_down_16)
         finally:
-            gtk.gdk.threads_leave()
+            Gdk.threads_leave()
 
 
 ####################################################################################################
@@ -503,31 +503,31 @@ def tree_selection_enable(treeView, enable=True):
 
 def tree_drag_data_motion(widget, drag_context, x, y, time):
     if drag_context.get_source_widget() == widget:
-        drag_context.drag_status(gtk.gdk.ACTION_MOVE, time)
+        drag_context.drag_status(Gdk.ACTION_MOVE, time)
     else:
-        drag_context.drag_status(gtk.gdk.ACTION_PRIVATE, time)
+        drag_context.drag_status(Gdk.ACTION_PRIVATE, time)
         return True
     drop_info = widget.get_dest_row_at_pos(x, y)
     if drop_info:
         dest_path, dest_pos = drop_info
         if len(dest_path) == 2:
-            if dest_pos == gtk.TREE_VIEW_DROP_BEFORE or dest_pos == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
-                widget.set_drag_dest_row(dest_path, gtk.TREE_VIEW_DROP_BEFORE)
-            elif dest_pos == gtk.TREE_VIEW_DROP_AFTER or dest_pos == gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
-                widget.set_drag_dest_row(dest_path, gtk.TREE_VIEW_DROP_AFTER)
+            if dest_pos == Gtk.TREE_VIEW_DROP_BEFORE or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
+                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_BEFORE)
+            elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
+                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_AFTER)
         else:
-            if dest_pos == gtk.TREE_VIEW_DROP_BEFORE:
-                widget.set_drag_dest_row(dest_path, gtk.TREE_VIEW_DROP_BEFORE)
-            elif dest_pos == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
-                widget.set_drag_dest_row(dest_path, gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
-            elif dest_pos == gtk.TREE_VIEW_DROP_AFTER and widget.row_expanded(dest_path):
-                widget.set_drag_dest_row(dest_path, gtk.TREE_VIEW_DROP_INTO_OR_AFTER)
-            elif dest_pos == gtk.TREE_VIEW_DROP_AFTER:
-                widget.set_drag_dest_row(dest_path, gtk.TREE_VIEW_DROP_AFTER)
-            elif dest_pos == gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
-                widget.set_drag_dest_row(dest_path, gtk.TREE_VIEW_DROP_INTO_OR_AFTER)
+            if dest_pos == Gtk.TREE_VIEW_DROP_BEFORE:
+                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_BEFORE)
+            elif dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
+                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
+            elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER and widget.row_expanded(dest_path):
+                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_INTO_OR_AFTER)
+            elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER:
+                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_AFTER)
+            elif dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
+                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_INTO_OR_AFTER)
     else:
-        widget.set_drag_dest_row((len(widget.get_model()) - 1,), gtk.TREE_VIEW_DROP_AFTER)
+        widget.set_drag_dest_row((len(widget.get_model()) - 1,), Gtk.TREE_VIEW_DROP_AFTER)
     return True
 
 
@@ -592,7 +592,7 @@ def tree_drag_data_received(treeView, context, x, y, selection, info, etime, cfg
                     if model[group_num][4] == "server":
                         dest_path = (group_num,)
                         dest_iter = model.get_iter(dest_path)
-                        dest_pos = gtk.TREE_VIEW_DROP_BEFORE
+                        dest_pos = Gtk.TREE_VIEW_DROP_BEFORE
                         break
                     group_num += 1
             # Если попытка переместить группу после/перед сервером, найти последнюю группу и вставить после.
@@ -602,11 +602,11 @@ def tree_drag_data_received(treeView, context, x, y, selection, info, etime, cfg
                     if model[group_num][4] != "server":
                         dest_path = (group_num,)
                         dest_iter = model.get_iter(dest_path)
-                        dest_pos = gtk.TREE_VIEW_DROP_AFTER
+                        dest_pos = Gtk.TREE_VIEW_DROP_AFTER
                         break
                     group_num -= 1
 
-            if dest_pos == gtk.TREE_VIEW_DROP_BEFORE or dest_pos == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
+            if dest_pos == Gtk.TREE_VIEW_DROP_BEFORE or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
                 new_iter = model.insert_before(None, dest_iter, row_data)
             else:
                 new_iter = model.insert_after(None, dest_iter, row_data)
@@ -806,13 +806,13 @@ def create_columns(cfg, treeView, list_col, visible=None):
     for col in list_col:
         i += 1
         if col == "pixbuf":
-            renderer = gtk.CellRendererPixbuf()
-            column = gtk.TreeViewColumn("", renderer, pixbuf=i)
-            column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+            renderer = Gtk.CellRendererPixbuf()
+            column = Gtk.TreeViewColumn("", renderer, pixbuf=i)
+            column.set_sizing(Gtk.TREE_VIEW_COLUMN_FIXED)
             column.set_fixed_width(28)
         else:
-            renderer = gtk.CellRendererText()
-            column = gtk.TreeViewColumn(col, renderer, text=i)
+            renderer = Gtk.CellRendererText()
+            column = Gtk.TreeViewColumn(col, renderer, text=i)
             column.set_expand(True)
         column.set_visible(True)
         treeView.append_column(column)
@@ -862,12 +862,12 @@ def save_userList_t(cfg):
     while cfg.timers.timer_userList("active"):
         time.sleep(0.5)
     time.sleep(1)
-    gtk.gdk.threads_enter()
+    Gdk.threads_enter()
     try:
         save_userList_start(cfg)
         cfg.save_userList_busy = False
     finally:
-        gtk.gdk.threads_leave()
+        Gdk.threads_leave()
 
 
 ##################################################

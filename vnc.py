@@ -35,7 +35,8 @@
 from tree import *
 from command import *
 
-import gobject
+import gi
+from gi.repository import GObject
 
 import gettext
 
@@ -312,7 +313,7 @@ def create_demo_server(cfg, server_iter):
     cfg.demoList.set(server_iter, cfg.dn['demo_port'], demo_port)
     cfg.demoList.set(server_iter, cfg.dn['demo_address'], demo_address)
     cfg.demoList.set(server_iter, cfg.dn['demo_server_pid'], str(proc.pid))
-    gobject.timeout_add(cfg.demo_check_interval * 1000 + 1000, save_demoList, cfg)
+    GObject.timeout_add(cfg.demo_check_interval * 1000 + 1000, save_demoList, cfg)
 
 
 ####################################################################################################
@@ -334,7 +335,7 @@ def stop_demo_server(cfg, server_iter):
         pass
     cfg.status(name + _("Demo server stop"), status=False)
 
-    gobject.timeout_add(cfg.demo_check_interval * 1000 + 1000, save_demoList, cfg)
+    GObject.timeout_add(cfg.demo_check_interval * 1000 + 1000, save_demoList, cfg)
 
 
 ####################################################################################################
@@ -462,7 +463,7 @@ def start_demo_client(cfg, client_iter):
         block_input(cfg, d, action="block_demo", name=name)
 
     cfg.demoList.set(client_iter, cfg.dn['demo_client_pid'], str(proc.pid))
-    gobject.timeout_add(cfg.demo_check_interval * 1000 + 1000, save_demoList, cfg)
+    GObject.timeout_add(cfg.demo_check_interval * 1000 + 1000, save_demoList, cfg)
 
 
 ####################################################################################################
@@ -491,7 +492,7 @@ def stop_demo_client(cfg, client_iter, server_iter=False):
     if demo_client[cfg.dn['demo_mode']] == "fullscreen":
         block_input(cfg, d, action="unblock_demo", name=name)
 
-    gobject.timeout_add(cfg.demo_check_interval * 1000 + 1000, save_demoList, cfg)
+    GObject.timeout_add(cfg.demo_check_interval * 1000 + 1000, save_demoList, cfg)
 
 
 ####################################################################################################

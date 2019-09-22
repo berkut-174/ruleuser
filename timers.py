@@ -35,10 +35,11 @@
 from command import run_command
 from tree import *
 
+import gi
+from gi.repository import GObject
+
 import datetime
 import gettext
-
-import gobject
 
 _ = gettext.gettext
 
@@ -97,7 +98,7 @@ class timers:
 
     def list_icons(self):
         while self.list_icons_check:
-            gtk.gdk.threads_enter()
+            Gdk.threads_enter()
             try:
                 server_iter = self.cfg.userList.get_iter_first()
                 while server_iter:
@@ -108,7 +109,7 @@ class timers:
                     server_iter = self.cfg.userList.iter_next(server_iter)
 
             finally:
-                gtk.gdk.threads_leave()
+                Gdk.threads_leave()
 
             time.sleep(3)
 
@@ -164,7 +165,7 @@ class timers:
         while self.network_scan:
 
             # Создание и проверка вхождения сети в список
-            gtk.gdk.threads_enter()
+            Gdk.threads_enter()
             try:
                 network_scan_list = []
                 for parent in range(len(self.cfg.userList)):
@@ -185,7 +186,7 @@ class timers:
                             if repeat == False:
                                 network_scan_list.append(net_)
             finally:
-                gtk.gdk.threads_leave()
+                Gdk.threads_leave()
 
             # scan
             nmap_list = self.nmap_scan_mac(self.cfg, network_scan_list)
@@ -193,7 +194,7 @@ class timers:
             # проставить IP
             if nmap_list != []:
                 save = False
-                gtk.gdk.threads_enter()
+                Gdk.threads_enter()
                 try:
                     for parent in range(len(self.cfg.userList)):
                         parent_iter = self.cfg.userList.get_iter(parent)
@@ -216,7 +217,7 @@ class timers:
                                                 self.cfg.userList[path][dn['server']] = x[0]
                                             ###############
                 finally:
-                    gtk.gdk.threads_leave()
+                    Gdk.threads_leave()
                 if save == True:
                     save_userList(self.cfg)
             time.sleep(float(self.cfg.checkStatusInterval) * 2)
@@ -248,7 +249,7 @@ class timers:
         while self.client_status_check:
 
             # Строка IP адресов
-            gtk.gdk.threads_enter()
+            Gdk.threads_enter()
             try:
                 hosts = ""
                 for parent in range(len(self.cfg.userList)):
@@ -256,13 +257,13 @@ class timers:
                     for client in range(self.cfg.userList.iter_n_children(parent_iter)):
                         hosts = hosts + " " + self.cfg.userList[(parent, client)][3]
             finally:
-                gtk.gdk.threads_leave()
+                Gdk.threads_leave()
 
             # scan
             nmap_list = self.nmap_scan_ping(self.cfg, hosts)
 
             # проставить статус
-            gtk.gdk.threads_enter()
+            Gdk.threads_enter()
             try:
                 if nmap_list != []:
                     for parent in range(len(self.cfg.userList)):
@@ -280,7 +281,7 @@ class timers:
                                 self.cfg.userList[(parent, client)][100] = self.cfg.pixbuf_status_down_16
                                 self.cfg.userList[(parent, client)][self.cfg.dn['ping']] = "False"
             finally:
-                gtk.gdk.threads_leave()
+                Gdk.threads_leave()
             time.sleep(float(self.cfg.checkStatusInterval))
 
     def nmap_scan_ping(self, cfg, hosts, ssh=""):
@@ -337,7 +338,7 @@ class timers:
                 time = datetime.datetime.now()
                 if int(start.replace(':', '')) < int(time.strftime("%H%M%S")):
                     continue
-                self.cfg.timersList[row][6] = gobject.timeout_add(1000, self.timer_user_get, number)
+                self.cfg.timersList[row][6] = GObject.timeout_add(1000, self.timer_user_get, number)
                 self.cfg.status(
                     _("Timer") + " №" + number + " - " + action + ", " + _("starting") + " " + _("in") + " " + start)
 
@@ -353,7 +354,7 @@ class timers:
                 if timer_id == 0:
                     continue
                 # Завершить
-                gobject.source_remove(timer_id)
+                GObject.source_remove(timer_id)
                 self.cfg.timersList[row][6] = 0
                 self.cfg.status(_("Timer") + " №" + number + " " + _("stopped"))
                 # Убрать иконки

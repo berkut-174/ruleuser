@@ -33,10 +33,13 @@
 ###################################################################################################
 
 from __future__ import with_statement
+
+import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('GtkVnc', '2.0')
+from gi.repository import Gtk, Gdk, Pango, GObject, GdkPixbuf, GtkVnc
+
 try:
-    import pango
-    import gtk
-    import gobject
     import os
     import socket
     import threading
@@ -51,7 +54,7 @@ try:
     import sys
 # import gc, weakref
 except:
-    print('Required python modules gtk,gobject,pango,os,socket,shutil,threading,re,string,shlex,\
+    print('Required python modules os,socket,shutil,threading,re,string,shlex,\
 	ConfigParser,gettext,datetime,time,sys,gc,weakref')
     raise SystemExit
 
@@ -61,13 +64,13 @@ if os.getuid() == 0:
 
 python_version = sys.version_info[0:2]
 
-if python_version < (2, 5):
-    print('Python 2.5.0 or later required"')
-    raise SystemExit
+# if python_version < (2, 5):
+#     print('Python 2.5.0 or later required"')
+#     raise SystemExit
 
-if gtk.pygtk_version < (2, 4, 0):
-    print('PyGtk 2.4.0 or later required')
-    raise SystemExit
+# if Gtk.pygtk_version < (2, 4, 0):
+#     print('PyGtk 2.4.0 or later required')
+#     raise SystemExit
 
 # gtkvnc
 # try:
@@ -80,11 +83,11 @@ if gtk.pygtk_version < (2, 4, 0):
 # except:
 #    pass
 
-try:
-    import gtkvnc
-except:
-    print('python-module-gtkvnc not found. Program is run in reduced functionality.')
-    gtkvnc = False
+# try:
+#     import gtkvnc
+# except:
+#     print('python-module-gtkvnc not found. Program is run in reduced functionality.')
+#     gtkvnc = False
 
 # program modules
 from config import *
@@ -118,17 +121,17 @@ class Program:
         else:
             self.cfg.debug_enable = False
 
-        if gtk.pygtk_version < (2, 12, 0):
-            self.cfg.tooltips = gtk.Tooltips()
+        if Gtk.pygtk_version < (2, 12, 0):
+            self.cfg.tooltips = Gtk.Tooltips()
         else:
-            self.cfg.tooltips = gtk.Tooltip()
+            self.cfg.tooltips = Gtk.Tooltip()
 
         self.cfg.gtkvnc = False
         self.cfg.gtkvnc_depth = False
         self.cfg.gtkvnc_encoding = False
-        if gtkvnc:
+        if GtkVnc:
             self.cfg.gtkvnc = True
-            for method in dir(gtkvnc.Display):
+            for method in dir(GtkVnc.Display):
                 if method == "set_depth":
                     self.cfg.gtkvnc_depth = True
                 if method == "set_encoding":
@@ -151,7 +154,7 @@ class Program:
         self.window = self.cfg.window
         self.cfg.maximized = False
         self.cfg.fullscreen = False
-        self.cfg.bg_color = self.window.get_style().copy().bg[gtk.STATE_NORMAL]
+        self.cfg.bg_color = self.window.get_style().copy().bg[Gtk.STATE_NORMAL]
         self.window.set_title(" RuleUser ")
         self.window.connect('check-resize', self.window_resize_event)
         self.window.connect("window-state-event", self.window_state_event)
@@ -170,7 +173,7 @@ class Program:
         self.cfg.timers.stop()
         self.cfg.status(_("Quit"))
         umount_point(self.cfg)
-        gtk.main_quit()
+        Gtk.main_quit()
 
     ##############################################
 
@@ -183,7 +186,7 @@ class Program:
             label_text = ""
             toolbar = data2[2].get_children()[0]
             for w in toolbar.get_children():
-                if type(w) == gtk.ToolItem:
+                if type(w) == Gtk.ToolItem:
                     label_text = w.get_child().get_text()
                     break
             vnc = data2[3]
@@ -203,7 +206,7 @@ class Program:
                 label_text = ""
                 toolbar = p[2].get_children()[0]
                 for w in toolbar.get_children():
-                    if type(w) == gtk.ToolItem:
+                    if type(w) == Gtk.ToolItem:
                         label_text = w.get_child().get_text()
                         break
                 vnc = p[3]
@@ -401,8 +404,8 @@ class Program:
                 if new:
                     thread = thread_gfunc(self.cfg, True, True, self.thumbnails_vnc, user_list, param)
                     thread.start()
-                    gobject.timeout_add(1000 + len(user_list) * 200, self.thumbnails_vnc_post, param)
-                    gobject.timeout_add(7000 + len(user_list) * 200, self.thumbnails_vnc_active)
+                    GObject.timeout_add(1000 + len(user_list) * 200, self.thumbnails_vnc_post, param)
+                    GObject.timeout_add(7000 + len(user_list) * 200, self.thumbnails_vnc_active)
             else:
                 if mode == "view":
                     create_vnc_viewer(self.cfg, get_selected_tree(self.cfg, self.cfg.treeView, "first"), "-viewonly")
@@ -421,8 +424,8 @@ class Program:
             if new:
                 thread = thread_gfunc(self.cfg, True, True, self.thumbnails_vnc, user_list, param)
                 thread.start()
-                gobject.timeout_add(1000 + len(user_list) * 200, self.thumbnails_vnc_post, param)
-                gobject.timeout_add(7000 + len(user_list) * 200, self.thumbnails_vnc_active)
+                GObject.timeout_add(1000 + len(user_list) * 200, self.thumbnails_vnc_post, param)
+                GObject.timeout_add(7000 + len(user_list) * 200, self.thumbnails_vnc_active)
             # thread = threading.Thread(target=self.thumbnails_vnc)
             # thread.start()
             # self.thumbnails_vnc()
@@ -431,14 +434,14 @@ class Program:
 
     def window_state_event(self, widget=None, event=None):
         state = event.changed_mask
-        if state == gtk.gdk.WINDOW_STATE_MAXIMIZED or state == gtk.gdk.WINDOW_STATE_FULLSCREEN:
+        if state == Gdk.WINDOW_STATE_MAXIMIZED or state == Gdk.WINDOW_STATE_FULLSCREEN:
             new_state = event.new_window_state
-            if new_state == gtk.gdk.WINDOW_STATE_MAXIMIZED:
+            if new_state == Gdk.WINDOW_STATE_MAXIMIZED:
                 self.cfg.maximized = True
             else:
                 self.cfg.maximized = False
             if (
-                    new_state == gtk.gdk.WINDOW_STATE_FULLSCREEN or new_state == gtk.gdk.WINDOW_STATE_MAXIMIZED | gtk.gdk.WINDOW_STATE_FULLSCREEN):
+                    new_state == Gdk.WINDOW_STATE_FULLSCREEN or new_state == Gdk.WINDOW_STATE_MAXIMIZED | Gdk.WINDOW_STATE_FULLSCREEN):
                 self.cfg.fullscreen = True
             else:
                 self.cfg.fullscreen = False
@@ -451,19 +454,19 @@ class Program:
     ##############################################
 
     def window_key_press_event(self, widget=None, event=None):
-        if event.keyval == gtk.keysyms.F1:
+        if event.keyval == Gtk.keysyms.F1:
             about_dialog()
-        if event.keyval == gtk.keysyms.F2:
+        if event.keyval == Gtk.keysyms.F2:
             self.view_list()
-        if event.keyval == gtk.keysyms.F3:
+        if event.keyval == Gtk.keysyms.F3:
             self.view_vnc_minimize()
-        if event.keyval == gtk.keysyms.F4:
+        if event.keyval == Gtk.keysyms.F4:
             self.view_vnc_close()
-        if event.keyval == gtk.keysyms.F9:
+        if event.keyval == Gtk.keysyms.F9:
             self.view_message_box()
-        if event.keyval == gtk.keysyms.F10:
+        if event.keyval == Gtk.keysyms.F10:
             self.view_status()
-        if event.keyval == gtk.keysyms.F11:
+        if event.keyval == Gtk.keysyms.F11:
             self.view_fullscreen()
 
     ##############################################
@@ -623,7 +626,7 @@ class Program:
                         ((resize_vbox[2] and resize_vbox[2] == self.cfg.vnc_box[num][2]) or (
                                 not resize_vbox[2] and num == 0)) and
                         (self.cfg.vnc_box[num][0] == "empty" or self.cfg.vnc_box[num][13] != "custom")):
-                    gobject.timeout_add(100, self.thumbnails_scroll, self.cfg.vnc_box[num][28])
+                    GObject.timeout_add(100, self.thumbnails_scroll, self.cfg.vnc_box[num][28])
                     # Проверка
                 # for num in range(len(self.cfg.vnc_box)):
                 #	print num, self.cfg.vnc_box[num][1], "width="+str(self.cfg.vnc_box[num][4]), "height="+str(self.cfg.vnc_box[num][5]),\
@@ -641,7 +644,7 @@ class Program:
 
     def thumbnails_button(self, p, label, data=None):
         for w in p[2].get_children()[0].get_children():
-            if (type(w) == gtk.ToolButton or type(w) == gtk.ToggleToolButton) and w.get_label() == label:
+            if (type(w) == Gtk.ToolButton or type(w) == Gtk.ToggleToolButton) and w.get_label() == label:
                 if label == _("Size"):
                     if p[13] == "custom":
                         image = w.get_icon_widget()
@@ -749,7 +752,7 @@ class Program:
 
     def vnc_item_toolbar_drag_begin(self, widget, drag_context):
         alloc = widget.get_allocation()
-        pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, False, 8, alloc.width, alloc.height)
+        pixbuf = Gdk.Pixbuf(Gdk.COLORSPACE_RGB, False, 8, alloc.width, alloc.height)
         snapshot = pixbuf.get_from_drawable(widget.window, widget.get_colormap(), alloc.x, alloc.y, 0, 0, alloc.width,
                                             alloc.height)
         drag_context.set_icon_pixbuf(snapshot, 0, 0)
@@ -770,9 +773,9 @@ class Program:
     def vnc_item(self, p, connect="connect"):
         self.cfg.debug("vnc_item: " + p[1])
         if connect == "empty":
-            vnc = gtk.Frame()
+            vnc = Gtk.Frame()
         elif connect == "connect":
-            vnc = p[3] = gtkvnc.Display()
+            vnc = p[3] = GtkVnc.Display()
         elif connect == "reconnect":
             if p[3]:
                 p[3].close()
@@ -780,7 +783,7 @@ class Program:
                 p[3] = None
             for x in p[2].get_children():
                 p[2].remove(x)
-            vnc = p[3] = gtkvnc.Display()
+            vnc = p[3] = GtkVnc.Display()
         # gc.collect()
 
         name = p[1]
@@ -799,24 +802,24 @@ class Program:
         keyboard_grab = p[22]
         encoding = p[23]
 
-        toolbar = gtk.Toolbar()
+        toolbar = Gtk.Toolbar()
 
         TARGETS = [('TEXT', 0, 0)]
         toolbar.connect("drag_data_get", self.vnc_item_toolbar_drag_data_get, p)
         toolbar.connect('drag_begin', self.vnc_item_toolbar_drag_begin)
-        toolbar.drag_source_set(gtk.gdk.BUTTON1_MASK, TARGETS, gtk.gdk.ACTION_DEFAULT)
+        toolbar.drag_source_set(Gdk.BUTTON1_MASK, TARGETS, Gdk.ACTION_DEFAULT)
 
         toolbar.set_size_request(-1, self.cfg.tt_size)
-        toolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
-        toolbar.set_style(gtk.TOOLBAR_ICONS)
+        toolbar.set_orientation(Gtk.ORIENTATION_HORIZONTAL)
+        toolbar.set_style(Gtk.TOOLBAR_ICONS)
         toolbar.set_border_width(0)
         toolbar.set_tooltips(True)
 
-        label = gtk.Label(" " + name)
+        label = Gtk.Label(" " + name)
         label.set_alignment(0, 0.5)
-        label.modify_font(pango.FontDescription(self.cfg.fontThumbnails))
-        item = gtk.ToolItem()
-        item.set_expand(gtk.EXPAND)
+        label.modify_font(Pango.FontDescription(self.cfg.fontThumbnails))
+        item = Gtk.ToolItem()
+        item.set_expand(Gtk.EXPAND)
         item.add(label)
         toolbar.insert(item, -1)
 
@@ -835,7 +838,7 @@ class Program:
             button.connect("clicked", self.thumbnails_vnc_event_button, p, "screenshot")
             toolbar.insert(button, -1)
 
-        item = gtk.SeparatorToolItem()
+        item = Gtk.SeparatorToolItem()
         toolbar.insert(item, -1)
 
         if "up" in self.cfg.vncThumbnailsToolbar:
@@ -846,10 +849,10 @@ class Program:
 
         button = toolbar_button(None, self.cfg.tooltips, _("Size"))
         if size == "min":
-            image = gtk.Image()
+            image = Gtk.Image()
             image.set_from_pixbuf(self.cfg.pixbuf_action_window_max_16)
         else:
-            image = gtk.Image()
+            image = Gtk.Image()
             image.set_from_pixbuf(self.cfg.pixbuf_action_window_min_16)
         button.set_icon_widget(image)
         button.set_label(_("Size"))
@@ -914,7 +917,7 @@ class Program:
             elif encoding == "raw":
                 vnc.set_encoding("VNC_DISPLAY_ENCODING_RAW")
 
-        vnc.set_credential(gtkvnc.CREDENTIAL_PASSWORD, password)
+        vnc.set_credential(GtkVnc.CREDENTIAL_PASSWORD, password)
 
         vnc.connect("vnc-initialized", self.vnc_item_init, p)
         vnc.connect("vnc-disconnected", self.vnc_item_disconnect, p)
@@ -947,18 +950,18 @@ class Program:
             p[3].destroy()
             p[3] = None
         if p[2]:
-            if len(p[2].get_children()) == 2 and type(p[2].get_children()[1]) == gtk.Frame:
+            if len(p[2].get_children()) == 2 and type(p[2].get_children()[1]) == Gtk.Frame:
                 p[2].remove(p[2].get_children()[1])
             if len(p[2].get_children()) == 1:
-                frame = gtk.Frame()
+                frame = Gtk.Frame()
                 p[2].pack_start(frame, expand=True, fill=True, padding=0)
-                label = gtk.Label(label_error)
-                label.modify_font(pango.FontDescription(self.cfg.fontThumbnails))
+                label = Gtk.Label(label_error)
+                label.modify_font(Pango.FontDescription(self.cfg.fontThumbnails))
                 frame.add(label)
                 frame.show_all()
             toolbar = p[2].get_children()[0]
             for w in toolbar.get_children():
-                if type(w) == gtk.ToolButton or type(w) == gtk.ToggleToolButton:
+                if type(w) == Gtk.ToolButton or type(w) == Gtk.ToggleToolButton:
                     if (w.get_label() != _("Connect") and
                                 w.get_label() != _("Upstairs") and
                                 w.get_label() != _("Size") and
@@ -1026,13 +1029,13 @@ class Program:
                         row += 1
                     continue
 
-            vbox = gtk.VBox(False, 0)
+            vbox = Gtk.VBox(False, 0)
             vbox.connect("motion-notify-event", self.thumbnails_motion_event)
             vbox.set_size_request(new_thumb_x, new_thumb_y)
             # Рамка
-            frame = gtk.Frame()
-            label = gtk.Label(_("Connecting") + "...")
-            label.modify_font(pango.FontDescription(self.cfg.fontThumbnails))
+            frame = Gtk.Frame()
+            label = Gtk.Label(_("Connecting") + "...")
+            label.modify_font(Pango.FontDescription(self.cfg.fontThumbnails))
             frame.add(label)
             vbox.pack_start(frame, expand=True, fill=True, padding=0)
             vbox.show_all()
@@ -1157,9 +1160,9 @@ class Program:
                 p = x
                 break
         if p and p[2] and not p[25] and not p[26]:
-            frame = gtk.Frame()
+            frame = Gtk.Frame()
             frame.set_border_width(0)
-            frame.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("gray"))
+            frame.modify_bg(Gtk.STATE_NORMAL, Gdk.color_parse("gray"))
             vbox_alloc = p[2].get_allocation()
             frame.set_size_request(vbox_alloc.width + self.cfg.tt_border, vbox_alloc.height + self.cfg.tt_border)
             self.table_vnc.put(frame, vbox_alloc.x - int(self.cfg.tt_border * 1.5),
@@ -1167,10 +1170,10 @@ class Program:
             frame.show_all()
             p[25] = frame
 
-            ebox = gtk.EventBox()
+            ebox = Gtk.EventBox()
             ebox.set_visible_window(False)
 
-            image = gtk.Image()
+            image = Gtk.Image()
             image.set_from_pixbuf(self.cfg.pixbuf_action_resize_12)
             ebox.add(image)
             ebox.connect("button-press-event", self.thumbnails_resize_press, p)
@@ -1179,7 +1182,7 @@ class Program:
                                vbox_alloc.y + vbox_alloc.height - int(self.cfg.tt_border * 0.5) - 9)
             ebox.show_all()
             p[26] = ebox
-            gobject.timeout_add(100, self.thumbnails_frame_destroy, p)
+            GObject.timeout_add(100, self.thumbnails_frame_destroy, p)
 
     ##############################################
 
@@ -1270,7 +1273,7 @@ class Program:
         vbox.remove(vbox.get_children()[0])
 
         # только idle_add
-        gobject.idle_add(self.vnc_item, p, connect)
+        GObject.idle_add(self.vnc_item, p, connect)
         # sleep, иначе зависание(P5/P6). Больше 3 секунд!
         time.sleep(7)
         self.cfg.debug("-thumbnails_vnc_item end- " + z[0])
@@ -1498,7 +1501,7 @@ class Program:
 
     def context_menu(self, event, line_vnc_box=None):
         # line_vnc_box объекты из self.cfg.vnc_box
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
 
         if not line_vnc_box:
             if self.cfg.read_config("hide", "hide_viewer") == "n":
@@ -1526,7 +1529,7 @@ class Program:
             item.connect('activate', self.callback, "screenshot_all")
             menu.append(item)
 
-            item = gtk.SeparatorMenuItem()
+            item = Gtk.SeparatorMenuItem()
             menu.append(item)
 
             item = menu_image_button(self.cfg.pixbuf_action_window_min_16, _("Minimize all"))
@@ -1537,7 +1540,7 @@ class Program:
             item.connect('activate', self.view_vnc_close)
             menu.append(item)
 
-        item = gtk.SeparatorMenuItem()
+        item = Gtk.SeparatorMenuItem()
         menu.append(item)
 
         if self.cfg.read_config("hide", "hide_message") == "n":
@@ -1556,14 +1559,14 @@ class Program:
             menu.append(item)
 
         if self.cfg.read_config("hide", "hide_util") == "n":
-            item = gtk.SeparatorMenuItem()
+            item = Gtk.SeparatorMenuItem()
             menu.append(item)
 
             item = menu_image_button(self.cfg.pixbuf_home_16, _("Home folder"))
             item.connect("activate", self.callback, "folder_user")
             menu.append(item)
 
-            item = gtk.SeparatorMenuItem()
+            item = Gtk.SeparatorMenuItem()
             menu.append(item)
 
             item = menu_image_button(self.cfg.pixbuf_console_16, _("Console"))
@@ -1582,7 +1585,7 @@ class Program:
             item.connect('activate', self.callback, "run_root")
             menu.append(item)
 
-            item = gtk.SeparatorMenuItem()
+            item = Gtk.SeparatorMenuItem()
             menu.append(item)
 
             item = menu_image_button(self.cfg.pixbuf_process_16, _("View process"))
@@ -1593,7 +1596,7 @@ class Program:
             item.connect('activate', self.callback, "hwinfo")
             menu.append(item)
 
-            item = gtk.SeparatorMenuItem()
+            item = Gtk.SeparatorMenuItem()
             menu.append(item)
 
             item = menu_image_button(self.cfg.pixbuf_lock_16, _("Lock screen"))
@@ -1604,7 +1607,7 @@ class Program:
             item.connect('activate', self.callback, "unlock")
             menu.append(item)
 
-            item = gtk.SeparatorMenuItem()
+            item = Gtk.SeparatorMenuItem()
             menu.append(item)
 
             item = menu_image_button(self.cfg.pixbuf_block_16, _("Lock the input"))
@@ -1616,10 +1619,10 @@ class Program:
             menu.append(item)
 
         if self.cfg.read_config("hide", "hide_system_util") == "n":
-            item = gtk.SeparatorMenuItem()
+            item = Gtk.SeparatorMenuItem()
             menu.append(item)
 
-            menu_system = gtk.Menu()
+            menu_system = Gtk.Menu()
             item = menu_image_button(self.cfg.pixbuf_menu_system_16, "")
             item.set_submenu(menu_system)
             menu.append(item)
@@ -1671,13 +1674,13 @@ class Program:
 
     def tree_cell_data_func(self, column, renderer, model, iter, data):
         if self.cfg.tree_motion_select_row == model.get_path(iter):
-            renderer.set_property("weight", pango.WEIGHT_BOLD)
+            renderer.set_property("weight", Pango.WEIGHT_BOLD)
             # renderer.set_property("underline", pango.UNDERLINE_LOW)
             # renderer.set_property("foreground", "blue")
             pass
         else:
-            renderer.set_property("weight", pango.WEIGHT_NORMAL)
-            # renderer.set_property("underline", pango.UNDERLINE_NONE)
+            renderer.set_property("weight", Pango.WEIGHT_NORMAL)
+            # renderer.set_property("underline", Pango.UNDERLINE_NONE)
             # renderer.set_property("foreground", "black")
             pass
 
@@ -1706,7 +1709,7 @@ class Program:
         if self.cfg.treeInfoTooltip == "y":
             if self.tree_info.get_text() != "":
                 self.tree_info.set_text("")
-            if gtk.pygtk_version < (2, 12, 0):
+            if Gtk.pygtk_version < (2, 12, 0):
                 # Отображается под treeView
                 # self.cfg.tooltips.set_tip(treeView, info)
                 # self.cfg.tooltips.enable()
@@ -1737,9 +1740,9 @@ class Program:
                 tree_selection_enable(self.cfg.treeView, False)
                 # Обратно включить
                 # Можно через button-release-event, но после popup-menu надо лишнее нажатие кнопки
-                gobject.timeout_add(10, tree_selection_enable, self.cfg.treeView, True)
+                GObject.timeout_add(10, tree_selection_enable, self.cfg.treeView, True)
         # Действия
-        if event.type == gtk.gdk._2BUTTON_PRESS and self.cfg.read_config("hide", "hide_tree_add_remove") == "n":
+        if event.type == Gdk._2BUTTON_PRESS and self.cfg.read_config("hide", "hide_tree_add_remove") == "n":
             self.callback(None, "edit_tree_item")
         if event.button == 3:
             self.context_menu(event)
@@ -1748,9 +1751,9 @@ class Program:
 
     def mainUi(self, data=None):
 
-        self.vboxMain = gtk.VBox(False, 0)
-        self.cfg.table2 = gtk.Table(42, 28, True)
-        self.cfg.panedWindow = gtk.HPaned()
+        self.vboxMain = Gtk.VBox(False, 0)
+        self.cfg.table2 = Gtk.Table(42, 28, True)
+        self.cfg.panedWindow = Gtk.HPaned()
         self.cfg.panedWindow.pack1(self.vboxMain, resize=False, shrink=True)
         self.cfg.panedWindow.pack2(self.cfg.table2, resize=False, shrink=True)
         self.cfg.window.add(self.cfg.panedWindow)
@@ -1759,42 +1762,42 @@ class Program:
         #################
         # status
         #################
-        self.swStatus = gtk.ScrolledWindow()
-        self.swStatus.set_policy(gtk.POLICY_NEVER, gtk.POLICY_ALWAYS)
-        self.textviewStatus = gtk.TextView(self.cfg.bufferStatus)
+        self.swStatus = Gtk.ScrolledWindow()
+        self.swStatus.set_policy(Gtk.POLICY_NEVER, Gtk.POLICY_ALWAYS)
+        self.textviewStatus = Gtk.TextView(self.cfg.bufferStatus)
         self.textviewStatus.connect('size-allocate', self.status_changed)
         self.textviewStatus.set_property('editable', False)
         self.textviewStatus.set_cursor_visible(False)
-        # self.textviewStatus.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse("light gray"))
-        self.textviewStatus.modify_base(gtk.STATE_NORMAL, self.cfg.bg_color)
-        self.textviewStatus.modify_font(pango.FontDescription(self.cfg.fontStatus))
+        # self.textviewStatus.modify_base(Gtk.STATE_NORMAL, Gdk.color_parse("light gray"))
+        self.textviewStatus.modify_base(Gtk.STATE_NORMAL, self.cfg.bg_color)
+        self.textviewStatus.modify_font(Pango.FontDescription(self.cfg.fontStatus))
         self.swStatus.set_border_width(0)
         self.swStatus.add(self.textviewStatus)
-        # Похож по цвету на gtk.StatusBar
+        # Похож по цвету на Gtk.StatusBar
         # без Viewport() цвет не изменить
-        self.viewportStatus = gtk.Viewport()
+        self.viewportStatus = Gtk.Viewport()
         self.viewportStatus.add(self.swStatus)
 
         self.cfg.bufferStatus.insert(self.cfg.bufferStatus.get_end_iter(), "\n")
         self.cfg.status(_("Starting"))
 
-        self.cfg.treeView = gtk.TreeView(self.cfg.userList)
+        self.cfg.treeView = Gtk.TreeView(self.cfg.userList)
         self.cfg.treeView.set_rules_hint(True)
         self.cfg.treeView.set_enable_tree_lines(True)
-        # self.cfg.treeView.set_grid_lines(gtk.TREE_VIEW_GRID_LINES_VERTICAL)
+        # self.cfg.treeView.set_grid_lines(Gtk.TREE_VIEW_GRID_LINES_VERTICAL)
         self.cfg.treeView.set_headers_visible(True)
         self.cfg.treeView.set_headers_clickable(False)
-        self.cfg.treeView.modify_font(pango.FontDescription(self.cfg.fontTree))
-        # self.cfg.treeView.modify_base(gtk.STATE_SELECTED, gtk.gdk.color_parse("black"))
+        self.cfg.treeView.modify_font(Pango.FontDescription(self.cfg.fontTree))
+        # self.cfg.treeView.modify_base(Gtk.STATE_SELECTED, Gdk.color_parse("black"))
         self.cfg.treeView.connect("button-press-event", self.tree_button_press)
         self.cfg.treeView.connect("motion-notify-event", self.tree_motion_event)
-        self.cfg.treeView.set_events(gtk.gdk.POINTER_MOTION_MASK)
+        self.cfg.treeView.set_events(Gdk.POINTER_MOTION_MASK)
 
         # drag and drop
-        TARGETS = [('TREE_MAIN', gtk.TARGET_SAME_WIDGET, 0), ('TEXT', 0, 0)]
-        self.cfg.treeView.enable_model_drag_source(gtk.gdk.BUTTON1_MASK, TARGETS,
-                                                   gtk.gdk.ACTION_DEFAULT | gtk.gdk.ACTION_MOVE)
-        self.cfg.treeView.enable_model_drag_dest(TARGETS, gtk.gdk.ACTION_DEFAULT)
+        TARGETS = [('TREE_MAIN', Gtk.TARGET_SAME_WIDGET, 0), ('TEXT', 0, 0)]
+        self.cfg.treeView.enable_model_drag_source(Gdk.BUTTON1_MASK, TARGETS,
+                                                   Gdk.ACTION_DEFAULT | Gdk.ACTION_MOVE)
+        self.cfg.treeView.enable_model_drag_dest(TARGETS, Gdk.ACTION_DEFAULT)
         self.cfg.treeView.connect("drag_data_received", tree_drag_data_received, self.cfg)
         self.cfg.treeView.connect("drag_data_get", tree_drag_data_get, self.cfg)
         self.cfg.treeView.connect("leave-notify-event", self.tree_leave)
@@ -1808,39 +1811,39 @@ class Program:
         for x in self.cfg.z:
             i += 1
             if i == d['alias']:
-                column = gtk.TreeViewColumn(_("Alias"))
+                column = Gtk.TreeViewColumn(_("Alias"))
                 column.set_expand(True)
                 column.set_spacing(3)
 
-                cell = gtk.CellRendererPixbuf()
+                cell = Gtk.CellRendererPixbuf()
                 column.pack_start(cell, expand=False)
                 column.set_attributes(cell, pixbuf=100)
 
-                cell = gtk.CellRendererText()
+                cell = Gtk.CellRendererText()
                 cell.connect('edited', self.rename_group)
                 column.pack_start(cell, expand=True)
                 column.set_attributes(cell, text=i)
                 column.set_cell_data_func(cell, self.tree_cell_data_func, None)
                 for y in range(9):
-                    cell = gtk.CellRendererPixbuf()
+                    cell = Gtk.CellRendererPixbuf()
                     column.pack_start(cell, expand=False)
                     column.set_attributes(cell, pixbuf=101 + y)
             else:
-                cell = gtk.CellRendererText()
+                cell = Gtk.CellRendererText()
                 if i == d['user']:
-                    column = gtk.TreeViewColumn(_("User"), cell, text=i)
+                    column = Gtk.TreeViewColumn(_("User"), cell, text=i)
                 elif i == d['host']:
-                    column = gtk.TreeViewColumn(_("Host"), cell, text=i)
+                    column = Gtk.TreeViewColumn(_("Host"), cell, text=i)
                 elif i == d['ip']:
-                    column = gtk.TreeViewColumn(_("IP"), cell, text=i)
+                    column = Gtk.TreeViewColumn(_("IP"), cell, text=i)
                 elif i == d['server']:
-                    column = gtk.TreeViewColumn(_("Server"), cell, text=i)
+                    column = Gtk.TreeViewColumn(_("Server"), cell, text=i)
                 elif i == d['mac']:
-                    column = gtk.TreeViewColumn(_("MAC"), cell, text=i)
+                    column = Gtk.TreeViewColumn(_("MAC"), cell, text=i)
                 elif i == d['start_time']:
-                    column = gtk.TreeViewColumn(_("Time"), cell, text=i)
+                    column = Gtk.TreeViewColumn(_("Time"), cell, text=i)
                 else:
-                    column = gtk.TreeViewColumn(x, cell, text=i)
+                    column = Gtk.TreeViewColumn(x, cell, text=i)
                 column.set_expand(True)
             self.cfg.treeView.append_column(column)
 
@@ -1865,37 +1868,37 @@ class Program:
         cell.set_property("visible", True)
 
         self.treeSelection = self.cfg.treeView.get_selection()
-        self.treeSelection.set_mode(gtk.SELECTION_MULTIPLE)
-        self.sw = gtk.ScrolledWindow()
-        self.sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        self.sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self.treeSelection.set_mode(Gtk.SELECTION_MULTIPLE)
+        self.sw = Gtk.ScrolledWindow()
+        self.sw.set_shadow_type(Gtk.SHADOW_ETCHED_IN)
+        self.sw.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
         self.sw.add(self.cfg.treeView)
 
         ######################
         # fast messages and commands
         ######################
-        self.cfg.messageBox = gtk.ComboBoxEntry(self.cfg.messageList, column=0)
+        self.cfg.messageBox = Gtk.ComboBoxEntry(self.cfg.messageList, column=0)
         #
         self.fileButton = image_button(self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips, _("Select the file"))
         self.fileButton.connect("clicked", file_chooser_dialog, self.cfg.messageBox, _("Select the file"))
 
-        ebox = gtk.EventBox()
+        ebox = Gtk.EventBox()
         ebox.add(self.cfg.messageBox)
-        if gtk.pygtk_version < (2, 12, 0):
+        if Gtk.pygtk_version < (2, 12, 0):
             self.cfg.tooltips.set_tip(ebox, _("The input field of the messages, commands and file selection"))
         else:
             self.cfg.messageBox.set_tooltip_text(_("The input field of the messages, commands and file selection"))
 
-        self.hbox_entry = gtk.HBox(False, 0)
+        self.hbox_entry = Gtk.HBox(False, 0)
         self.hbox_entry.pack_start(ebox, expand=True, fill=True, padding=0)
         self.hbox_entry.pack_start(self.fileButton, expand=False, fill=False, padding=0)
 
         ################
         # main toolbar
         ################
-        self.toolbarMain = gtk.Toolbar()
-        self.toolbarMain.set_orientation(gtk.ORIENTATION_HORIZONTAL)
-        self.toolbarMain.set_style(gtk.TOOLBAR_ICONS)
+        self.toolbarMain = Gtk.Toolbar()
+        self.toolbarMain.set_orientation(Gtk.ORIENTATION_HORIZONTAL)
+        self.toolbarMain.set_style(Gtk.TOOLBAR_ICONS)
         self.toolbarMain.set_border_width(0)
         self.toolbarMain.set_tooltips(True)
 
@@ -1903,7 +1906,7 @@ class Program:
         button.connect('clicked', self.callback, "refresh")
         self.toolbarMain.insert(button, -1)
 
-        item = gtk.SeparatorToolItem()
+        item = Gtk.SeparatorToolItem()
         self.toolbarMain.insert(item, -1)
 
         button = toolbar_button(self.cfg.pixbuf_action_viewer, self.cfg.tooltips, _("Viewer"))
@@ -1921,7 +1924,7 @@ class Program:
         if self.cfg.read_config("hide", "hide_thumbnails") == "n":
             self.toolbarMain.insert(button, -1)
 
-        item = gtk.SeparatorToolItem()
+        item = Gtk.SeparatorToolItem()
         self.toolbarMain.insert(item, -1)
 
         button = toolbar_button(self.cfg.pixbuf_action_vnc_servers, self.cfg.tooltips, _("Demo"))
@@ -1939,9 +1942,9 @@ class Program:
         if self.cfg.read_config("hide", "hide_tree_add_remove") == "n":
             self.toolbarMain.insert(button, -1)
 
-        item = gtk.SeparatorToolItem()
+        item = Gtk.SeparatorToolItem()
         item.set_draw(False)
-        item.set_expand(gtk.EXPAND)
+        item.set_expand(Gtk.EXPAND)
         self.toolbarMain.insert(item, -1)
 
         # toolbar menu util
@@ -1953,7 +1956,7 @@ class Program:
         item.connect("activate", self.callback, "folder_user")
         button.append(item)
 
-        item = gtk.SeparatorMenuItem()
+        item = Gtk.SeparatorMenuItem()
         button.append(item)
 
         item = menu_image_button(self.cfg.pixbuf_console, _("Console"))
@@ -1972,7 +1975,7 @@ class Program:
         item.connect('activate', self.callback, "run_root")
         button.append(item)
 
-        item = gtk.SeparatorMenuItem()
+        item = Gtk.SeparatorMenuItem()
         button.append(item)
 
         item = menu_image_button(self.cfg.pixbuf_process, _("View process"))
@@ -1983,7 +1986,7 @@ class Program:
         item.connect('activate', self.callback, "hwinfo")
         button.append(item)
 
-        item = gtk.SeparatorMenuItem()
+        item = Gtk.SeparatorMenuItem()
         button.append(item)
 
         item = menu_image_button(self.cfg.pixbuf_lock, _("Lock screen"))
@@ -1994,7 +1997,7 @@ class Program:
         item.connect('activate', self.callback, "unlock")
         button.append(item)
 
-        item = gtk.SeparatorMenuItem()
+        item = Gtk.SeparatorMenuItem()
         button.append(item)
 
         item = menu_image_button(self.cfg.pixbuf_block, _("Lock the input"))
@@ -2029,9 +2032,9 @@ class Program:
         ##################
         # tree toolbar
         #################
-        self.toolbarTree = gtk.Toolbar()
-        self.toolbarTree.set_orientation(gtk.ORIENTATION_HORIZONTAL)
-        self.toolbarTree.set_style(gtk.TOOLBAR_ICONS)
+        self.toolbarTree = Gtk.Toolbar()
+        self.toolbarTree.set_orientation(Gtk.ORIENTATION_HORIZONTAL)
+        self.toolbarTree.set_style(Gtk.TOOLBAR_ICONS)
         self.toolbarTree.set_border_width(0)
         self.toolbarTree.set_tooltips(True)
 
@@ -2039,7 +2042,7 @@ class Program:
         button.connect('clicked', self.view_list)
         self.toolbarTree.insert(button, -1)
 
-        # item = gtk.SeparatorToolItem()
+        # item = Gtk.SeparatorToolItem()
         # self.toolbarTree.insert(item,-1)
 
         # toolbar menu
@@ -2069,23 +2072,23 @@ class Program:
             self.toolbarTree.insert(button, -1)
 
             button_up = image_button(self.cfg.pixbuf_list_arrow_up_16, None, self.cfg.tooltips, _("Move above"))
-            button_up.props.relief = gtk.RELIEF_NONE
+            button_up.props.relief = Gtk.RELIEF_NONE
             button_up.set_size_request(24, 12)
             button_up.connect("clicked", tree_move, self.cfg, self.cfg.treeView, "up")
             button_down = image_button(self.cfg.pixbuf_list_arrow_down_16, None, self.cfg.tooltips, _("Move below"))
-            button_down.props.relief = gtk.RELIEF_NONE
+            button_down.props.relief = Gtk.RELIEF_NONE
             button_down.set_size_request(24, 12)
             button_down.connect("clicked", tree_move, self.cfg, self.cfg.treeView, "down")
-            vbox = gtk.VBox(False, 0)
+            vbox = Gtk.VBox(False, 0)
             vbox.pack_start(button_up, expand=True, fill=False, padding=0)
             vbox.pack_start(button_down, expand=True, fill=False, padding=0)
-            item = gtk.ToolItem()
+            item = Gtk.ToolItem()
             item.add(vbox)
             self.toolbarTree.insert(item, -1)
 
-        self.tree_info = gtk.Label()
-        item = gtk.ToolItem()
-        item.set_expand(gtk.EXPAND)
+        self.tree_info = Gtk.Label()
+        item = Gtk.ToolItem()
+        item.set_expand(Gtk.EXPAND)
         item.add(self.tree_info)
         self.toolbarTree.insert(item, -1)
 
@@ -2113,21 +2116,21 @@ class Program:
         ############################
         # paned tree
         ############################
-        self.panedTree = gtk.HPaned()
+        self.panedTree = Gtk.HPaned()
         self.panedTree.add1(self.sw)
 
-        self.swVnc = gtk.ScrolledWindow()
-        self.swVnc.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self.swVnc = Gtk.ScrolledWindow()
+        self.swVnc.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
         self.panedTree.add2(self.swVnc)
 
-        self.table_vnc = gtk.Fixed()
+        self.table_vnc = Gtk.Fixed()
         self.table_vnc.set_border_width(10)
-        ebox = gtk.EventBox()
+        ebox = Gtk.EventBox()
         ebox.add(self.table_vnc)
         ebox.connect("motion-notify-event", self.table_vnc_motion_event)
 
         TARGETS = [('TEXT', 0, 0)]
-        self.table_vnc.drag_dest_set(gtk.DEST_DEFAULT_ALL, TARGETS, gtk.gdk.ACTION_DEFAULT)
+        self.table_vnc.drag_dest_set(Gtk.DEST_DEFAULT_ALL, TARGETS, Gdk.ACTION_DEFAULT)
         self.table_vnc.connect("drag_data_received", self.table_vnc_drag_data_received)
         self.table_vnc.connect('drag_motion', self.table_vnc_drag_data_motion)
         self.table_vnc.connect('drag_drop', self.table_vnc_drag_data_drop)
@@ -2143,20 +2146,20 @@ class Program:
         ##########
         # menu
         ##########
-        self.menuBar = gtk.MenuBar()
+        self.menuBar = Gtk.MenuBar()
         #
-        self.menuFile = gtk.Menu()
-        self.itemFile = gtk.MenuItem(_("File"))
+        self.menuFile = Gtk.Menu()
+        self.itemFile = Gtk.MenuItem(_("File"))
         self.itemFile.set_submenu(self.menuFile)
         self.menuBar.append(self.itemFile)
 
-        item = gtk.MenuItem(_("Quit"))
+        item = Gtk.MenuItem(_("Quit"))
         item.connect("activate", self.program_exit)
         self.menuFile.append(item)
 
         #
-        self.menuTools = gtk.Menu()
-        self.itemTools = gtk.MenuItem(_("Tools"))
+        self.menuTools = Gtk.Menu()
+        self.itemTools = Gtk.MenuItem(_("Tools"))
         self.itemTools.set_submenu(self.menuTools)
         self.menuBar.append(self.itemTools)
 
@@ -2194,7 +2197,7 @@ class Program:
             item.connect("activate", self.callback, "client_info")
             self.menuTools.append(item)
 
-        item = gtk.SeparatorMenuItem()
+        item = Gtk.SeparatorMenuItem()
         self.menuTools.append(item)
 
         item = menu_image_button(None, _("Log"))
@@ -2206,52 +2209,52 @@ class Program:
             item.connect("activate", self.callback, "settings")
             self.menuTools.append(item)
 
-        # self.itemLanguage = gtk.MenuItem(_("Language"))
+        # self.itemLanguage = Gtk.MenuItem(_("Language"))
         # self.itemLanguage.connect("activate", self.createLanguageWindow)
         # self.menuConfig.append(self.itemLanguage)
 
         #
-        self.menuView = gtk.Menu()
-        self.itemView = gtk.MenuItem(_("View"))
+        self.menuView = Gtk.Menu()
+        self.itemView = Gtk.MenuItem(_("View"))
         self.itemView.set_submenu(self.menuView)
         self.menuBar.append(self.itemView)
 
-        self.itemHideToolbarMain = gtk.CheckMenuItem(_("The upper toolbar"))
+        self.itemHideToolbarMain = Gtk.CheckMenuItem(_("The upper toolbar"))
         self.itemHideToolbarMain.set_active(True)
         self.itemHideToolbarMain.connect("activate", self.view_toolbar_main)
         self.menuView.append(self.itemHideToolbarMain)
 
-        self.itemHideToolbarTree = gtk.CheckMenuItem(_("The lower toolbar"))
+        self.itemHideToolbarTree = Gtk.CheckMenuItem(_("The lower toolbar"))
         self.itemHideToolbarTree.set_active(True)
         self.itemHideToolbarTree.connect("activate", self.view_toolbar_tree)
         self.menuView.append(self.itemHideToolbarTree)
 
-        self.itemHideMessageBox = gtk.CheckMenuItem(_("Input field") + "\t\t\t\t\tF9")
+        self.itemHideMessageBox = Gtk.CheckMenuItem(_("Input field") + "\t\t\t\t\tF9")
         self.itemHideMessageBox.set_active(True)
         self.itemHideMessageBox.connect("activate", self.view_message_box)
         self.menuView.append(self.itemHideMessageBox)
 
-        self.itemHideStatus = gtk.CheckMenuItem(_("Log") + "\t\t\t\t\t\tF10")
+        self.itemHideStatus = Gtk.CheckMenuItem(_("Log") + "\t\t\t\t\t\tF10")
         self.itemHideStatus.set_active(True)
         self.itemHideStatus.connect("activate", self.view_status)
         self.menuView.append(self.itemHideStatus)
 
-        item = gtk.SeparatorMenuItem()
+        item = Gtk.SeparatorMenuItem()
         self.menuView.append(item)
 
-        self.itemFullscreen = gtk.CheckMenuItem(_("Full screen") + "\t\t\t\t\tF11")
+        self.itemFullscreen = Gtk.CheckMenuItem(_("Full screen") + "\t\t\t\t\tF11")
         self.itemFullscreen.connect("activate", self.view_fullscreen)
         self.menuView.append(self.itemFullscreen)
 
-        item = gtk.SeparatorMenuItem()
+        item = Gtk.SeparatorMenuItem()
         self.menuView.append(item)
 
-        self.itemHideList = gtk.CheckMenuItem(_("Show/Hide the list") + "\t\t\tF2")
+        self.itemHideList = Gtk.CheckMenuItem(_("Show/Hide the list") + "\t\t\tF2")
         self.itemHideList.set_active(True)
         self.itemHideList.connect("activate", self.view_list)
         self.menuView.append(self.itemHideList)
 
-        item = gtk.SeparatorMenuItem()
+        item = Gtk.SeparatorMenuItem()
         self.menuView.append(item)
 
         self.itemVncMinimize = menu_image_button(self.cfg.pixbuf_action_window_min_16,
@@ -2265,16 +2268,16 @@ class Program:
         self.menuView.append(self.itemVncClose)
 
         #
-        self.menuHelp = gtk.Menu()
-        self.itemHelp = gtk.MenuItem(_("Help"))
+        self.menuHelp = Gtk.Menu()
+        self.itemHelp = Gtk.MenuItem(_("Help"))
         self.itemHelp.set_submenu(self.menuHelp)
         self.menuBar.append(self.itemHelp)
 
-        self.itemHelpProgram = gtk.MenuItem(_("Help") + "\t\tF1")
+        self.itemHelpProgram = Gtk.MenuItem(_("Help") + "\t\tF1")
         self.itemHelpProgram.connect("activate", about_dialog)
         self.menuHelp.append(self.itemHelpProgram)
 
-        self.itemAbout = gtk.MenuItem(_("About"))
+        self.itemAbout = Gtk.MenuItem(_("About"))
         self.itemAbout.connect("activate", about_dialog)
         self.menuHelp.append(self.itemAbout)
 
@@ -2425,7 +2428,7 @@ class Program:
     ##############################################
 
     def view_list(self, widget=None):
-        if type(widget) == gtk.ToolButton or not widget:
+        if type(widget) == Gtk.ToolButton or not widget:
             if self.itemHideList.get_active():
                 self.itemHideList.set_active(False)
             else:
@@ -2467,7 +2470,7 @@ class Program:
         self.cfg.demoUi = demoUi(self.cfg)
         self.timersUi = timersUi(self.cfg)
         #
-        gobject.timeout_add(3000, self.cfg.timers.start)
+        GObject.timeout_add(3000, self.cfg.timers.start)
 
     ##############################################
 
@@ -2492,8 +2495,8 @@ class Program:
 
     def table_vnc_drag_data_motion(self, widget, drag_context, x, y, time):
         if drag_context.get_source_widget() == self.cfg.treeView:
-            drag_context.drag_status(gtk.gdk.ACTION_LINK, time)
-        elif type(drag_context.get_source_widget()) == gtk.Toolbar:
+            drag_context.drag_status(Gdk.ACTION_LINK, time)
+        elif type(drag_context.get_source_widget()) == Gtk.Toolbar:
             # При наведении на миниатюру
             p_target = None
             for p in self.cfg.vnc_box:
@@ -2502,19 +2505,19 @@ class Program:
                     p_target = p[2]
                     break
             if p_target:
-                drag_context.drag_status(gtk.gdk.ACTION_MOVE, time)
+                drag_context.drag_status(Gdk.ACTION_MOVE, time)
                 self.thumbnails_motion_event(widget=p_target)
             else:
-                drag_context.drag_status(gtk.gdk.ACTION_PRIVATE, time)
+                drag_context.drag_status(Gdk.ACTION_PRIVATE, time)
                 return True
         else:
-            drag_context.drag_status(gtk.gdk.ACTION_PRIVATE, time)
+            drag_context.drag_status(Gdk.ACTION_PRIVATE, time)
             return True
 
     def table_vnc_drag_data_received(self, widget, drag_context, x, y, selection, target_type, time):
         if drag_context.get_source_widget() == self.cfg.treeView:
             self.callback(None, "thumbnails")
-        elif type(drag_context.get_source_widget()) == gtk.Toolbar:
+        elif type(drag_context.get_source_widget()) == Gtk.Toolbar:
             client_id = selection.data
             p_source = None
             p_source_index = None
@@ -2540,9 +2543,9 @@ class Program:
 
 ############################################################################################################################
 if __name__ == "__main__":
-    gobject.threads_init()
-    gtk.gdk.threads_init()
+    GObject.threads_init()
+    Gdk.threads_init()
     base = Program()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
+    Gdk.threads_enter()
+    Gtk.main()
+    Gdk.threads_leave()

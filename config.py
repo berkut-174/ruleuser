@@ -4,7 +4,7 @@
 ###################################################################################################
 # RuleUser
 # config.py
-# 
+#
 # Copyright (C) 2012,2013 Andrey Burbovskiy <xak-altsp@yandex.ru>
 # Copyright (C) 2017 Артем Проскурнев (Artem Proskurnev) <tema@proskurnev.name>
 # Поддерживается в Школе №830 г. Москва
@@ -35,13 +35,14 @@
 
 from __future__ import with_statement
 
+import gi
+from gi.repository import GObject, GdkPixbuf
+
 import ConfigParser
 import datetime
 import gettext
 import logging
 import logging.handlers as handlers
-
-import gobject
 
 _ = gettext.gettext
 
@@ -133,11 +134,12 @@ class cfg:
             if not os.path.exists(os.path.expanduser("~/.ruleuser")):
                 os.makedirs(os.path.expanduser("~/.ruleuser"))
         except:
-            print('System error create folder ' + os.path.expanduser('~/.ruleuser'))
+            print('System error create folder ' +
+                  os.path.expanduser('~/.ruleuser'))
             raise SystemExit
 
-        self.CountCommands=20
-        self.f=[]
+        self.CountCommands = 20
+        self.f = []
         self.timers = None
         self.logger = logging.getLogger('MyLogger')
         self.logger.setLevel(logging.DEBUG)
@@ -148,13 +150,14 @@ class cfg:
         self.config.read(configFile)
 
         #
-        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        self.window.set_icon(gtk.gdk.pixbuf_new_from_file(icon_path + "ruleuser_16.png"))
+        self.window = Gtk.Window(Gtk.WINDOW_TOPLEVEL)
+        self.window.set_icon(GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "ruleuser_16.png"))
         #
         self.global_widget()
 
-        # statusicon = gtk.StatusIcon()
-        # statusIcon = gtk.status_icon_new_from_file(icon_path+"ruleuser_16.png")
+        # statusicon = Gtk.StatusIcon()
+        # statusIcon = Gtk.status_icon_new_from_file(icon_path+"ruleuser_16.png")
         # statusicon.set_visible(True)
 
         # Курсор
@@ -365,7 +368,8 @@ class cfg:
         self.ps_command = "ps "
         self.netstat_command = "netstat "
 
-        self.known_desktop = ["kde3", "kde4", "kde5", "gnome2", "gnome3", "lxde", "xfce", "linux", "windows", "unknown"]
+        self.known_desktop = ["kde3", "kde4", "kde5", "gnome2",
+                              "gnome3", "lxde", "xfce", "linux", "windows", "unknown"]
         self.unknown_desktop = ["windows", "unknown"]
 
         self.message_system = {
@@ -416,42 +420,43 @@ class cfg:
         # Тема
         self.gtkrc = self.read_config("window", "gtkrc")
         if self.gtkrc != "":
-            gtk.rc_parse(os.path.expanduser(self.gtkrc))
+            Gtk.rc_parse(os.path.expanduser(self.gtkrc))
 
         self.phandle_size = 0
-        gtk.rc_parse_string("style 'my_style' {\n"
+        Gtk.rc_parse_string("style 'my_style' {\n"
                             "GtkPaned::handle-size = 0\n"
                             " }\n"
                             "widget '*' style 'my_style'")
-        gtk.rc_parse_string("gtk-menu-bar-accel = ''")
+        Gtk.rc_parse_string("gtk-menu-bar-accel = ''")
 
         self.slider_size = 15
-        gtk.rc_parse_string("style 'my_style' {\n"
+        Gtk.rc_parse_string("style 'my_style' {\n"
                             "GtkScrollbar::slider-width = 15\n"
                             "GtkScrollbar::trough-border = 0\n"
                             " }\n"
                             "widget '*' style 'my_style'")
         # F10 отключить
-        gtk.rc_parse_string("gtk-menu-bar-accel = ''")
+        Gtk.rc_parse_string("gtk-menu-bar-accel = ''")
 
     def global_widget(self):
         # журнал
-        self.bufferStatus = gtk.TextBuffer()
+        self.bufferStatus = Gtk.TextBuffer()
         #
         # Основной список
-        self.userList = gtk.TreeStore(*([str] * 100 + [gtk.gdk.Pixbuf] * 10))
+        self.userList = Gtk.TreeStore(*([str] * 100 + [GdkPixbuf.Pixbuf] * 10))
         self.userList.set_default_sort_func(None)
         #
         # тоже что и userList + картинки
-        self.demoList = gtk.TreeStore(*([str] * 100 + [gtk.gdk.Pixbuf] * 5))
+        self.demoList = Gtk.TreeStore(*([str] * 100 + [GdkPixbuf.Pixbuf] * 5))
         self.demoList.set_default_sort_func(None)
 
         #
         # number,action,start,command,icon,user_list[[],[]],timer_id
-        self.timersList = gtk.TreeStore(str, str, str, str, gtk.gdk.Pixbuf, gobject.TYPE_PYOBJECT, int)
+        self.timersList = Gtk.TreeStore(
+            str, str, str, str, GdkPixbuf.Pixbuf, GObject.TYPE_PYOBJECT, int)
         self.timersList.set_default_sort_func(None)
         #
-        self.messageList = gtk.ListStore(str)
+        self.messageList = Gtk.ListStore(str)
 
     #
 
@@ -482,10 +487,11 @@ class cfg:
         self.window.move(0, 0)
         self.window.set_resizable(True)
         self.window.resize(self.mainWindowX, self.mainWindowY)
-        self.window.set_size_request(self.min_mainWindowX, self.min_mainWindowY)
+        self.window.set_size_request(
+            self.min_mainWindowX, self.min_mainWindowY)
 
         self.fontDefault = self.read_config("tree", "font_default")
-        gtk.settings_get_default().props.gtk_font_name = self.fontDefault
+        Gtk.settings_get_default().props.gtk_font_name = self.fontDefault
 
         # IP адрес
         self.localIp = ""
@@ -503,12 +509,14 @@ class cfg:
             if text != "":
                 self.messageList.append([text])
 
-        self.logoutCommandUse = self.read_config("system", "logout_command_use")
+        self.logoutCommandUse = self.read_config(
+            "system", "logout_command_use")
         self.logoutCommand = self.read_config("system", "logout_command")
 
         self.vncThumbnailsX = int(self.read_config("vnc", "vnc_thumbnails_x"))
         self.vncThumbnailsY = int(self.read_config("vnc", "vnc_thumbnails_y"))
-        self.vncThumbnailsToolbar = self.read_config("vnc", "vnc_thumbnails_toolbar")
+        self.vncThumbnailsToolbar = self.read_config(
+            "vnc", "vnc_thumbnails_toolbar")
         self.vncShotFolder = self.read_config("vnc", "vnc_shot_folder")
         self.vncShotFolder = os.path.expanduser(self.vncShotFolder)
 
@@ -523,7 +531,8 @@ class cfg:
         self.demoVlcFps = self.read_config("vnc", "demo_vlc_fps")
         self.demoVlcVcodec = self.read_config("vnc", "demo_vlc_vcodec")
         self.demoVlcScaleFull = self.read_config("vnc", "demo_vlc_scale_full")
-        self.demoVlcScaleWindow = self.read_config("vnc", "demo_vlc_scale_window")
+        self.demoVlcScaleWindow = self.read_config(
+            "vnc", "demo_vlc_scale_window")
         self.demoVlcCaching = self.read_config("vnc", "demo_vlc_caching")
 
         self.vncServer = self.read_config("vnc", "vnc_server")
@@ -537,9 +546,10 @@ class cfg:
         self.fontStatus = self.read_config("tree", "font_status")
         self.fontThumbnails = self.read_config("tree", "font_thumbnails")
         self.checkDhcp = self.read_config("tree", "check_dhcp")
-        self.checkStatusInterval = self.read_config("tree", "check_status_interval")
+        self.checkStatusInterval = self.read_config(
+            "tree", "check_status_interval")
 
-        self.f=[]
+        self.f = []
         for i in range(self.CountCommands):
             self.f.append(self.read_config("command", "f" + str(i+1)))
         # self.f1 = self.read_config("command", "f1")
@@ -569,9 +579,12 @@ class cfg:
         self.gtkrc = self.read_config("window", "gtkrc")
 
         self.ssh_options = self.read_config("ssh", "ssh_options")
-        self.ssh = "ssh " + self.ssh_options + " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no "
-        self.scp = "scp " + self.ssh_options + " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no -r "
-        self.sshfs = "sshfs " + self.ssh_options + " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no "
+        self.ssh = "ssh " + self.ssh_options + \
+            " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no "
+        self.scp = "scp " + self.ssh_options + \
+            " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no -r "
+        self.sshfs = "sshfs " + self.ssh_options + \
+            " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no "
 
     def ssh_command(self, key, port, user, ip, mode=""):
         # print mode, user, ip
@@ -580,154 +593,266 @@ class cfg:
     def read_icons(self):
 
         # gtk icon theme
-        # settings = gtk.settings_get_default()
+        # settings = Gtk.settings_get_default()
         # settings.set_string_property("gtk-icon-theme-name", "", "")
-        self.icon_theme = gtk.icon_theme_get_default()
+        self.icon_theme = Gtk.icon_theme_get_default()
         self.icon_theme.prepend_search_path(icon_path)
         # self.list_icons = self.icon_theme.list_icons()
         # self.icon_theme.load_icon(icon_name,16,0)
 
-        self.pixbuf_list_hide0_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_hide0_16.png")
-        self.pixbuf_list_hide1_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_hide1_16.png")
-        self.pixbuf_list_add_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_add_16.png")
-        self.pixbuf_list_remove_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_remove_16.png")
-        self.pixbuf_list_transfer_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_transfer_16.png")
-        self.pixbuf_list_up_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_up_16.png")
-        self.pixbuf_list_edit_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_edit_16.png")
-        self.pixbuf_list_clear_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_clear_16.png")
-        self.pixbuf_list_play_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_play_16.png")
-        self.pixbuf_list_stop_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_stop_16.png")
-        self.pixbuf_list_save_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_save_16.png")
-        self.pixbuf_list_file_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_file_16.png")
-        self.pixbuf_list_link_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_file_link_16.png")
-        self.pixbuf_list_mount_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_file_mount_16.png")
-        self.pixbuf_list_file_hide_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_file_hide_16.png")
-        self.pixbuf_list_folder_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_folder_16.png")
-        self.pixbuf_list_file_add_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_file_add_16.png")
-        self.pixbuf_list_folder_add_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_folder_add_16.png")
-        self.pixbuf_list_file_copy_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_file_copy_16.png")
-        self.pixbuf_list_file_paste_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_file_paste_16.png")
-        self.pixbuf_list_file_edit_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_file_edit_16.png")
-        self.pixbuf_list_file_remove_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_file_remove_16.png")
-        self.pixbuf_list_file_send_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_file_send_16.png")
-        self.pixbuf_list_file_up_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_file_up_16.png")
+        self.pixbuf_list_hide0_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_hide0_16.png")
+        self.pixbuf_list_hide1_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_hide1_16.png")
+        self.pixbuf_list_add_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_add_16.png")
+        self.pixbuf_list_remove_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_remove_16.png")
+        self.pixbuf_list_transfer_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_transfer_16.png")
+        self.pixbuf_list_up_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_up_16.png")
+        self.pixbuf_list_edit_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_edit_16.png")
+        self.pixbuf_list_clear_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_clear_16.png")
+        self.pixbuf_list_play_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_play_16.png")
+        self.pixbuf_list_stop_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_stop_16.png")
+        self.pixbuf_list_save_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_save_16.png")
+        self.pixbuf_list_file_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_file_16.png")
+        self.pixbuf_list_link_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_file_link_16.png")
+        self.pixbuf_list_mount_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_file_mount_16.png")
+        self.pixbuf_list_file_hide_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_file_hide_16.png")
+        self.pixbuf_list_folder_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_folder_16.png")
+        self.pixbuf_list_file_add_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_file_add_16.png")
+        self.pixbuf_list_folder_add_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_folder_add_16.png")
+        self.pixbuf_list_file_copy_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_file_copy_16.png")
+        self.pixbuf_list_file_paste_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_file_paste_16.png")
+        self.pixbuf_list_file_edit_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_file_edit_16.png")
+        self.pixbuf_list_file_remove_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_file_remove_16.png")
+        self.pixbuf_list_file_send_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_file_send_16.png")
+        self.pixbuf_list_file_up_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_file_up_16.png")
 
-        self.pixbuf_action_resize_12 = gtk.gdk.pixbuf_new_from_file(icon_path + "action_resize_12.png")
+        self.pixbuf_action_resize_12 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_resize_12.png")
 
-        self.pixbuf_action_close_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "action_close_16.png")
+        self.pixbuf_action_close_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_close_16.png")
 
-        self.pixbuf_action_send_message_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "action_send_message_16.png")
-        self.pixbuf_action_run_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "action_run_16.png")
+        self.pixbuf_action_send_message_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_send_message_16.png")
+        self.pixbuf_action_run_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_run_16.png")
 
-        self.pixbuf_action_refresh_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "action_refresh_16.png")
-        self.pixbuf_action_refresh = gtk.gdk.pixbuf_new_from_file(icon_path + "action_refresh_32.png")
+        self.pixbuf_action_refresh_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_refresh_16.png")
+        self.pixbuf_action_refresh = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_refresh_32.png")
 
-        self.pixbuf_action_viewer_16 = gtk.gdk.pixbuf_new_from_file(icon_path + 'action_viewer_16.png')
-        self.pixbuf_action_viewer = gtk.gdk.pixbuf_new_from_file(icon_path + "action_viewer_32.png")
+        self.pixbuf_action_viewer_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + 'action_viewer_16.png')
+        self.pixbuf_action_viewer = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_viewer_32.png")
 
-        self.pixbuf_action_control_16 = gtk.gdk.pixbuf_new_from_file(icon_path + 'action_control_16.png')
-        self.pixbuf_action_control = gtk.gdk.pixbuf_new_from_file(icon_path + "action_control_32.png")
+        self.pixbuf_action_control_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + 'action_control_16.png')
+        self.pixbuf_action_control = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_control_32.png")
 
-        self.pixbuf_action_screenshot_16 = gtk.gdk.pixbuf_new_from_file(icon_path + 'action_screenshot_16.png')
+        self.pixbuf_action_screenshot_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + 'action_screenshot_16.png')
 
-        self.pixbuf_action_thumbnails_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "action_thumbnails_16.png")
-        self.pixbuf_action_thumbnails = gtk.gdk.pixbuf_new_from_file(icon_path + "action_thumbnails_32.png")
+        self.pixbuf_action_thumbnails_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_thumbnails_16.png")
+        self.pixbuf_action_thumbnails = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_thumbnails_32.png")
 
-        self.pixbuf_action_vnc_servers = gtk.gdk.pixbuf_new_from_file(icon_path + "action_vnc_servers_32.png")
+        self.pixbuf_action_vnc_servers = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_vnc_servers_32.png")
 
-        self.pixbuf_action_timers = gtk.gdk.pixbuf_new_from_file(icon_path + "action_timers_32.png")
+        self.pixbuf_action_timers = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_timers_32.png")
 
-        self.pixbuf_action_user_info_16 = gtk.gdk.pixbuf_new_from_file(icon_path + 'action_user_info_16.png')
-        self.pixbuf_action_user_info = gtk.gdk.pixbuf_new_from_file(icon_path + "action_user_info_32.png")
+        self.pixbuf_action_user_info_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + 'action_user_info_16.png')
+        self.pixbuf_action_user_info = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_user_info_32.png")
 
-        self.pixbuf_action_window_min_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "action_window_min_16.png")
-        self.pixbuf_action_window_max_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "action_window_max_16.png")
-        self.pixbuf_action_window_up_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "action_window_up_16.png")
-        self.pixbuf_action_window_connect_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "action_window_connect_16.png")
-        self.pixbuf_action_window_close_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "action_window_close_16.png")
+        self.pixbuf_action_window_min_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_window_min_16.png")
+        self.pixbuf_action_window_max_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_window_max_16.png")
+        self.pixbuf_action_window_up_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_window_up_16.png")
+        self.pixbuf_action_window_connect_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_window_connect_16.png")
+        self.pixbuf_action_window_close_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "action_window_close_16.png")
 
-        self.pixbuf_st = gtk.gdk.pixbuf_new_from_file(icon_path + "st_32.png")
-        self.pixbuf_server = gtk.gdk.pixbuf_new_from_file(icon_path + "server_32.png")
+        self.pixbuf_st = GdkPixbuf.Pixbuf.new_from_file(icon_path + "st_32.png")
+        self.pixbuf_server = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "server_32.png")
 
-        self.pixbuf_menu_util_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "menu_util_16.png")
-        self.pixbuf_menu_util = gtk.gdk.pixbuf_new_from_file(icon_path + "menu_util_32.png")
-        self.pixbuf_menu_system_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "menu_system_16.png")
-        self.pixbuf_menu_system = gtk.gdk.pixbuf_new_from_file(icon_path + "menu_system_32.png")
+        self.pixbuf_menu_util_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "menu_util_16.png")
+        self.pixbuf_menu_util = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "menu_util_32.png")
+        self.pixbuf_menu_system_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "menu_system_16.png")
+        self.pixbuf_menu_system = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "menu_system_32.png")
 
         #
-        self.pixbuf_lock_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "system_lock_16.png")
-        self.pixbuf_lock = gtk.gdk.pixbuf_new_from_file(icon_path + "system_lock_22.png")
-        self.pixbuf_unlock_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "system_unlock_16.png")
-        self.pixbuf_unlock = gtk.gdk.pixbuf_new_from_file(icon_path + "system_unlock_22.png")
+        self.pixbuf_lock_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_lock_16.png")
+        self.pixbuf_lock = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_lock_22.png")
+        self.pixbuf_unlock_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_unlock_16.png")
+        self.pixbuf_unlock = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_unlock_22.png")
 
-        self.pixbuf_block_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "system_block_16.png")
-        self.pixbuf_block = gtk.gdk.pixbuf_new_from_file(icon_path + "system_block_22.png")
-        self.pixbuf_unblock_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "system_unblock_16.png")
-        self.pixbuf_unblock = gtk.gdk.pixbuf_new_from_file(icon_path + "system_unblock_22.png")
+        self.pixbuf_block_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_block_16.png")
+        self.pixbuf_block = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_block_22.png")
+        self.pixbuf_unblock_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_unblock_16.png")
+        self.pixbuf_unblock = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_unblock_22.png")
 
-        self.pixbuf_home_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "system_home_16.png")
-        self.pixbuf_home = gtk.gdk.pixbuf_new_from_file(icon_path + "system_home_22.png")
+        self.pixbuf_home_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_home_16.png")
+        self.pixbuf_home = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_home_22.png")
 
-        self.pixbuf_console_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "system_console_16.png")
-        self.pixbuf_console = gtk.gdk.pixbuf_new_from_file(icon_path + "system_console_22.png")
+        self.pixbuf_console_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_console_16.png")
+        self.pixbuf_console = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_console_22.png")
 
-        self.pixbuf_console_root_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "system_console_root_16.png")
-        self.pixbuf_console_root = gtk.gdk.pixbuf_new_from_file(icon_path + "system_console_root_22.png")
-        self.pixbuf_run_root_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "system_run_root_16.png")
-        self.pixbuf_run_root = gtk.gdk.pixbuf_new_from_file(icon_path + "system_run_root_22.png")
+        self.pixbuf_console_root_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_console_root_16.png")
+        self.pixbuf_console_root = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_console_root_22.png")
+        self.pixbuf_run_root_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_run_root_16.png")
+        self.pixbuf_run_root = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_run_root_22.png")
 
-        self.pixbuf_process_16 = gtk.gdk.pixbuf_new_from_file(icon_path + 'system_process_16.png')
-        self.pixbuf_process = gtk.gdk.pixbuf_new_from_file(icon_path + "system_process_22.png")
-        self.pixbuf_hwinfo_16 = gtk.gdk.pixbuf_new_from_file(icon_path + 'system_hwinfo_16.png')
-        self.pixbuf_hwinfo = gtk.gdk.pixbuf_new_from_file(icon_path + "system_hwinfo_22.png")
+        self.pixbuf_process_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + 'system_process_16.png')
+        self.pixbuf_process = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_process_22.png")
+        self.pixbuf_hwinfo_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + 'system_hwinfo_16.png')
+        self.pixbuf_hwinfo = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_hwinfo_22.png")
 
-        self.pixbuf_turn_on_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "system_turn_on_16.png")
-        self.pixbuf_turn_on = gtk.gdk.pixbuf_new_from_file(icon_path + "system_turn_on_22.png")
-        self.pixbuf_logout_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "system_logout_16.png")
-        self.pixbuf_logout = gtk.gdk.pixbuf_new_from_file(icon_path + "system_logout_22.png")
-        self.pixbuf_reboot_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "system_reboot_16.png")
-        self.pixbuf_reboot = gtk.gdk.pixbuf_new_from_file(icon_path + "system_reboot_22.png")
-        self.pixbuf_shutdown_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "system_shutdown_16.png")
-        self.pixbuf_shutdown = gtk.gdk.pixbuf_new_from_file(icon_path + "system_shutdown_22.png")
+        self.pixbuf_turn_on_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_turn_on_16.png")
+        self.pixbuf_turn_on = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_turn_on_22.png")
+        self.pixbuf_logout_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_logout_16.png")
+        self.pixbuf_logout = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_logout_22.png")
+        self.pixbuf_reboot_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_reboot_16.png")
+        self.pixbuf_reboot = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_reboot_22.png")
+        self.pixbuf_shutdown_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_shutdown_16.png")
+        self.pixbuf_shutdown = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "system_shutdown_22.png")
 
-        self.pixbuf_status_autostart_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_autostart_16.png")
-        self.pixbuf_status_group_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_group_16.png")
-        self.pixbuf_status_server_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_server_16.png")
-        self.pixbuf_status_server_off_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_server_off_16.png")
+        self.pixbuf_status_autostart_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_autostart_16.png")
+        self.pixbuf_status_group_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_group_16.png")
+        self.pixbuf_status_server_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_server_16.png")
+        self.pixbuf_status_server_off_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_server_off_16.png")
 
-        self.pixbuf_status_up_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_up_16.png")
-        self.pixbuf_status_down_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_down_16.png")
-        self.pixbuf_status_unknown_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_unknown_16.png")
-        self.pixbuf_status_timer_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_timer_16.png")
-        self.pixbuf_status_xdmcp_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_xdmcp_16.png")
-        self.pixbuf_status_st_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_st_16.png")
-        self.pixbuf_status_nx_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_nx_16.png")
+        self.pixbuf_status_up_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_up_16.png")
+        self.pixbuf_status_down_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_down_16.png")
+        self.pixbuf_status_unknown_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_unknown_16.png")
+        self.pixbuf_status_timer_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_timer_16.png")
+        self.pixbuf_status_xdmcp_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_xdmcp_16.png")
+        self.pixbuf_status_st_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_st_16.png")
+        self.pixbuf_status_nx_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_nx_16.png")
 
-        self.pixbuf_status_kde3_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_kde3_16.png")
-        self.pixbuf_status_kde4_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_kde4_16.png")
-        self.pixbuf_status_gnome2_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_gnome2_16.png")
-        self.pixbuf_status_gnome3_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_gnome3_16.png")
-        self.pixbuf_status_lxde_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_lxde_16.png")
-        self.pixbuf_status_xfce_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_xfce_16.png")
-        self.pixbuf_status_linux_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_linux_16.png")
-        self.pixbuf_status_windows_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_windows_16.png")
+        self.pixbuf_status_kde3_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_kde3_16.png")
+        self.pixbuf_status_kde4_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_kde4_16.png")
+        self.pixbuf_status_gnome2_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_gnome2_16.png")
+        self.pixbuf_status_gnome3_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_gnome3_16.png")
+        self.pixbuf_status_lxde_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_lxde_16.png")
+        self.pixbuf_status_xfce_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_xfce_16.png")
+        self.pixbuf_status_linux_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_linux_16.png")
+        self.pixbuf_status_windows_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_windows_16.png")
 
-        self.pixbuf_list_play_fullscreen_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_play_fullscreen_16.png")
-        self.pixbuf_list_play_window_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_play_window_16.png")
-        self.pixbuf_list_play_file_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_play_file_16.png")
+        self.pixbuf_list_play_fullscreen_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_play_fullscreen_16.png")
+        self.pixbuf_list_play_window_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_play_window_16.png")
+        self.pixbuf_list_play_file_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_play_file_16.png")
 
-        self.pixbuf_list_arrow_up_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_arrow_up_16.png")
-        self.pixbuf_list_arrow_down_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "list_arrow_down_16.png")
+        self.pixbuf_list_arrow_up_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_arrow_up_16.png")
+        self.pixbuf_list_arrow_down_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "list_arrow_down_16.png")
 
-        self.pixbuf_status_vlc_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_vlc_16.png")
-        self.pixbuf_status_vlc_audio_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_vlc_audio_16.png")
-        self.pixbuf_status_vnc_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_vnc_16.png")
-        self.pixbuf_status_direct_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_direct_16.png")
-        self.pixbuf_status_ssh_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_ssh_16.png")
-        self.pixbuf_status_http_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_http_16.png")
-        self.pixbuf_status_multicast_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_multicast_16.png")
-        self.pixbuf_status_demo_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_demo_16.png")
-        self.pixbuf_status_demo_client_16 = gtk.gdk.pixbuf_new_from_file(icon_path + "status_demo_client_16.png")
+        self.pixbuf_status_vlc_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_vlc_16.png")
+        self.pixbuf_status_vlc_audio_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_vlc_audio_16.png")
+        self.pixbuf_status_vnc_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_vnc_16.png")
+        self.pixbuf_status_direct_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_direct_16.png")
+        self.pixbuf_status_ssh_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_ssh_16.png")
+        self.pixbuf_status_http_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_http_16.png")
+        self.pixbuf_status_multicast_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_multicast_16.png")
+        self.pixbuf_status_demo_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_demo_16.png")
+        self.pixbuf_status_demo_client_16 = GdkPixbuf.Pixbuf.new_from_file(
+            icon_path + "status_demo_client_16.png")
 
     def debug(self, text):
         if self.debug_enable:
@@ -737,15 +862,17 @@ class cfg:
     def status(self, text, status=True, log_alert=False):
         time = datetime.datetime.now()
         if log_alert:
-            text_status = "\n" + time.strftime(" %H:%M:%S ") + "--> " + _("Log")
-            gobject.idle_add(self.status_insert, text_status)
+            text_status = "\n" + \
+                time.strftime(" %H:%M:%S ") + "--> " + _("Log")
+            GObject.idle_add(self.status_insert, text_status)
         elif status:
             if len(text) > 150:
-                text_status = "\n" + time.strftime(" %H:%M:%S ") + "--> " + _("Log")
-                gobject.idle_add(self.status_insert, text_status)
+                text_status = "\n" + \
+                    time.strftime(" %H:%M:%S ") + "--> " + _("Log")
+                GObject.idle_add(self.status_insert, text_status)
             else:
                 text_status = "\n" + time.strftime(" %H:%M:%S ") + text
-                gobject.idle_add(self.status_insert, text_status)
+                GObject.idle_add(self.status_insert, text_status)
 
         text_log = time.strftime("%d.%m.%y %H:%M:%S ") + text
         self.logger.debug(text_log)
@@ -813,7 +940,8 @@ class logFileHandler(handlers.TimedRotatingFileHandler):
     def __init__(self, filename, mode='a', maxBytes=1000, backupCount=0, encoding=None, interval=1, when='h'):
         if maxBytes > 0:
             mode = 'a'
-        handlers.TimedRotatingFileHandler.__init__(self, filename, when, interval, backupCount, encoding)
+        handlers.TimedRotatingFileHandler.__init__(
+            self, filename, when, interval, backupCount, encoding)
         self.maxBytes = maxBytes
 
     def shouldRollover(self, record):
