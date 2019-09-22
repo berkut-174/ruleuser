@@ -121,9 +121,9 @@ class Program:
         else:
             self.cfg.debug_enable = False
 
-        if Gtk.pygtk_version < (2, 12, 0):
-            self.cfg.tooltips = Gtk.Tooltips()
-        else:
+        # if Gtk.pygtk_version < (2, 12, 0):
+        #     self.cfg.tooltips = Gtk.Tooltips()
+        # else:
             self.cfg.tooltips = Gtk.Tooltip()
 
         self.cfg.gtkvnc = False
@@ -154,7 +154,7 @@ class Program:
         self.window = self.cfg.window
         self.cfg.maximized = False
         self.cfg.fullscreen = False
-        self.cfg.bg_color = self.window.get_style().copy().bg[Gtk.STATE_NORMAL]
+        # self.cfg.bg_color = self.window.get_style().copy().bg[Gtk.STATE_NORMAL]
         self.window.set_title(" RuleUser ")
         self.window.connect('check-resize', self.window_resize_event)
         self.window.connect("window-state-event", self.window_state_event)
@@ -1674,12 +1674,12 @@ class Program:
 
     def tree_cell_data_func(self, column, renderer, model, iter, data):
         if self.cfg.tree_motion_select_row == model.get_path(iter):
-            renderer.set_property("weight", Pango.WEIGHT_BOLD)
+            # renderer.set_property("weight", Pango.WEIGHT_BOLD)
             # renderer.set_property("underline", pango.UNDERLINE_LOW)
             # renderer.set_property("foreground", "blue")
             pass
         else:
-            renderer.set_property("weight", Pango.WEIGHT_NORMAL)
+            # renderer.set_property("weight", Pango.WEIGHT_NORMAL)
             # renderer.set_property("underline", Pango.UNDERLINE_NONE)
             # renderer.set_property("foreground", "black")
             pass
@@ -1763,13 +1763,13 @@ class Program:
         # status
         #################
         self.swStatus = Gtk.ScrolledWindow()
-        self.swStatus.set_policy(Gtk.POLICY_NEVER, Gtk.POLICY_ALWAYS)
-        self.textviewStatus = Gtk.TextView(self.cfg.bufferStatus)
+        # self.swStatus.set_policy(Gtk.POLICY_NEVER, Gtk.POLICY_ALWAYS)
+        self.textviewStatus = Gtk.TextView(buffer=self.cfg.bufferStatus)
         self.textviewStatus.connect('size-allocate', self.status_changed)
         self.textviewStatus.set_property('editable', False)
         self.textviewStatus.set_cursor_visible(False)
         # self.textviewStatus.modify_base(Gtk.STATE_NORMAL, Gdk.color_parse("light gray"))
-        self.textviewStatus.modify_base(Gtk.STATE_NORMAL, self.cfg.bg_color)
+        # self.textviewStatus.modify_base(Gtk.STATE_NORMAL, self.cfg.bg_color)
         self.textviewStatus.modify_font(Pango.FontDescription(self.cfg.fontStatus))
         self.swStatus.set_border_width(0)
         self.swStatus.add(self.textviewStatus)
@@ -1791,17 +1791,17 @@ class Program:
         # self.cfg.treeView.modify_base(Gtk.STATE_SELECTED, Gdk.color_parse("black"))
         self.cfg.treeView.connect("button-press-event", self.tree_button_press)
         self.cfg.treeView.connect("motion-notify-event", self.tree_motion_event)
-        self.cfg.treeView.set_events(Gdk.POINTER_MOTION_MASK)
+        # self.cfg.treeView.set_events(Gdk.POINTER_MOTION_MASK)
 
         # drag and drop
-        TARGETS = [('TREE_MAIN', Gtk.TARGET_SAME_WIDGET, 0), ('TEXT', 0, 0)]
-        self.cfg.treeView.enable_model_drag_source(Gdk.BUTTON1_MASK, TARGETS,
-                                                   Gdk.ACTION_DEFAULT | Gdk.ACTION_MOVE)
-        self.cfg.treeView.enable_model_drag_dest(TARGETS, Gdk.ACTION_DEFAULT)
-        self.cfg.treeView.connect("drag_data_received", tree_drag_data_received, self.cfg)
-        self.cfg.treeView.connect("drag_data_get", tree_drag_data_get, self.cfg)
-        self.cfg.treeView.connect("leave-notify-event", self.tree_leave)
-        self.cfg.treeView.connect("drag_motion", tree_drag_data_motion)
+        # TARGETS = [('TREE_MAIN', Gtk.TARGET_SAME_WIDGET, 0), ('TEXT', 0, 0)]
+        # self.cfg.treeView.enable_model_drag_source(Gdk.BUTTON1_MASK, TARGETS,
+        #                                            Gdk.ACTION_DEFAULT | Gdk.ACTION_MOVE)
+        # self.cfg.treeView.enable_model_drag_dest(TARGETS, Gdk.ACTION_DEFAULT)
+        # self.cfg.treeView.connect("drag_data_received", tree_drag_data_received, self.cfg)
+        # self.cfg.treeView.connect("drag_data_get", tree_drag_data_get, self.cfg)
+        # self.cfg.treeView.connect("leave-notify-event", self.tree_leave)
+        # self.cfg.treeView.connect("drag_motion", tree_drag_data_motion)
 
         d = {}
         for x in range(len(self.cfg.z)):
@@ -1864,43 +1864,43 @@ class Program:
                 column.set_visible(False)
 
         column = self.cfg.treeView.get_column(0)
-        cell = column.get_cell_renderers()[1]
+        cell = column.get_cells()[1]
         cell.set_property("visible", True)
 
         self.treeSelection = self.cfg.treeView.get_selection()
-        self.treeSelection.set_mode(Gtk.SELECTION_MULTIPLE)
+        # self.treeSelection.set_mode(Gtk.SELECTION_MULTIPLE)
         self.sw = Gtk.ScrolledWindow()
-        self.sw.set_shadow_type(Gtk.SHADOW_ETCHED_IN)
-        self.sw.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
+        # self.sw.set_shadow_type(Gtk.SHADOW_ETCHED_IN)
+        # self.sw.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
         self.sw.add(self.cfg.treeView)
 
         ######################
         # fast messages and commands
         ######################
-        self.cfg.messageBox = Gtk.ComboBoxEntry(self.cfg.messageList, column=0)
+        # self.cfg.messageBox = Gtk.ComboBoxEntry(self.cfg.messageList, column=0)
         #
-        self.fileButton = image_button(self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips, _("Select the file"))
-        self.fileButton.connect("clicked", file_chooser_dialog, self.cfg.messageBox, _("Select the file"))
+        # self.fileButton = image_button(self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips, _("Select the file"))
+        # self.fileButton.connect("clicked", file_chooser_dialog, self.cfg.messageBox, _("Select the file"))
 
-        ebox = Gtk.EventBox()
-        ebox.add(self.cfg.messageBox)
-        if Gtk.pygtk_version < (2, 12, 0):
-            self.cfg.tooltips.set_tip(ebox, _("The input field of the messages, commands and file selection"))
-        else:
-            self.cfg.messageBox.set_tooltip_text(_("The input field of the messages, commands and file selection"))
+        # ebox = Gtk.EventBox()
+        # ebox.add(self.cfg.messageBox)
+        # if Gtk.pygtk_version < (2, 12, 0):
+        #     self.cfg.tooltips.set_tip(ebox, _("The input field of the messages, commands and file selection"))
+        # else:
+        #     self.cfg.messageBox.set_tooltip_text(_("The input field of the messages, commands and file selection"))
 
-        self.hbox_entry = Gtk.HBox(False, 0)
-        self.hbox_entry.pack_start(ebox, expand=True, fill=True, padding=0)
-        self.hbox_entry.pack_start(self.fileButton, expand=False, fill=False, padding=0)
+        # self.hbox_entry = Gtk.HBox(False, 0)
+        # self.hbox_entry.pack_start(ebox, expand=True, fill=True, padding=0)
+        # self.hbox_entry.pack_start(self.fileButton, expand=False, fill=False, padding=0)
 
         ################
         # main toolbar
         ################
         self.toolbarMain = Gtk.Toolbar()
-        self.toolbarMain.set_orientation(Gtk.ORIENTATION_HORIZONTAL)
-        self.toolbarMain.set_style(Gtk.TOOLBAR_ICONS)
+        # self.toolbarMain.set_orientation(Gtk.ORIENTATION_HORIZONTAL)
+        # self.toolbarMain.set_style(Gtk.TOOLBAR_ICONS)
         self.toolbarMain.set_border_width(0)
-        self.toolbarMain.set_tooltips(True)
+        # self.toolbarMain.set_tooltips(True)
 
         button = toolbar_button(self.cfg.pixbuf_action_refresh, self.cfg.tooltips, _("Refresh"))
         button.connect('clicked', self.callback, "refresh")
@@ -1944,7 +1944,7 @@ class Program:
 
         item = Gtk.SeparatorToolItem()
         item.set_draw(False)
-        item.set_expand(Gtk.EXPAND)
+        # item.set_expand(Gtk.EXPAND)
         self.toolbarMain.insert(item, -1)
 
         # toolbar menu util
@@ -2033,10 +2033,10 @@ class Program:
         # tree toolbar
         #################
         self.toolbarTree = Gtk.Toolbar()
-        self.toolbarTree.set_orientation(Gtk.ORIENTATION_HORIZONTAL)
-        self.toolbarTree.set_style(Gtk.TOOLBAR_ICONS)
+        # self.toolbarTree.set_orientation(Gtk.ORIENTATION_HORIZONTAL)
+        # self.toolbarTree.set_style(Gtk.TOOLBAR_ICONS)
         self.toolbarTree.set_border_width(0)
-        self.toolbarTree.set_tooltips(True)
+        # self.toolbarTree.set_tooltips(True)
 
         button = toolbar_button(self.cfg.pixbuf_list_hide1_16, self.cfg.tooltips, _("Show/Hide the list"))
         button.connect('clicked', self.view_list)
@@ -2072,11 +2072,11 @@ class Program:
             self.toolbarTree.insert(button, -1)
 
             button_up = image_button(self.cfg.pixbuf_list_arrow_up_16, None, self.cfg.tooltips, _("Move above"))
-            button_up.props.relief = Gtk.RELIEF_NONE
+            # button_up.props.relief = Gtk.RELIEF_NONE
             button_up.set_size_request(24, 12)
             button_up.connect("clicked", tree_move, self.cfg, self.cfg.treeView, "up")
             button_down = image_button(self.cfg.pixbuf_list_arrow_down_16, None, self.cfg.tooltips, _("Move below"))
-            button_down.props.relief = Gtk.RELIEF_NONE
+            # button_down.props.relief = Gtk.RELIEF_NONE
             button_down.set_size_request(24, 12)
             button_down.connect("clicked", tree_move, self.cfg, self.cfg.treeView, "down")
             vbox = Gtk.VBox(False, 0)
@@ -2088,7 +2088,7 @@ class Program:
 
         self.tree_info = Gtk.Label()
         item = Gtk.ToolItem()
-        item.set_expand(Gtk.EXPAND)
+        # item.set_expand(Gtk.EXPAND)
         item.add(self.tree_info)
         self.toolbarTree.insert(item, -1)
 
@@ -2120,7 +2120,7 @@ class Program:
         self.panedTree.add1(self.sw)
 
         self.swVnc = Gtk.ScrolledWindow()
-        self.swVnc.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
+        # self.swVnc.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
         self.panedTree.add2(self.swVnc)
 
         self.table_vnc = Gtk.Fixed()
@@ -2130,7 +2130,7 @@ class Program:
         ebox.connect("motion-notify-event", self.table_vnc_motion_event)
 
         TARGETS = [('TEXT', 0, 0)]
-        self.table_vnc.drag_dest_set(Gtk.DEST_DEFAULT_ALL, TARGETS, Gdk.ACTION_DEFAULT)
+        # self.table_vnc.drag_dest_set(Gtk.DEST_DEFAULT_ALL, TARGETS, Gdk.ACTION_DEFAULT)
         self.table_vnc.connect("drag_data_received", self.table_vnc_drag_data_received)
         self.table_vnc.connect('drag_motion', self.table_vnc_drag_data_motion)
         self.table_vnc.connect('drag_drop', self.table_vnc_drag_data_drop)
@@ -2140,8 +2140,8 @@ class Program:
         self.panedTree.connect("notify::position", self.paned_tree_event)
 
         #
-        self.fileButton = image_button(self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips, _("Select the file"))
-        self.fileButton.connect("clicked", file_chooser_dialog, self.cfg.messageBox, _("Select the file"))
+        # self.fileButton = image_button(self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips, _("Select the file"))
+        # self.fileButton.connect("clicked", file_chooser_dialog, self.cfg.messageBox, _("Select the file"))
 
         ##########
         # menu
@@ -2290,8 +2290,8 @@ class Program:
         if (self.cfg.read_config("hide", "hide_command") == "n" or self.cfg.read_config("hide",
                                                                                         "hide_tree_add_remove") == "n"):
             self.vboxMain.pack_start(self.toolbarTree, expand=False, fill=False, padding=0)
-        if self.cfg.read_config("hide", "hide_command") == "n":
-            self.vboxMain.pack_start(self.hbox_entry, expand=False, fill=False, padding=0)
+        # if self.cfg.read_config("hide", "hide_command") == "n":
+        #     self.vboxMain.pack_start(self.hbox_entry, expand=False, fill=False, padding=0)
         self.vboxMain.pack_start(self.viewportStatus, expand=False, fill=False, padding=0)
 
         # таймеры

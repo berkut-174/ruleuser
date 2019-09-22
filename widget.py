@@ -56,11 +56,11 @@ def toolbar_button(pixbuf=None, tooltips=None, tooltip=None, toggle=None):
     else:
         button = Gtk.ToolButton()
     button.set_icon_widget(image)
-    button.unset_flags(Gtk.CAN_FOCUS)
+    # button.unset_flags(Gtk.CAN_FOCUS)
     if tooltips and tooltip:
-        if Gtk.pygtk_version < (2, 12, 0):
-            button.set_tooltip(tooltips, tooltip)
-        else:
+        # if Gtk.pygtk_version < (2, 12, 0):
+        #     button.set_tooltip(tooltips, tooltip)
+        # else:
             button.set_tooltip_text(tooltip)
     return button
 
@@ -82,15 +82,15 @@ def image_button(pixbuf=None, label=None, tooltips=None, tooltip=None, toggle=No
         button = Gtk.ToggleButton(label)
     else:
         button = Gtk.Button(label)
-    button.unset_flags(Gtk.CAN_FOCUS)
+    # button.unset_flags(Gtk.CAN_FOCUS)
     # button.set_can_focus(False)
     image = Gtk.Image()
     image.set_from_pixbuf(pixbuf)
     button.set_image(image)
     if tooltips and tooltip:
-        if Gtk.pygtk_version < (2, 12, 0):
-            tooltips.set_tip(button, tooltip)
-        else:
+        # if Gtk.pygtk_version < (2, 12, 0):
+        #     tooltips.set_tip(button, tooltip)
+        # else:
             button.set_tooltip_text(tooltip)
     return button
 
@@ -104,10 +104,10 @@ class menu_tool_button(Gtk.ToolButton):
         image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
         self.set_icon_widget(image)
-        if Gtk.pygtk_version < (2, 12, 0):
-            self.set_tooltip(tooltips, tooltip)
-        else:
-            self.set_tooltip_text(tooltip)
+        # if Gtk.pygtk_version < (2, 12, 0):
+        #     self.set_tooltip(tooltips, tooltip)
+        # else:
+            # self.set_tooltip_text(tooltip)
 
         self.button = self.get_child()
         self.button.connect("button-press-event", self.event)
