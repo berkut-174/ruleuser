@@ -339,7 +339,7 @@ def create_tree_group(cfg):
                     z[item] = ""
                 # ping
                 if item == cfg.dn['ping']:
-                    z[item] = False
+                    z[item] = ""
                 cfg.userList.set(iter, item, z[item])
             cfg.userList.set(iter, 100, cfg.pixbuf_status_down_16)
 
@@ -503,31 +503,31 @@ def tree_selection_enable(treeView, enable=True):
 
 def tree_drag_data_motion(widget, drag_context, x, y, time):
     if drag_context.get_source_widget() == widget:
-        drag_context.drag_status(Gdk.ACTION_MOVE, time)
+        drag_context.drag_status(Gdk.DragAction.MOVE, time)
     else:
-        drag_context.drag_status(Gdk.ACTION_PRIVATE, time)
+        drag_context.drag_status(Gdk.DragAction.PRIVATE, time)
         return True
     drop_info = widget.get_dest_row_at_pos(x, y)
     if drop_info:
         dest_path, dest_pos = drop_info
         if len(dest_path) == 2:
-            if dest_pos == Gtk.TREE_VIEW_DROP_BEFORE or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
-                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_BEFORE)
-            elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
-                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_AFTER)
+            if dest_pos == Gtk.TreeViewDropPosition.BEFORE or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE:
+                widget.set_drag_dest_row(dest_path, Gtk.TreeViewDropPosition.BEFORE)
+            elif dest_pos == Gtk.TreeViewDropPosition.AFTER or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_AFTER:
+                widget.set_drag_dest_row(dest_path, Gtk.TreeViewDropPosition.AFTER)
         else:
-            if dest_pos == Gtk.TREE_VIEW_DROP_BEFORE:
-                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_BEFORE)
-            elif dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
-                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
-            elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER and widget.row_expanded(dest_path):
-                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_INTO_OR_AFTER)
-            elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER:
-                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_AFTER)
-            elif dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
-                widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_INTO_OR_AFTER)
+            if dest_pos == Gtk.TreeViewDropPosition.BEFORE:
+                widget.set_drag_dest_row(dest_path, Gtk.TreeViewDropPosition.BEFORE)
+            elif dest_pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE:
+                widget.set_drag_dest_row(dest_path, Gtk.TreeViewDropPosition.INTO_OR_BEFORE)
+            elif dest_pos == Gtk.TreeViewDropPosition.AFTER and widget.row_expanded(dest_path):
+                widget.set_drag_dest_row(dest_path, Gtk.TreeViewDropPosition.INTO_OR_AFTER)
+            elif dest_pos == Gtk.TreeViewDropPosition.AFTER:
+                widget.set_drag_dest_row(dest_path, Gtk.TreeViewDropPosition.AFTER)
+            elif dest_pos == Gtk.TreeViewDropPosition.INTO_OR_AFTER:
+                widget.set_drag_dest_row(dest_path, Gtk.TreeViewDropPosition.INTO_OR_AFTER)
     else:
-        widget.set_drag_dest_row((len(widget.get_model()) - 1,), Gtk.TREE_VIEW_DROP_AFTER)
+        widget.set_drag_dest_row((len(widget.get_model()) - 1,), Gtk.TreeViewDropPosition.AFTER)
     return True
 
 
@@ -592,7 +592,7 @@ def tree_drag_data_received(treeView, context, x, y, selection, info, etime, cfg
                     if model[group_num][4] == "server":
                         dest_path = (group_num,)
                         dest_iter = model.get_iter(dest_path)
-                        dest_pos = Gtk.TREE_VIEW_DROP_BEFORE
+                        dest_pos = Gtk.TreeViewDropPosition.BEFORE
                         break
                     group_num += 1
             # Если попытка переместить группу после/перед сервером, найти последнюю группу и вставить после.
@@ -602,11 +602,11 @@ def tree_drag_data_received(treeView, context, x, y, selection, info, etime, cfg
                     if model[group_num][4] != "server":
                         dest_path = (group_num,)
                         dest_iter = model.get_iter(dest_path)
-                        dest_pos = Gtk.TREE_VIEW_DROP_AFTER
+                        dest_pos = Gtk.TreeViewDropPosition.AFTER
                         break
                     group_num -= 1
 
-            if dest_pos == Gtk.TREE_VIEW_DROP_BEFORE or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
+            if dest_pos == Gtk.TreeViewDropPosition.BEFORE or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE:
                 new_iter = model.insert_before(None, dest_iter, row_data)
             else:
                 new_iter = model.insert_after(None, dest_iter, row_data)
@@ -808,7 +808,7 @@ def create_columns(cfg, treeView, list_col, visible=None):
         if col == "pixbuf":
             renderer = Gtk.CellRendererPixbuf()
             column = Gtk.TreeViewColumn("", renderer, pixbuf=i)
-            column.set_sizing(Gtk.TREE_VIEW_COLUMN_FIXED)
+            column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
             column.set_fixed_width(28)
         else:
             renderer = Gtk.CellRendererText()

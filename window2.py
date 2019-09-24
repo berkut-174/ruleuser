@@ -4,7 +4,7 @@
 ###################################################################################################
 # RuleUser
 # window2.py
-# 
+#
 # Copyright (C) 2012,2013 Andrey Burbovskiy <xak-altsp@yandex.ru>
 # Copyright (C) 2017 Артем Проскурнев (Artem Proskurnev) <tema@proskurnev.name>
 # Поддерживается в Школе №830 г. Москва
@@ -51,7 +51,8 @@ def create_window2(cfg):
     if not cfg.table2.get_children():
         cfg.mainWindowLastX = cfg.window_x
         if cfg.maximized or cfg.fullscreen:
-            GObject.timeout_add(50, paned_set_position, cfg, cfg.window_x - cfg.panedWindowX - cfg.phandle_size)
+            GObject.timeout_add(50, paned_set_position, cfg,
+                                cfg.window_x - cfg.panedWindowX - cfg.phandle_size)
         elif cfg.screen_x < cfg.window_x + cfg.panedWindowX:
             cfg.window.move(0, 0)
             cfg.window.resize(cfg.screen_x, cfg.window_y)
@@ -75,7 +76,8 @@ def close_window2(data, cfg):
         cfg.panedWindow.set_position(cfg.window_x - cfg.phandle_size)
     else:
         cfg.window.set_size_request(cfg.min_mainWindowX, cfg.min_mainWindowY)
-        GObject.timeout_add(50, paned_set_position, cfg, cfg.window_x - cfg.phandle_size)
+        GObject.timeout_add(50, paned_set_position, cfg,
+                            cfg.window_x - cfg.phandle_size)
         if cfg.mainWindowLastX < cfg.window_x - cfg.panedWindowX:
             cfg.window.resize(cfg.window_x - cfg.panedWindowX, cfg.window_y)
         else:
@@ -84,7 +86,8 @@ def close_window2(data, cfg):
 
 
 def window_size_request(cfg):
-    cfg.window.set_size_request(cfg.min_mainWindowX + cfg.panedWindowX, cfg.min_mainWindowY)
+    cfg.window.set_size_request(
+        cfg.min_mainWindowX + cfg.panedWindowX, cfg.min_mainWindowY)
     return False
 
 
@@ -133,7 +136,7 @@ class folderUi:
             cfg.mount_point = os.path.expanduser("~/.ruleuser/sshfs/")
 
         cmd = cfg.sshfs + " -o IdentityFile=" + d['server_key'] + " " + " -p " + d['server_port'] + " " + \
-              d['user'] + "@" + d['server'] + ": " + cfg.mount_point
+            d['user'] + "@" + d['server'] + ": " + cfg.mount_point
         proc = popen_sub(cfg, shlex.split(cmd))
         if not proc:
             close_window2(None, cfg)
@@ -152,7 +155,8 @@ class folderUi:
         cfg.table2.attach(frame, 0, 28, 0, 39)
         cfg.table2.attach(frame2, 0, 28, 39, 42)
         cfg.table2.attach(vbox, 1, 27, 1, 39)
-        cfg.table2.attach(closeButton, 21, 27, 40, 42, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
+        cfg.table2.attach(closeButton, 21, 27, 40, 42,
+                          xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
 
         cfg.table2.show_all()
 
@@ -173,12 +177,14 @@ class timersUi:
         self.treeTimer = Gtk.TreeView(self.cfg.timersList)
         self.treeTimer.set_rules_hint(True)
         self.treeTimer.set_enable_tree_lines(True)
-        self.treeTimer.set_grid_lines(Gtk.TREE_VIEW_GRID_LINES_VERTICAL)
+        self.treeTimer.set_grid_lines(Gtk.TreeViewGridLines.VERTICAL)
         self.treeTimer.connect("button-press-event", self.tree_event)
-        TARGETS = [('TREE_TIMER', Gtk.TARGET_SAME_WIDGET, 0), ('TEXT', 0, 0), ]
-        # self.treeTimer.enable_model_drag_source(Gdk.BUTTON1_MASK, TARGETS, Gdk.ACTION_DEFAULT|Gdk.ACTION_MOVE)
-        self.treeTimer.enable_model_drag_dest(TARGETS, Gdk.ACTION_DEFAULT)
-        self.treeTimer.connect("drag_data_received", self.tree_timer_drag_data_received)
+        TARGETS = [('TREE_TIMER', Gtk.TargetFlags.SAME_WIDGET, 0),
+                   ('TEXT', 0, 0), ]
+        # self.treeTimer.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK, TARGETS, Gdk.DragAction.DEFAULT|Gdk.DragAction.MOVE)
+        self.treeTimer.enable_model_drag_dest(TARGETS, Gdk.DragAction.DEFAULT)
+        self.treeTimer.connect("drag_data_received",
+                               self.tree_timer_drag_data_received)
         self.treeTimer.connect('drag_motion', self.tree_timer_drag_data_motion)
 
         cell = Gtk.CellRendererText()
@@ -202,16 +208,17 @@ class timersUi:
         self.treeTimer.append_column(column)
 
         cell = Gtk.CellRendererText()
-        column = Gtk.TreeViewColumn(_("Message") + " / " + _("Command"), cell, text=3)
+        column = Gtk.TreeViewColumn(
+            _("Message") + " / " + _("Command"), cell, text=3)
         column.set_expand(True)
         self.treeTimer.append_column(column)
 
         self.treeTimerSelection = self.treeTimer.get_selection()
-        self.treeTimerSelection.set_mode(Gtk.SELECTION_MULTIPLE)
+        self.treeTimerSelection.set_mode(Gtk.SelectionMode.MULTIPLE)
 
         swTimer = Gtk.ScrolledWindow()
-        swTimer.set_shadow_type(Gtk.SHADOW_ETCHED_IN)
-        swTimer.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
+        swTimer.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        swTimer.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         swTimer.add(self.treeTimer)
 
         #######
@@ -219,7 +226,7 @@ class timersUi:
         #######
         frame = Gtk.Frame()
 
-        self.cbAction = Gtk.combo_box_new_text()
+        self.cbAction = Gtk.ComboBoxText()
         self.cbAction.append_text(_("Logout"))
         self.cbAction.append_text(_("Reboot"))
         self.cbAction.append_text(_("Turn On"))
@@ -230,82 +237,92 @@ class timersUi:
 
         # time
         adj = Gtk.Adjustment(0.0, 0.0, 23.0, 1.0, 5.0, 0.0)
-        self.sbHour = Gtk.SpinButton(adj, 0, 0)
+        self.sbHour = Gtk.SpinButton.new(adj, 0, 0)
         self.sbHour.set_wrap(True)
         labelHour = Gtk.Label(_("Hour"))
         labelHour.set_alignment(0, 0.5)
 
         adj = Gtk.Adjustment(0.0, 0.0, 59.0, 1.0, 5.0, 0.0)
-        self.sbMin = Gtk.SpinButton(adj, 0, 0)
+        self.sbMin = Gtk.SpinButton.new(adj, 0, 0)
         self.sbMin.set_wrap(True)
         labelMin = Gtk.Label(_("Minute"))
         labelMin.set_alignment(0, 0.5)
 
         adj = Gtk.Adjustment(0.0, 0.0, 59.0, 1.0, 5.0, 0.0)
-        self.sbSec = Gtk.SpinButton(adj, 0, 0)
+        self.sbSec = Gtk.SpinButton.new(adj, 0, 0)
         self.sbSec.set_wrap(True)
         labelSec = Gtk.Label(_("Second"))
         labelSec.set_alignment(0, 0.5)
 
         # combobox
         textBox = Gtk.ListStore(str)
-        self.entryBox = Gtk.ComboBoxEntry(textBox, column=0)
+        self.entryBox = Gtk.ComboBox.new_with_model_and_entry(textBox)
         textBox.append([""])
         for i in range(self.cfg.CountCommands):
             if self.cfg.read_config("command", "f" + str(i + 1)) != "":
-                textBox.append([self.cfg.read_config("command", "f" + str(i + 1))])
+                textBox.append(
+                    [self.cfg.read_config("command", "f" + str(i + 1))])
 
         # filechooser
 
         fileChooserButton = image_button(self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips,
                                          _("Select the file"))
         fileChooserButton.set_size_request(25, 25)
-        fileChooserButton.connect("clicked", file_chooser_dialog, self.entryBox, _("Select the file"))
+        fileChooserButton.connect(
+            "clicked", file_chooser_dialog, self.entryBox, _("Select the file"))
 
         # toolbar
         toolbar = Gtk.Toolbar()
-        toolbar.set_orientation(Gtk.ORIENTATION_HORIZONTAL)
-        toolbar.set_style(Gtk.TOOLBAR_ICONS)
+        toolbar.set_orientation(Gtk.Orientation.HORIZONTAL)
+        toolbar.set_style(Gtk.ToolbarStyle.ICONS)
         toolbar.set_border_width(0)
-        toolbar.set_tooltips(True)
+        #~ toolbar.set_tooltips(True)
 
-        button = toolbar_button(self.cfg.pixbuf_list_transfer_16, self.cfg.tooltips, _("Add"))
+        button = toolbar_button(
+            self.cfg.pixbuf_list_transfer_16, self.cfg.tooltips, _("Add"))
         button.connect('clicked', self.add_client)
         toolbar.insert(button, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_list_remove_16, self.cfg.tooltips, _("Remove"))
+        button = toolbar_button(
+            self.cfg.pixbuf_list_remove_16, self.cfg.tooltips, _("Remove"))
         button.connect('clicked', self.remove_client)
         toolbar.insert(button, -1)
 
         space = Gtk.SeparatorToolItem()
         space.set_draw(False)
-        space.set_expand(Gtk.EXPAND)
+        space.set_expand(Gtk.AttachOptions.EXPAND)
         toolbar.insert(space, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_list_play_16, self.cfg.tooltips, _("Start"))
+        button = toolbar_button(
+            self.cfg.pixbuf_list_play_16, self.cfg.tooltips, _("Start"))
         button.connect('clicked', self.timer_start)
         toolbar.insert(button, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_list_stop_16, self.cfg.tooltips, _("Stop"))
+        button = toolbar_button(
+            self.cfg.pixbuf_list_stop_16, self.cfg.tooltips, _("Stop"))
         button.connect('clicked', self.timer_stop)
         toolbar.insert(button, -1)
 
         space = Gtk.SeparatorToolItem()
         toolbar.insert(space, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_list_save_16, self.cfg.tooltips, _("Save"))
+        button = toolbar_button(
+            self.cfg.pixbuf_list_save_16, self.cfg.tooltips, _("Save"))
         button.connect('clicked', self.save_timer, "save")
         toolbar.insert(button, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_list_add_16, self.cfg.tooltips, _("New"))
+        button = toolbar_button(
+            self.cfg.pixbuf_list_add_16, self.cfg.tooltips, _("New"))
         button.connect('clicked', self.save_timer, "create")
         toolbar.insert(button, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_list_remove_16, self.cfg.tooltips, _("Remove"))
+        button = toolbar_button(
+            self.cfg.pixbuf_list_remove_16, self.cfg.tooltips, _("Remove"))
         button.connect('clicked', self.remove_timer)
         toolbar.insert(button, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_list_edit_16, self.cfg.tooltips, _("Edit"))
+        button = toolbar_button(
+            self.cfg.pixbuf_list_edit_16, self.cfg.tooltips, _("Edit"))
         button.connect('clicked', self.edit_timer)
         toolbar.insert(button, -1)
 
@@ -318,23 +335,34 @@ class timersUi:
         frame = Gtk.Frame()
         frame2 = Gtk.Frame()
         self.cfg.table2.attach(swTimer, 0, 28, 0, 30)
-        self.cfg.table2.attach(toolbar, 0, 28, 30, 32, yoptions=Gtk.SHRINK)
+        self.cfg.table2.attach(toolbar, 0, 28, 30, 32,
+                               yoptions=Gtk.AttachOptions.SHRINK)
         #
         self.cfg.table2.attach(frame, 0, 28, 32, 39)
-        self.cfg.table2.attach(labelHour, 15, 18, 33, 34, yoptions=Gtk.SHRINK)
-        self.cfg.table2.attach(self.sbHour, 15, 18, 34, 36, yoptions=Gtk.SHRINK)
-        self.cfg.table2.attach(labelMin, 19, 22, 33, 34, yoptions=Gtk.SHRINK)
-        self.cfg.table2.attach(self.sbMin, 19, 22, 34, 36, yoptions=Gtk.SHRINK)
-        self.cfg.table2.attach(labelSec, 23, 27, 33, 34, yoptions=Gtk.SHRINK)
-        self.cfg.table2.attach(self.sbSec, 23, 26, 34, 36, yoptions=Gtk.SHRINK)
+        self.cfg.table2.attach(labelHour, 15, 18, 33, 34,
+                               yoptions=Gtk.AttachOptions.SHRINK)
+        self.cfg.table2.attach(self.sbHour, 15, 18, 34,
+                               36, yoptions=Gtk.AttachOptions.SHRINK)
+        self.cfg.table2.attach(labelMin, 19, 22, 33, 34,
+                               yoptions=Gtk.AttachOptions.SHRINK)
+        self.cfg.table2.attach(self.sbMin, 19, 22, 34,
+                               36, yoptions=Gtk.AttachOptions.SHRINK)
+        self.cfg.table2.attach(labelSec, 23, 27, 33, 34,
+                               yoptions=Gtk.AttachOptions.SHRINK)
+        self.cfg.table2.attach(self.sbSec, 23, 26, 34,
+                               36, yoptions=Gtk.AttachOptions.SHRINK)
 
-        self.cfg.table2.attach(self.cbAction, 1, 14, 34, 36, yoptions=Gtk.SHRINK)
+        self.cfg.table2.attach(self.cbAction, 1, 14, 34,
+                               36, yoptions=Gtk.AttachOptions.SHRINK)
 
-        self.cfg.table2.attach(self.entryBox, 1, 24, 36, 38, yoptions=Gtk.SHRINK)
-        self.cfg.table2.attach(fileChooserButton, 24, 26, 36, 38, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
+        self.cfg.table2.attach(self.entryBox, 1, 24, 36,
+                               38, yoptions=Gtk.AttachOptions.SHRINK)
+        self.cfg.table2.attach(fileChooserButton, 24, 26, 36, 38,
+                               xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
         #
         self.cfg.table2.attach(frame2, 0, 28, 39, 42)
-        self.cfg.table2.attach(closeButton, 21, 27, 40, 42, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
+        self.cfg.table2.attach(closeButton, 21, 27, 40, 42,
+                               xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
 
         self.treeTimer.expand_all()
         self.cfg.table2.show_all()
@@ -366,7 +394,8 @@ class timersUi:
             for x in range(len(user_list)):
                 if user_list[x][0] == model[row][1]:
                     # Убрать иконки
-                    userList_column_value(self.cfg, 54, None, [user_list[x]], False)
+                    userList_column_value(self.cfg, 54, None, [
+                                          user_list[x]], False)
                     del user_list[x]
                     break
             model[timer_path][5] = user_list
@@ -442,11 +471,14 @@ class timersUi:
         number = str(len(self.cfg.timersList) + 1)
         action = self.cbAction.get_active_text()
         hour = str(int(self.sbHour.get_value()))
-        if len(hour) == 1: hour = "0" + hour
+        if len(hour) == 1:
+            hour = "0" + hour
         minute = str(int(self.sbMin.get_value()))
-        if len(minute) == 1: minute = "0" + minute
+        if len(minute) == 1:
+            minute = "0" + minute
         second = str(int(self.sbSec.get_value()))
-        if len(second) == 1: second = "0" + second
+        if len(second) == 1:
+            second = "0" + second
         start = hour + ":" + minute + ":" + second
 
         if action == _("Logout") or action == _("Reboot") or action == _("Shutdown"):
@@ -484,36 +516,44 @@ class timersUi:
             treeView.get_selection().unselect_all()
             return
         # Действия
-        if event.type == Gdk._2BUTTON_PRESS:
+        if event.type == Gdk.EventType._2BUTTON_PRESS:
             self.edit_timer()
 
     def tree_timer_drag_data_motion(self, widget, drag_context, x, y, time):
         if drag_context.get_source_widget() == self.cfg.treeView:
-            drag_context.drag_status(Gdk.ACTION_LINK, time)
+            drag_context.drag_status(Gdk.DragAction.LINK, time)
         else:
-            drag_context.drag_status(Gdk.ACTION_PRIVATE, time)
+            drag_context.drag_status(Gdk.DragAction.PRIVATE, time)
             return True
         drop_info = widget.get_dest_row_at_pos(x, y)
         if drop_info:
             dest_path, dest_pos = drop_info
             if len(dest_path) == 2:
-                if dest_pos == Gtk.TREE_VIEW_DROP_BEFORE or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_BEFORE)
-                elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_AFTER)
+                if dest_pos == Gtk.TreeViewDropPosition.BEFORE or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE:
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.BEFORE)
+                elif dest_pos == Gtk.TreeViewDropPosition.AFTER or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_AFTER:
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.AFTER)
             else:
-                if dest_pos == Gtk.TREE_VIEW_DROP_BEFORE:
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_BEFORE)
-                elif dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
-                elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER and widget.row_expanded(dest_path):
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_INTO_OR_AFTER)
-                elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER:
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_AFTER)
-                elif dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_INTO_OR_AFTER)
+                if dest_pos == Gtk.TreeViewDropPosition.BEFORE:
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.BEFORE)
+                elif dest_pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE:
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.INTO_OR_BEFORE)
+                elif dest_pos == Gtk.TreeViewDropPosition.AFTER and widget.row_expanded(dest_path):
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.INTO_OR_AFTER)
+                elif dest_pos == Gtk.TreeViewDropPosition.AFTER:
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.AFTER)
+                elif dest_pos == Gtk.TreeViewDropPosition.INTO_OR_AFTER:
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.INTO_OR_AFTER)
         else:
-            widget.set_drag_dest_row((len(widget.get_model()) - 1,), Gtk.TREE_VIEW_DROP_AFTER)
+            widget.set_drag_dest_row(
+                (len(widget.get_model()) - 1,), Gtk.TreeViewDropPosition.AFTER)
         return True
 
     def tree_timer_drag_data_received(self, treeview, context, x, y, selection, info, etime):
@@ -573,37 +613,39 @@ class demoUi:
         # toolbar, создать здесь, т.к. в timers запрос
         self.toolbarTree = Gtk.Toolbar()
 
-    def createUi(self, data=None):
+    def createui(self, data=None):
 
         create_window2(self.cfg)
 
         # toolbar
         self.toolbarTree = Gtk.Toolbar()
-        self.toolbarTree.set_orientation(Gtk.ORIENTATION_HORIZONTAL)
-        self.toolbarTree.set_style(Gtk.TOOLBAR_ICONS)
+        self.toolbarTree.set_orientation(Gtk.Orientation.HORIZONTAL)
+        self.toolbarTree.set_style(Gtk.ToolbarStyle.ICONS)
         self.toolbarTree.set_border_width(0)
-        self.toolbarTree.set_tooltips(True)
+        #~ self.toolbarTree.set_tooltips(True)
 
         self.treeDemo = Gtk.TreeView(self.cfg.demoList)
         self.treeDemo.set_rules_hint(True)
         self.treeDemo.set_enable_tree_lines(True)
         self.treeDemo.set_headers_visible(True)
         self.treeDemo.set_headers_clickable(True)
-        # self.treeDemo.set_grid_lines(Gtk.TREE_VIEW_GRID_LINES_VERTICAL)
-        # self.treeDemo.set_grid_lines(Gtk.TREE_VIEW_GRID_LINES_HORIZONTAL)
+        # self.treeDemo.set_grid_lines(Gtk.TreeViewGridLines.VERTICAL)
+        # self.treeDemo.set_grid_lines(Gtk.TreeViewGridLines.HORIZONTAL)
         self.treeDemo.modify_font(Pango.FontDescription(self.cfg.fontTree))
         self.treeDemo.connect("button-press-event", self.tree_button_press)
 
-        TARGETS = [('TREE_DEMO', Gtk.TARGET_SAME_WIDGET, 0), ('TEXT', 0, 0)]
-        self.treeDemo.enable_model_drag_source(Gdk.BUTTON1_MASK, TARGETS,
-                                               Gdk.ACTION_DEFAULT | Gdk.ACTION_MOVE)
-        self.treeDemo.enable_model_drag_dest(TARGETS, Gdk.ACTION_DEFAULT)
-        # self.treeDemo.drag_dest_set(Gtk.DEST_DEFAULT_ALL, TARGETS, Gdk.ACTION_DEFAULT|Gdk.ACTION_MOVE)
-        self.treeDemo.connect("drag_data_received", self.tree_demo_drag_data_received)
+        TARGETS = [('TREE_DEMO', Gtk.TargetFlags.SAME_WIDGET, 0),
+                   ('TEXT', 0, 0)]
+        self.treeDemo.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK, TARGETS,
+                                               Gdk.DragAction.DEFAULT | Gdk.DragAction.MOVE)
+        self.treeDemo.enable_model_drag_dest(TARGETS, Gdk.DragAction.DEFAULT)
+        # self.treeDemo.drag_dest_set(Gtk.DestDefaults.ALL, TARGETS, Gdk.DragAction.DEFAULT|Gdk.DragAction.MOVE)
+        self.treeDemo.connect("drag_data_received",
+                              self.tree_demo_drag_data_received)
         self.treeDemo.connect("drag_motion", self.tree_demo_drag_data_motion)
 
         self.treeDemoSelection = self.treeDemo.get_selection()
-        self.treeDemoSelection.set_mode(Gtk.SELECTION_MULTIPLE)
+        self.treeDemoSelection.set_mode(Gtk.SelectionMode.MULTIPLE)
 
         for i in range(len(self.cfg.z)):
             if i == self.cfg.dn['demo_pixbuf']:
@@ -635,41 +677,49 @@ class demoUi:
                 column.set_visible(False)
 
         swDemo = Gtk.ScrolledWindow()
-        swDemo.set_shadow_type(Gtk.SHADOW_ETCHED_IN)
-        swDemo.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
+        swDemo.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        swDemo.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         swDemo.add(self.treeDemo)
 
         # toolbar menu
         for x in self.toolbarTree.get_children():
             self.toolbarTree.remove(x)
 
-        button = menu_tool_button(self.cfg.pixbuf_list_transfer_16, self.cfg.tooltips, _("Add"))
+        button = menu_tool_button(
+            self.cfg.pixbuf_list_transfer_16, self.cfg.tooltips, _("Add"))
         self.toolbarTree.insert(button, -1)
 
-        item = menu_image_button(self.cfg.pixbuf_list_transfer_16, _("Add server"))
+        item = menu_image_button(
+            self.cfg.pixbuf_list_transfer_16, _("Add server"))
         item.connect('activate', self.callback, "add_server")
         button.append(item)
 
-        item = menu_image_button(self.cfg.pixbuf_list_transfer_16, _("Add clients"))
+        item = menu_image_button(
+            self.cfg.pixbuf_list_transfer_16, _("Add clients"))
         item.connect('activate', self.callback, "add_client")
         button.append(item)
 
-        button = toolbar_button(self.cfg.pixbuf_list_remove_16, self.cfg.tooltips, _("Remove"))
+        button = toolbar_button(
+            self.cfg.pixbuf_list_remove_16, self.cfg.tooltips, _("Remove"))
         button.connect('clicked', self.callback, "remove")
         self.toolbarTree.insert(button, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_list_edit_16, self.cfg.tooltips, _("Edit"))
+        button = toolbar_button(
+            self.cfg.pixbuf_list_edit_16, self.cfg.tooltips, _("Edit"))
         button.connect('clicked', self.callback, "edit_tree_item")
         self.toolbarTree.insert(button, -1)
 
-        button_up = image_button(self.cfg.pixbuf_list_arrow_up_16, None, self.cfg.tooltips, _("Move above"))
-        button_up.props.relief = Gtk.RELIEF_NONE
+        button_up = image_button(
+            self.cfg.pixbuf_list_arrow_up_16, None, self.cfg.tooltips, _("Move above"))
+        button_up.props.relief = Gtk.ReliefStyle.NONE
         button_up.set_size_request(24, 12)
         button_up.connect("clicked", tree_move, self.cfg, self.treeDemo, "up")
-        button_down = image_button(self.cfg.pixbuf_list_arrow_down_16, None, self.cfg.tooltips, _("Move below"))
-        button_down.props.relief = Gtk.RELIEF_NONE
+        button_down = image_button(
+            self.cfg.pixbuf_list_arrow_down_16, None, self.cfg.tooltips, _("Move below"))
+        button_down.props.relief = Gtk.ReliefStyle.NONE
         button_down.set_size_request(24, 12)
-        button_down.connect("clicked", tree_move, self.cfg, self.treeDemo, "down")
+        button_down.connect("clicked", tree_move, self.cfg,
+                            self.treeDemo, "down")
         vbox = Gtk.VBox(False, 0)
         vbox.pack_start(button_up, expand=True, fill=False, padding=0)
         vbox.pack_start(button_down, expand=True, fill=False, padding=0)
@@ -679,7 +729,7 @@ class demoUi:
 
         space = Gtk.SeparatorToolItem()
         space.set_draw(False)
-        space.set_expand(Gtk.EXPAND)
+        space.set_expand(Gtk.AttachOptions.EXPAND)
         self.toolbarTree.insert(space, -1)
 
         button = toolbar_button(self.cfg.pixbuf_list_play_fullscreen_16, self.cfg.tooltips,
@@ -697,7 +747,8 @@ class demoUi:
         button.connect('clicked', self.callback, "start_file")
         self.toolbarTree.insert(button, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_list_stop_16, self.cfg.tooltips, _("Stop"))
+        button = toolbar_button(
+            self.cfg.pixbuf_list_stop_16, self.cfg.tooltips, _("Stop"))
         button.connect('clicked', self.callback, "stop")
         self.toolbarTree.insert(button, -1)
 
@@ -708,12 +759,16 @@ class demoUi:
             if text != "":
                 demoEntryList.append([text])
 
-        self.cfg.demoEntryBox = Gtk.ComboBoxEntry(demoEntryList, column=0)
-        fileButton = image_button(self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips, _("Select the file"))
-        fileButton.connect("clicked", file_chooser_dialog, self.cfg.demoEntryBox, _("Select the file"))
+        self.cfg.demoEntryBox = Gtk.ComboBox.new_with_model_and_entry(
+            demoEntryList)
+        fileButton = image_button(
+            self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips, _("Select the file"))
+        fileButton.connect("clicked", file_chooser_dialog,
+                           self.cfg.demoEntryBox, _("Select the file"))
 
         hbox2 = Gtk.HBox()
-        hbox2.pack_start(self.cfg.demoEntryBox, expand=True, fill=True, padding=0)
+        hbox2.pack_start(self.cfg.demoEntryBox,
+                         expand=True, fill=True, padding=0)
         hbox2.pack_start(fileButton, expand=False, fill=False, padding=0)
 
         # button
@@ -729,11 +784,13 @@ class demoUi:
         vbox = Gtk.VBox(False, 0)
         vbox.pack_start(self.toolbarTree, expand=False, fill=False, padding=0)
         vbox.pack_start(hbox2, expand=False, fill=False, padding=0)
-        self.cfg.table2.attach(vbox, 0, 28, 35, 39, yoptions=Gtk.FILL)
+        self.cfg.table2.attach(vbox, 0, 28, 35, 39,
+                               yoptions=Gtk.AttachOptions.FILL)
 
         frame = Gtk.Frame()
         self.cfg.table2.attach(frame, 0, 28, 35, 42)
-        self.cfg.table2.attach(closeButton, 21, 27, 40, 42, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
+        self.cfg.table2.attach(closeButton, 21, 27, 40, 42,
+                               xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
 
         self.treeDemo.expand_all()
         self.cfg.table2.show_all()
@@ -761,17 +818,21 @@ class demoUi:
                 else:
                     if len(dest_path) == 1:
                         if (
-                                        dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_AFTER):
+                                dest_pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_AFTER):
                             new_iter = model.append(dest_iter)
-                        elif dest_pos == Gtk.TREE_VIEW_DROP_BEFORE:
-                            new_iter = model.insert_before(None, dest_iter, None)
-                        elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER:
-                            new_iter = model.insert_after(None, dest_iter, None)
+                        elif dest_pos == Gtk.TreeViewDropPosition.BEFORE:
+                            new_iter = model.insert_before(
+                                None, dest_iter, None)
+                        elif dest_pos == Gtk.TreeViewDropPosition.AFTER:
+                            new_iter = model.insert_after(
+                                None, dest_iter, None)
                     else:
-                        if dest_pos == Gtk.TREE_VIEW_DROP_BEFORE or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
-                            new_iter = model.insert_before(None, dest_iter, None)
-                        elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
-                            new_iter = model.insert_after(None, dest_iter, None)
+                        if dest_pos == Gtk.TreeViewDropPosition.BEFORE or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE:
+                            new_iter = model.insert_before(
+                                None, dest_iter, None)
+                        elif dest_pos == Gtk.TreeViewDropPosition.AFTER or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_AFTER:
+                            new_iter = model.insert_after(
+                                None, dest_iter, None)
 
                 if new_iter:
                     for x in range(len(z)):
@@ -918,32 +979,33 @@ class demoUi:
                 create_demo_server(self.cfg, iter)
                 time.sleep(1)
             elif len(model.get_path(iter)) == 2:
-                thread = thread_gfunc(self.cfg, False, True, start_demo_client, self.cfg, iter)
+                thread = thread_gfunc(
+                    self.cfg, False, True, start_demo_client, self.cfg, iter)
                 thread.start()
                 # start_demo_client(self.cfg, iter)
 
     def check_start(self, model, iter):
         # Если iter включен как сервер = True
         if (len(model.get_path(iter)) == 1 and
-                    model.get_value(iter, self.cfg.dn['demo_server_pid']) not in self.cfg.null):
+                model.get_value(iter, self.cfg.dn['demo_server_pid']) not in self.cfg.null):
             return True
         # Если iter включен как клиент = True
         if (len(model.get_path(iter)) == 2 and
-                    model.get_value(iter, self.cfg.dn['demo_client_pid']) not in self.cfg.null):
+                model.get_value(iter, self.cfg.dn['demo_client_pid']) not in self.cfg.null):
             return True
         return False
 
     def check_start_all(self, model, iter):
         # Если iter клиента и сервер не включен = True
         if (len(model.get_path(iter)) == 2 and
-                    model.get_value(model.iter_parent(iter), self.cfg.dn['demo_server_pid']) in self.cfg.null):
+                model.get_value(model.iter_parent(iter), self.cfg.dn['demo_server_pid']) in self.cfg.null):
             return True
         # Если включен любой сервер/клиент с этим id = True
         client_id = model.get_value(iter, self.cfg.dn["client_id"])
         server_iter = self.cfg.demoList.get_iter_first()
         while server_iter:
             if (model.get_value(server_iter, self.cfg.dn["client_id"]) == client_id and
-                        model.get_value(server_iter, self.cfg.dn['demo_server_pid']) not in self.cfg.null):
+                    model.get_value(server_iter, self.cfg.dn['demo_server_pid']) not in self.cfg.null):
                 return True
             client_iter = self.cfg.demoList.iter_children(server_iter)
             while client_iter:
@@ -961,7 +1023,7 @@ class demoUi:
             treeView.get_selection().unselect_all()
             return
         # Действия
-        if event.button == 1 and (event.state & Gdk.CONTROL_MASK or event.state & Gdk.SHIFT_MASK):
+        if event.button == 1 and (event.state & Gdk.ModifierType.CONTROL_MASK or event.state & Gdk.ModifierType.SHIFT_MASK):
             # Нельзя выделить клиентов больше чем в одной группе
             # Нельзя выделить несколько групп
             model, rows = treeView.get_selection().get_selected_rows()
@@ -970,44 +1032,53 @@ class demoUi:
                     # Отлючить выделение
                     tree_selection_enable(self.treeDemo, False)
                     # Обратно включить
-                    GObject.timeout_add(10, tree_selection_enable, self.treeDemo, True)
+                    GObject.timeout_add(
+                        10, tree_selection_enable, self.treeDemo, True)
                     break
-        elif event.type == Gdk._2BUTTON_PRESS:
+        elif event.type == Gdk.EventType._2BUTTON_PRESS:
             self.callback(None, "edit_tree_item")
 
     def tree_demo_drag_data_motion(self, widget, drag_context, x, y, etime):
         if drag_context.get_source_widget() == widget:
-            drag_context.drag_status(Gdk.ACTION_MOVE, etime)
+            drag_context.drag_status(Gdk.DragAction.MOVE, etime)
         elif drag_context.get_source_widget() == self.cfg.treeView:
-            drag_context.drag_status(Gdk.ACTION_LINK, etime)
+            drag_context.drag_status(Gdk.DragAction.LINK, etime)
         else:
-            drag_context.drag_status(Gdk.ACTION_PRIVATE, etime)
+            drag_context.drag_status(Gdk.DragAction.PRIVATE, etime)
             return True
         drop_info = widget.get_dest_row_at_pos(x, y)
         if drop_info:
             dest_path, dest_pos = drop_info
             if len(dest_path) == 2:
-                if dest_pos == Gtk.TREE_VIEW_DROP_BEFORE or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_BEFORE)
-                elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_AFTER)
+                if dest_pos == Gtk.TreeViewDropPosition.BEFORE or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE:
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.BEFORE)
+                elif dest_pos == Gtk.TreeViewDropPosition.AFTER or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_AFTER:
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.AFTER)
             else:
-                if dest_pos == Gtk.TREE_VIEW_DROP_BEFORE:
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_BEFORE)
-                elif dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
-                elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER and widget.row_expanded(dest_path):
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_INTO_OR_AFTER)
-                elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER:
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_AFTER)
-                elif dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
-                    widget.set_drag_dest_row(dest_path, Gtk.TREE_VIEW_DROP_INTO_OR_AFTER)
+                if dest_pos == Gtk.TreeViewDropPosition.BEFORE:
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.BEFORE)
+                elif dest_pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE:
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.INTO_OR_BEFORE)
+                elif dest_pos == Gtk.TreeViewDropPosition.AFTER and widget.row_expanded(dest_path):
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.INTO_OR_AFTER)
+                elif dest_pos == Gtk.TreeViewDropPosition.AFTER:
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.AFTER)
+                elif dest_pos == Gtk.TreeViewDropPosition.INTO_OR_AFTER:
+                    widget.set_drag_dest_row(
+                        dest_path, Gtk.TreeViewDropPosition.INTO_OR_AFTER)
             # Нельзя вставить до первой группы
             if (len(dest_path) == 1 and dest_path[0] == 0 and (
-                            dest_pos == Gtk.TREE_VIEW_DROP_BEFORE or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)):
-                drag_context.drag_status(Gdk.ACTION_PRIVATE, etime)
+                    dest_pos == Gtk.TreeViewDropPosition.BEFORE or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE)):
+                drag_context.drag_status(Gdk.DragAction.PRIVATE, etime)
         else:
-            widget.set_drag_dest_row((len(widget.get_model()) - 1,), Gtk.TREE_VIEW_DROP_AFTER)
+            widget.set_drag_dest_row(
+                (len(widget.get_model()) - 1,), Gtk.TreeViewDropPosition.AFTER)
         return True
 
     def tree_demo_drag_data_received(self, treeView, context, x, y, selection, info, etime):
@@ -1059,7 +1130,7 @@ class demoUi:
                         continue
                     # Нельзя переместить группу в группу
                     if (len(row) == 1 and len(dest_path) == 1 and (
-                                    dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_AFTER)):
+                            dest_pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_AFTER)):
                         continue
 
                 # Переместить группу в конец списка если нет назначения
@@ -1068,17 +1139,21 @@ class demoUi:
                 else:
                     if len(dest_path) == 1:
                         if (
-                                        dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_AFTER):
+                                dest_pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_AFTER):
                             new_iter = model.append(dest_iter, row_data)
-                        elif dest_pos == Gtk.TREE_VIEW_DROP_BEFORE:
-                            new_iter = model.insert_before(None, dest_iter, row_data)
-                        elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER:
-                            new_iter = model.insert_after(None, dest_iter, row_data)
+                        elif dest_pos == Gtk.TreeViewDropPosition.BEFORE:
+                            new_iter = model.insert_before(
+                                None, dest_iter, row_data)
+                        elif dest_pos == Gtk.TreeViewDropPosition.AFTER:
+                            new_iter = model.insert_after(
+                                None, dest_iter, row_data)
                     else:
-                        if dest_pos == Gtk.TREE_VIEW_DROP_BEFORE or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
-                            new_iter = model.insert_before(None, dest_iter, row_data)
-                        elif dest_pos == Gtk.TREE_VIEW_DROP_AFTER or dest_pos == Gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
-                            new_iter = model.insert_after(None, dest_iter, row_data)
+                        if dest_pos == Gtk.TreeViewDropPosition.BEFORE or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE:
+                            new_iter = model.insert_before(
+                                None, dest_iter, row_data)
+                        elif dest_pos == Gtk.TreeViewDropPosition.AFTER or dest_pos == Gtk.TreeViewDropPosition.INTO_OR_AFTER:
+                            new_iter = model.insert_after(
+                                None, dest_iter, row_data)
 
                 # Удалить если повтор в группе
                 if new_iter and check_demo_client_group(self.cfg, model, new_iter):
@@ -1145,11 +1220,13 @@ class demoUi:
             if row == False:
                 return
             # Раскрыть и выделить
-            self.cfg.treeView.scroll_to_cell(row, None, use_align=True, row_align=0.5, col_align=0.0)
+            self.cfg.treeView.scroll_to_cell(
+                row, None, use_align=True, row_align=0.5, col_align=0.0)
             self.cfg.treeView.expand_to_path(row)
             self.cfg.treeView.get_selection().unselect_all()
             self.cfg.treeView.get_selection().select_path(row)
-            userUi(self.cfg, "edit", get_selected_tree(self.cfg, self.cfg.treeView, "edit"))
+            userUi(self.cfg, "edit", get_selected_tree(
+                self.cfg, self.cfg.treeView, "edit"))
 
         if data2 == "add_server":
             self.add("add_server")
@@ -1158,7 +1235,8 @@ class demoUi:
         if data2 == "remove":
             self.remove()
         if data2 == "start_fullscreen":
-            thread = thread_gfunc(self.cfg, True, True, self.start, "fullscreen")
+            thread = thread_gfunc(self.cfg, True, True,
+                                  self.start, "fullscreen")
             thread.start()
             GObject.timeout_add(200, self.toolbar_sens, thread)
         if data2 == "start_window":
@@ -1214,7 +1292,8 @@ class userUi:
             col = self.treeView.get_column(0)
             cell = col.get_cell_renderers()[1]
             cell.set_property('editable', True)
-            self.treeView.set_cursor_on_cell(row, col, cell, start_editing=True)
+            self.treeView.set_cursor_on_cell(
+                row, col, cell, start_editing=True)
             return
 
         if self.mode == "edit_group":
@@ -1223,7 +1302,8 @@ class userUi:
             col = self.treeView.get_column(0)
             cell = col.get_cell_renderers()[1]
             cell.set_property('editable', True)
-            self.treeView.set_cursor_on_cell(row, col, cell, start_editing=True)
+            self.treeView.set_cursor_on_cell(
+                row, col, cell, start_editing=True)
             return
 
         if self.mode == "server":
@@ -1509,40 +1589,54 @@ class userUi:
             editable = True
 
         if self.mode != "server":
-            self.entryAlias = label_entry(_("Alias"), self.alias, 24, 24, 20, 210, True)
-            vbox.pack_start(self.entryAlias, expand=False, fill=False, padding=0)
+            self.entryAlias = label_entry(
+                _("Alias"), self.alias, 24, 24, 20, 210, True)
+            vbox.pack_start(self.entryAlias, expand=False,
+                            fill=False, padding=0)
 
-            self.entryUser = label_entry(_("User"), user, 24, 24, 20, 210, editable)
-            vbox.pack_start(self.entryUser, expand=False, fill=False, padding=0)
+            self.entryUser = label_entry(
+                _("User"), user, 24, 24, 20, 210, editable)
+            vbox.pack_start(self.entryUser, expand=False,
+                            fill=False, padding=0)
 
-            self.entryHost = label_entry(_("Host"), host, 24, 24, 20, 210, editable)
-            vbox.pack_start(self.entryHost, expand=False, fill=False, padding=0)
+            self.entryHost = label_entry(
+                _("Host"), host, 24, 24, 20, 210, editable)
+            vbox.pack_start(self.entryHost, expand=False,
+                            fill=False, padding=0)
 
-        self.entryIp = label_entry("IP " + _("address"), ip, 24, 15, 20, 210, editable)
+        self.entryIp = label_entry(
+            "IP " + _("address"), ip, 24, 15, 20, 210, editable)
         vbox.pack_start(self.entryIp, expand=False, fill=False, padding=0)
         if self.mode == "server":
-            self.entryIp.entry.connect("changed", self.callback, "server_changed")
+            self.entryIp.entry.connect(
+                "changed", self.callback, "server_changed")
 
         if self.mode != "server":
-            self.entryMac = label_entry("MAC " + _("address"), mac, 24, 24, 20, 210, editable)
+            self.entryMac = label_entry(
+                "MAC " + _("address"), mac, 24, 24, 20, 210, editable)
             vbox.pack_start(self.entryMac, expand=False, fill=False, padding=0)
 
             if self.client != "standalone":
                 self.entryUser.set_editable(False)
-                self.entryServer = label_entry(_("Server"), self.server, 24, 24, 20, 210, False)
-                vbox.pack_start(self.entryServer, expand=False, fill=False, padding=0)
+                self.entryServer = label_entry(
+                    _("Server"), self.server, 24, 24, 20, 210, False)
+                vbox.pack_start(self.entryServer, expand=False,
+                                fill=False, padding=0)
 
-            self.entryDisplay = label_entry(_("Display number"), display, 24, 24, 20, 210, editable)
-            vbox.pack_start(self.entryDisplay, expand=False, fill=False, padding=0)
+            self.entryDisplay = label_entry(
+                _("Display number"), display, 24, 24, 20, 210, editable)
+            vbox.pack_start(self.entryDisplay, expand=False,
+                            fill=False, padding=0)
 
-        self.entryTimeout = label_entry(_("Nmap timeout"), timeout, 24, 5, 20, 210, editable)
+        self.entryTimeout = label_entry(
+            _("Nmap timeout"), timeout, 24, 5, 20, 210, editable)
         vbox.pack_start(self.entryTimeout, expand=False, fill=False, padding=0)
 
         if self.mode != "server":
             # desktop
             label = Gtk.Label(_("Desktop"))
             label.set_alignment(0, 0.5)
-            self.comboDesktop = Gtk.combo_box_new_text()
+            self.comboDesktop = Gtk.ComboBoxText()
             self.comboDesktop.set_size_request(175, 26)
             for i in cfg.known_desktop:
                 self.comboDesktop.append_text(i)
@@ -1565,7 +1659,7 @@ class userUi:
         # dhcp
         label = Gtk.Label(_("DHCP"))
         label.set_alignment(0, 0.5)
-        self.comboDhcp = Gtk.combo_box_new_text()
+        self.comboDhcp = Gtk.ComboBoxText()
         self.comboDhcp.set_size_request(175, 26)
         self.comboDhcp.append_text("dynamic")
         self.comboDhcp.append_text("static")
@@ -1584,7 +1678,7 @@ class userUi:
 
         label = Gtk.Label(_("IP address from ARP table"))
         self.buttonDhcpArp = Gtk.CheckButton(" ")
-        self.buttonDhcpArp.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDhcpArp.set_property('can-focus', True)
         self.buttonDhcpArp.set_sensitive(editable)
         if dhcp_arp == "True":
             self.buttonDhcpArp.set_active(True)
@@ -1599,7 +1693,7 @@ class userUi:
 
         label = Gtk.Label(_("Show local sessions"))
         self.buttonShowLocalSessions = Gtk.CheckButton(_("Dangerous!"))
-        self.buttonShowLocalSessions.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonShowLocalSessions.set_property('can-focus', True)
         self.buttonShowLocalSessions.set_sensitive(editable)
         if show_local_sessions == "True":
             self.buttonShowLocalSessions.set_active(True)
@@ -1612,7 +1706,7 @@ class userUi:
 
         label = Gtk.Label(_("Multi-user"))
         self.buttonDynamicUser = Gtk.CheckButton(" ")
-        self.buttonDynamicUser.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDynamicUser.set_property('can-focus', True)
         if dynamic_user == "True":
             self.buttonDynamicUser.set_active(True)
         if self.client == "standalone":
@@ -1636,16 +1730,23 @@ class userUi:
             self.entryServerKey = file_entry(self.cfg.pixbuf_list_file_add_16, "SSH " + _("key"), server_key, 20, 20,
                                              210, editable)
             self.entryServerKey.button.set_sensitive(editable)
-            vbox.pack_start(self.entryServerKey, expand=False, fill=False, padding=0)
+            vbox.pack_start(self.entryServerKey, expand=False,
+                            fill=False, padding=0)
 
-            self.entryServerPort = label_entry("SSH " + _("port"), server_port, 24, 5, 20, 210, editable)
-            vbox.pack_start(self.entryServerPort, expand=False, fill=False, padding=0)
+            self.entryServerPort = label_entry(
+                "SSH " + _("port"), server_port, 24, 5, 20, 210, editable)
+            vbox.pack_start(self.entryServerPort, expand=False,
+                            fill=False, padding=0)
 
-            self.entryServerUser = label_entry("SSH " + _("user"), server_user, 24, 24, 20, 210, editable)
-            vbox.pack_start(self.entryServerUser, expand=False, fill=False, padding=0)
+            self.entryServerUser = label_entry(
+                "SSH " + _("user"), server_user, 24, 24, 20, 210, editable)
+            vbox.pack_start(self.entryServerUser, expand=False,
+                            fill=False, padding=0)
 
-            self.entryConsoleServer = label_entry("SSH " + _("console"), console_server, 24, 24, 20, 210, editable)
-            vbox.pack_start(self.entryConsoleServer, expand=False, fill=False, padding=0)
+            self.entryConsoleServer = label_entry(
+                "SSH " + _("console"), console_server, 24, 24, 20, 210, editable)
+            vbox.pack_start(self.entryConsoleServer,
+                            expand=False, fill=False, padding=0)
 
         separator = Gtk.HSeparator()
         vbox.pack_start(separator, expand=False, fill=False, padding=0)
@@ -1670,20 +1771,29 @@ class userUi:
                                           20, 20, 210, editable)
         self.entrySshKeyRoot.button.set_sensitive(editable)
         if self.client == "standalone":
-            vbox.pack_start(self.entrySshKeyRoot, expand=False, fill=False, padding=0)
+            vbox.pack_start(self.entrySshKeyRoot, expand=False,
+                            fill=False, padding=0)
 
-        self.entryHostPort = label_entry("SSH " + _("port"), host_port, 24, 5, 20, 210, editable)
-        vbox.pack_start(self.entryHostPort, expand=False, fill=False, padding=0)
+        self.entryHostPort = label_entry(
+            "SSH " + _("port"), host_port, 24, 5, 20, 210, editable)
+        vbox.pack_start(self.entryHostPort, expand=False,
+                        fill=False, padding=0)
 
-        self.entryHostUser = label_entry("SSH " + _("user"), host_user, 24, 24, 20, 210, editable)
+        self.entryHostUser = label_entry(
+            "SSH " + _("user"), host_user, 24, 24, 20, 210, editable)
         if self.client != "standalone":
-            vbox.pack_start(self.entryHostUser, expand=False, fill=False, padding=0)
+            vbox.pack_start(self.entryHostUser, expand=False,
+                            fill=False, padding=0)
 
-        self.entryConsoleHost = label_entry("SSH " + _("console"), console_host, 24, 24, 20, 210, editable)
-        vbox.pack_start(self.entryConsoleHost, expand=False, fill=False, padding=0)
+        self.entryConsoleHost = label_entry(
+            "SSH " + _("console"), console_host, 24, 24, 20, 210, editable)
+        vbox.pack_start(self.entryConsoleHost,
+                        expand=False, fill=False, padding=0)
 
-        self.entryFolderUser = label_entry(_("Folder for sending files"), folder_user, 24, 200, 20, 210, editable)
-        vbox.pack_start(self.entryFolderUser, expand=False, fill=False, padding=0)
+        self.entryFolderUser = label_entry(
+            _("Folder for sending files"), folder_user, 24, 200, 20, 210, editable)
+        vbox.pack_start(self.entryFolderUser, expand=False,
+                        fill=False, padding=0)
 
         ##########################################
         # VNC
@@ -1703,7 +1813,7 @@ class userUi:
         vbox.pack_start(separator, expand=False, fill=False, padding=0)
 
         self.buttonVncAutostart = Gtk.CheckButton(" ")
-        self.buttonVncAutostart.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncAutostart.set_property('can-focus', True)
         self.buttonVncAutostart.set_sensitive(editable)
         if vnc_autostart == "True":
             self.buttonVncAutostart.set_active(True)
@@ -1715,16 +1825,18 @@ class userUi:
 
         self.entryVncAutostartCommand = label_entry(_("Autostart x11vnc") + "(" + _("command") + ")",
                                                     vnc_autostart_command, 24, 200, 20, 210, editable)
-        vbox.pack_start(self.entryVncAutostartCommand, expand=False, fill=False, padding=0)
+        vbox.pack_start(self.entryVncAutostartCommand,
+                        expand=False, fill=False, padding=0)
 
-        self.entryVncPort = label_entry("VNC " + _("port"), vncport, 24, 5, 20, 210, editable)
+        self.entryVncPort = label_entry(
+            "VNC " + _("port"), vncport, 24, 5, 20, 210, editable)
         vbox.pack_start(self.entryVncPort, expand=False, fill=False, padding=0)
 
         ###
         label = Gtk.Label(_("Priority of the connection"))
 
         self.buttonOverServer = Gtk.CheckButton(_("Over server"))
-        self.buttonOverServer.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonOverServer.set_property('can-focus', True)
         self.buttonOverServer.set_sensitive(editable)
         if over_server == "True":
             self.buttonOverServer.set_active(True)
@@ -1734,7 +1846,7 @@ class userUi:
         #    vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonVncNormal = Gtk.CheckButton("VNC " + _("normal"))
-        self.buttonVncNormal.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncNormal.set_property('can-focus', True)
         self.buttonVncNormal.set_sensitive(editable)
         if vnc_normal == "True":
             self.buttonVncNormal.set_active(True)
@@ -1744,7 +1856,7 @@ class userUi:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonVncSsh = Gtk.CheckButton(_("VNC over SSH"))
-        self.buttonVncSsh.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncSsh.set_property('can-focus', True)
         self.buttonVncSsh.set_sensitive(editable)
         if vnc_ssh == "True":
             self.buttonVncSsh.set_active(True)
@@ -1764,7 +1876,7 @@ class userUi:
             vbox.pack_start(separator, expand=False, fill=False, padding=1)
 
         self.buttonVncNxThin = Gtk.CheckButton(_("Thin client"))
-        self.buttonVncNxThin.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncNxThin.set_property('can-focus', True)
         self.buttonVncNxThin.set_sensitive(editable)
         if vnc_nx_thin == "True":
             self.buttonVncNxThin.set_active(True)
@@ -1776,7 +1888,7 @@ class userUi:
             vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonVncNxScan = Gtk.CheckButton(_("Search x11vnc port"))
-        self.buttonVncNxScan.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncNxScan.set_property('can-focus', True)
         self.buttonVncNxScan.set_sensitive(editable)
         if vnc_nx_scan == "True":
             self.buttonVncNxScan.set_active(True)
@@ -1786,7 +1898,7 @@ class userUi:
             vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonVncNxAutostart = Gtk.CheckButton(_("Autostart x11vnc"))
-        self.buttonVncNxAutostart.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncNxAutostart.set_property('can-focus', True)
         self.buttonVncNxAutostart.set_sensitive(editable)
         if vnc_nx_autostart == "True":
             self.buttonVncNxAutostart.set_active(True)
@@ -1805,13 +1917,15 @@ class userUi:
         separator = Gtk.HSeparator()
         vbox.pack_start(separator, expand=False, fill=False, padding=1)
 
-        self.entryVncPassword = label_entry(_("Password"), vnc_pass, 24, 24, 20, 210, editable, False)
-        vbox.pack_start(self.entryVncPassword, expand=False, fill=False, padding=0)
+        self.entryVncPassword = label_entry(
+            _("Password"), vnc_pass, 24, 24, 20, 210, editable, False)
+        vbox.pack_start(self.entryVncPassword,
+                        expand=False, fill=False, padding=0)
 
         ###
         label = Gtk.Label(_("Encoding"))
         label.set_alignment(0, 0.5)
-        self.comboVncGtkEncoding = Gtk.combo_box_new_text()
+        self.comboVncGtkEncoding = Gtk.ComboBoxText()
         self.comboVncGtkEncoding.set_size_request(175, 26)
         self.comboVncGtkEncoding.append_text("default")
         self.comboVncGtkEncoding.append_text("zrle")
@@ -1833,7 +1947,7 @@ class userUi:
         ###
         label = Gtk.Label(_("Color level"))
         label.set_alignment(0, 0.5)
-        self.comboVncGtkColor = Gtk.combo_box_new_text()
+        self.comboVncGtkColor = Gtk.ComboBoxText()
         self.comboVncGtkColor.set_sensitive(editable)
         self.comboVncGtkColor.set_size_request(175, 26)
         self.comboVncGtkColor.append_text("default")
@@ -1854,7 +1968,7 @@ class userUi:
                 break
 
         self.buttonVncGtkLossy = Gtk.CheckButton(_("Lossy encoding"))
-        self.buttonVncGtkLossy.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncGtkLossy.set_property('can-focus', True)
         self.buttonVncGtkLossy.set_sensitive(editable)
         if vnc_gtk_lossy == "True":
             self.buttonVncGtkLossy.set_active(True)
@@ -1863,7 +1977,7 @@ class userUi:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonVncGtkPointer = Gtk.CheckButton(_("Pointer local"))
-        self.buttonVncGtkPointer.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncGtkPointer.set_property('can-focus', True)
         self.buttonVncGtkPointer.set_sensitive(editable)
         if vnc_gtk_pointer == "True":
             self.buttonVncGtkPointer.set_active(True)
@@ -1872,7 +1986,7 @@ class userUi:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonVncGtkPointerGrab = Gtk.CheckButton(_("Pointer grab"))
-        self.buttonVncGtkPointerGrab.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncGtkPointerGrab.set_property('can-focus', True)
         self.buttonVncGtkPointerGrab.set_sensitive(editable)
         if vnc_gtk_pointer_grab == "True":
             self.buttonVncGtkPointerGrab.set_active(True)
@@ -1881,7 +1995,7 @@ class userUi:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonVncGtkKeyboardGrab = Gtk.CheckButton(_("Keyboard grab"))
-        self.buttonVncGtkKeyboardGrab.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncGtkKeyboardGrab.set_property('can-focus', True)
         self.buttonVncGtkKeyboardGrab.set_sensitive(editable)
         if vnc_gtk_keyboard_grab == "True":
             self.buttonVncGtkKeyboardGrab.set_active(True)
@@ -1902,10 +2016,13 @@ class userUi:
         self.entryVncPasswordFile = file_entry(self.cfg.pixbuf_list_file_add_16, _("Password"), vnc_pass_file, 20, 20,
                                                210, editable)
         self.entryVncPasswordFile.button.set_sensitive(editable)
-        vbox.pack_start(self.entryVncPasswordFile, expand=False, fill=False, padding=0)
+        vbox.pack_start(self.entryVncPasswordFile,
+                        expand=False, fill=False, padding=0)
 
-        self.entryVncCommand = label_entry("VNC " + _("command"), vnc_command, 24, 200, 20, 210, editable)
-        vbox.pack_start(self.entryVncCommand, expand=False, fill=False, padding=0)
+        self.entryVncCommand = label_entry(
+            "VNC " + _("command"), vnc_command, 24, 200, 20, 210, editable)
+        vbox.pack_start(self.entryVncCommand, expand=False,
+                        fill=False, padding=0)
 
         ##########################################
         # Demo
@@ -1921,8 +2038,9 @@ class userUi:
         separator = Gtk.HSeparator()
         vbox.pack_start(separator, expand=False, fill=False, padding=0)
 
-        self.buttonDemoVlc = Gtk.RadioButton(None, _("Video streaming") + "(VLC)")
-        self.buttonDemoVlc.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoVlc = Gtk.RadioButton(
+            None, _("Video streaming") + "(VLC)")
+        self.buttonDemoVlc.set_property('can-focus', True)
         self.buttonDemoVlc.set_sensitive(editable)
         fixed = Gtk.Fixed()
         label = Gtk.Label(_("Server type"))
@@ -1931,7 +2049,7 @@ class userUi:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonDemoVnc = Gtk.RadioButton(self.buttonDemoVlc, _("VNC"))
-        self.buttonDemoVnc.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoVnc.set_property('can-focus', True)
         self.buttonDemoVnc.set_sensitive(editable)
         if demo_vlc != "True":
             self.buttonDemoVnc.set_active(True)
@@ -1940,7 +2058,7 @@ class userUi:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonDemoDirect = Gtk.RadioButton(None, _("Direct"))
-        self.buttonDemoDirect.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoDirect.set_property('can-focus', True)
         self.buttonDemoDirect.set_sensitive(editable)
         fixed = Gtk.Fixed()
         label = Gtk.Label(_("Connection of clients"))
@@ -1948,8 +2066,9 @@ class userUi:
         fixed.put(self.buttonDemoDirect, 210, 0)
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
-        self.buttonDemoSsh = Gtk.RadioButton(self.buttonDemoDirect, _("VNC/HTTP over SSH"))
-        self.buttonDemoSsh.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoSsh = Gtk.RadioButton(
+            self.buttonDemoDirect, _("VNC/HTTP over SSH"))
+        self.buttonDemoSsh.set_property('can-focus', True)
         self.buttonDemoSsh.set_sensitive(editable)
         if demo_ssh == "True":
             self.buttonDemoSsh.set_active(True)
@@ -1967,14 +2086,15 @@ class userUi:
         ###
         ###
         self.buttonDemoVlcHttp = Gtk.RadioButton(None, "HTTP")
-        self.buttonDemoVlcHttp.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoVlcHttp.set_property('can-focus', True)
         self.buttonDemoVlcHttp.set_sensitive(editable)
         fixed = Gtk.Fixed()
         fixed.put(self.buttonDemoVlcHttp, 210, 0)
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
-        self.buttonDemoVlcRtp = Gtk.RadioButton(self.buttonDemoVlcHttp, "RTP (multicast 239.0.0.1)")
-        self.buttonDemoVlcRtp.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoVlcRtp = Gtk.RadioButton(
+            self.buttonDemoVlcHttp, "RTP (multicast 239.0.0.1)")
+        self.buttonDemoVlcRtp.set_property('can-focus', True)
         self.buttonDemoVlcRtp.set_sensitive(editable)
         if demo_vlc_rtp in self.cfg.true:
             self.buttonDemoVlcRtp.set_active(True)
@@ -1983,8 +2103,9 @@ class userUi:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         ###
-        self.buttonDemoVlcAudio = Gtk.CheckButton(_("Audio") + " (" + _("only") + " PulseAudio)")
-        self.buttonDemoVlcAudio.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoVlcAudio = Gtk.CheckButton(
+            _("Audio") + " (" + _("only") + " PulseAudio)")
+        self.buttonDemoVlcAudio.set_property('can-focus', True)
         self.buttonDemoVlcAudio.set_sensitive(editable)
         # if ( demo_vlc_audio in self.cfg.true ):
         #    self.buttonDemoVlcAudio.set_active(True)
@@ -1994,7 +2115,7 @@ class userUi:
 
         label = Gtk.Label(_("Frames per second"))
         label.set_alignment(0, 0.5)
-        self.comboDemoVlcFps = Gtk.combo_box_new_text()
+        self.comboDemoVlcFps = Gtk.ComboBoxText()
         self.comboDemoVlcFps.set_sensitive(editable)
         self.comboDemoVlcFps.set_size_request(175, 26)
         self.comboDemoVlcFps.append_text("5")
@@ -2015,7 +2136,7 @@ class userUi:
         ###
         label = Gtk.Label(_("Video codec"))
         label.set_alignment(0, 0.5)
-        self.comboDemoVlcVcodec = Gtk.combo_box_new_text()
+        self.comboDemoVlcVcodec = Gtk.ComboBoxText()
         self.comboDemoVlcVcodec.set_sensitive(editable)
         self.comboDemoVlcVcodec.set_size_request(175, 26)
         self.comboDemoVlcVcodec.append_text("mp1v")
@@ -2038,7 +2159,7 @@ class userUi:
         ###
         label = Gtk.Label(_("Resolution") + " (" + _("in full screen") + ")")
         label.set_alignment(0, 0.5)
-        self.comboDemoVlcScaleFull = Gtk.combo_box_new_text()
+        self.comboDemoVlcScaleFull = Gtk.ComboBoxText()
         self.comboDemoVlcScaleFull.set_row_separator_func(self.combo_separator)
         self.comboDemoVlcScaleFull.set_sensitive(editable)
         self.comboDemoVlcScaleFull.set_size_request(175, 26)
@@ -2057,8 +2178,9 @@ class userUi:
         ###
         label = Gtk.Label(_("Resolution") + " (" + _("in window") + ")")
         label.set_alignment(0, 0.5)
-        self.comboDemoVlcScaleWindow = Gtk.combo_box_new_text()
-        self.comboDemoVlcScaleWindow.set_row_separator_func(self.combo_separator)
+        self.comboDemoVlcScaleWindow = Gtk.ComboBoxText()
+        self.comboDemoVlcScaleWindow.set_row_separator_func(
+            self.combo_separator)
         self.comboDemoVlcScaleWindow.set_sensitive(editable)
         self.comboDemoVlcScaleWindow.set_size_request(175, 26)
         for x in self.cfg.scale_list:
@@ -2076,7 +2198,7 @@ class userUi:
         ###
         label = Gtk.Label(_("Caching"))
         label.set_alignment(0, 0.5)
-        self.comboDemoVlcCaching = Gtk.combo_box_new_text()
+        self.comboDemoVlcCaching = Gtk.ComboBoxText()
         self.comboDemoVlcCaching.set_sensitive(editable)
         self.comboDemoVlcCaching.set_size_request(175, 26)
         self.comboDemoVlcCaching.append_text("300")
@@ -2099,7 +2221,7 @@ class userUi:
         label = Gtk.Label(_("Another client command"))
         label.set_alignment(0, 0.5)
         self.buttonDemoVlcClient = Gtk.CheckButton(" ")
-        self.buttonDemoVlcClient.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoVlcClient.set_property('can-focus', True)
         self.buttonDemoVlcClient.set_sensitive(editable)
         if demo_vlc_client == "True":
             self.buttonDemoVlcClient.set_active(True)
@@ -2108,8 +2230,10 @@ class userUi:
         fixed.put(self.buttonDemoVlcClient, 210, 0)
         vbox.pack_start(fixed, expand=False, fill=False, padding=3)
 
-        self.entryDemoVlcClientCommand = label_entry("", demo_vlc_client_command, 51, 200, 20, 20, editable)
-        vbox.pack_start(self.entryDemoVlcClientCommand, expand=False, fill=False, padding=0)
+        self.entryDemoVlcClientCommand = label_entry(
+            "", demo_vlc_client_command, 51, 200, 20, 20, editable)
+        vbox.pack_start(self.entryDemoVlcClientCommand,
+                        expand=False, fill=False, padding=0)
 
         # VNC
         separator = Gtk.HSeparator()
@@ -2119,19 +2243,25 @@ class userUi:
         separator = Gtk.HSeparator()
         vbox.pack_start(separator, expand=False, fill=False, padding=1)
 
-        self.entryVncServer = label_entry(_("Server command"), vnc_server, 24, 200, 20, 210, editable)
-        vbox.pack_start(self.entryVncServer, expand=False, fill=False, padding=0)
+        self.entryVncServer = label_entry(
+            _("Server command"), vnc_server, 24, 200, 20, 210, editable)
+        vbox.pack_start(self.entryVncServer, expand=False,
+                        fill=False, padding=0)
 
         self.entryVncServerWindow = label_entry(_("Server command") + "(" + _("in window") + ")", vnc_server_window, 24,
                                                 200, 20, 210, editable)
-        vbox.pack_start(self.entryVncServerWindow, expand=False, fill=False, padding=0)
+        vbox.pack_start(self.entryVncServerWindow,
+                        expand=False, fill=False, padding=0)
 
-        self.entryVncClient = label_entry(_("Client command"), vnc_client, 24, 200, 20, 210, editable)
-        vbox.pack_start(self.entryVncClient, expand=False, fill=False, padding=0)
+        self.entryVncClient = label_entry(
+            _("Client command"), vnc_client, 24, 200, 20, 210, editable)
+        vbox.pack_start(self.entryVncClient, expand=False,
+                        fill=False, padding=0)
 
         self.entryVncClientWindow = label_entry(_("Client command") + "(" + _("in window") + ")", vnc_client_window, 24,
                                                 200, 20, 210, editable)
-        vbox.pack_start(self.entryVncClientWindow, expand=False, fill=False, padding=0)
+        vbox.pack_start(self.entryVncClientWindow,
+                        expand=False, fill=False, padding=0)
 
         separator = Gtk.HSeparator()
         vbox.pack_start(separator, expand=False, fill=False, padding=1)
@@ -2168,37 +2298,47 @@ class userUi:
         hbox.pack_start(image, expand=False, fill=False, padding=0)
         hbox.pack_start(layout, expand=False, fill=False, padding=10)
         hbox.pack_start(labelMode, expand=False, fill=False, padding=0)
-        self.cfg.table2.attach(hbox, 0, 26, 0, 3, xoptions=Gtk.EXPAND, yoptions=Gtk.FILL)
+        self.cfg.table2.attach(
+            hbox, 0, 26, 0, 3, xoptions=Gtk.AttachOptions.EXPAND, yoptions=Gtk.AttachOptions.FILL)
 
         sw = Gtk.ScrolledWindow()
-        sw.set_policy(Gtk.POLICY_NEVER, Gtk.POLICY_ALWAYS)
+        sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
         sw.add_with_viewport(vbox)
-        self.cfg.table2.attach(sw, 1, 28, 3, 40, yoptions=Gtk.FILL)
+        self.cfg.table2.attach(
+            sw, 1, 28, 3, 40, yoptions=Gtk.AttachOptions.FILL)
 
-        self.cfg.table2.attach(saveButton, 1, 9, 40, 42, xoptions=Gtk.FILL, yoptions=Gtk.SHRINK)
-        self.cfg.table2.attach(closeButton, 19, 27, 40, 42, xoptions=Gtk.FILL, yoptions=Gtk.SHRINK)
+        self.cfg.table2.attach(
+            saveButton, 1, 9, 40, 42, xoptions=Gtk.AttachOptions.FILL, yoptions=Gtk.AttachOptions.SHRINK)
+        self.cfg.table2.attach(closeButton, 19, 27, 40, 42,
+                               xoptions=Gtk.AttachOptions.FILL, yoptions=Gtk.AttachOptions.SHRINK)
         self.cfg.table2.show_all()
 
         if self.mode == "server":
             self.callback(None, "server_changed")
         #
-        self.buttonVncAutostart.connect("clicked", self.callback, "vnc_autostart")
+        self.buttonVncAutostart.connect(
+            "clicked", self.callback, "vnc_autostart")
         self.callback(None, "vnc_autostart")
         #
         self.buttonDemoVlc.connect("clicked", self.callback, "demo_vlc")
         self.callback(None, "demo_vlc")
         self.buttonDemoDirect.connect("clicked", self.callback, "demo_direct")
         self.callback(None, "demo_direct")
-        self.buttonDemoVlcHttp.connect("clicked", self.callback, "demo_vlc_http")
+        self.buttonDemoVlcHttp.connect(
+            "clicked", self.callback, "demo_vlc_http")
         self.callback(None, "demo_vlc_http")
 
-        self.buttonDemoVlcAudio.connect("clicked", self.callback, "demo_vlc_audio")
+        self.buttonDemoVlcAudio.connect(
+            "clicked", self.callback, "demo_vlc_audio")
         self.callback(None, "demo_vlc_audio")
 
-        self.comboDemoVlcVcodec.connect("changed", self.callback, "demo_vlc_vcodec")
-        self.comboDemoVlcCaching.connect("changed", self.callback, "demo_vlc_caching")
+        self.comboDemoVlcVcodec.connect(
+            "changed", self.callback, "demo_vlc_vcodec")
+        self.comboDemoVlcCaching.connect(
+            "changed", self.callback, "demo_vlc_caching")
 
-        self.buttonDemoVlcClient.connect("clicked", self.callback, "demo_vlc_client")
+        self.buttonDemoVlcClient.connect(
+            "clicked", self.callback, "demo_vlc_client")
         self.callback(None, "demo_vlc_client")
 
     def save(self, data=None):
@@ -2284,22 +2424,26 @@ class userUi:
             if rows != []:
                 row = (rows[0][0],)
                 group_name = self.cfg.userList[row][0]
-                parent_iter = find_tree(self.cfg, self.cfg.userList, parent=group_name, group=True)
+                parent_iter = find_tree(
+                    self.cfg, self.cfg.userList, parent=group_name, group=True)
                 if parent_iter:
                     self.group = group_name
             if parent_iter == False:
-                parent_iter = find_tree(self.cfg, self.cfg.userList, parent="standalone")
+                parent_iter = find_tree(
+                    self.cfg, self.cfg.userList, parent="standalone")
             if parent_iter == False:
                 parent_iter = self.cfg.userList.prepend(None)
                 self.cfg.userList.set(parent_iter, 0, "standalone")
             iter = self.cfg.userList.append(parent_iter)
 
         elif self.mode == "client_info":
-            row = find_tree(self.cfg, self.cfg.userList, client_id=self.client_id)
+            row = find_tree(self.cfg, self.cfg.userList,
+                            client_id=self.client_id)
             if row:
                 iter = self.cfg.userList.get_iter(row)
             else:
-                parent_iter = find_tree(self.cfg, self.cfg.userList, parent=self.group)
+                parent_iter = find_tree(
+                    self.cfg, self.cfg.userList, parent=self.group)
                 if parent_iter == False:
                     parent_iter = self.cfg.userList.prepend(None)
                     self.cfg.userList.set(parent_iter, 0, self.group)
@@ -2313,7 +2457,8 @@ class userUi:
                     server_path = self.cfg.userList.get_path(iter)
                     child_iters = []
                     for x in range(self.cfg.userList.iter_n_children(iter)):
-                        iter_c = self.cfg.userList.get_iter((server_path[0], x))
+                        iter_c = self.cfg.userList.get_iter(
+                            (server_path[0], x))
                         child_iters.append(iter_c)
                     for iter_c in child_iters:
                         self.cfg.userList.remove(iter_c)
@@ -2333,26 +2478,45 @@ class userUi:
             self.cfg.userList.set(iter, dn['alias'], alias)
             self.cfg.userList.set(iter, dn['client'], self.client)
             self.cfg.userList.set(iter, dn['host_port'], host_port)
-            self.cfg.userList.set(iter, dn['vnc_pass'], self.entryVncPassword.get_text())
-            self.cfg.userList.set(iter, dn['vnc_pass_file'], self.entryVncPasswordFile.get_text())
-            self.cfg.userList.set(iter, dn['vnc_command'], self.entryVncCommand.get_text())
-            self.cfg.userList.set(iter, dn['vnc_client'], self.entryVncClient.get_text())
-            self.cfg.userList.set(iter, dn['vnc_server'], self.entryVncServer.get_text())
-            self.cfg.userList.set(iter, dn['vnc_client_window'], self.entryVncClientWindow.get_text())
-            self.cfg.userList.set(iter, dn['vnc_server_window'], self.entryVncServerWindow.get_text())
-            self.cfg.userList.set(iter, dn['console_host'], self.entryConsoleHost.get_text())
-            self.cfg.userList.set(iter, dn['folder_user'], self.entryFolderUser.get_text())
-            self.cfg.userList.set(iter, dn['vnc_gtk_encoding'], self.comboVncGtkEncoding.get_active_text())
-            self.cfg.userList.set(iter, dn['vnc_gtk_color'], self.comboVncGtkColor.get_active_text())
-            self.cfg.userList.set(iter, dn['dhcp'], self.comboDhcp.get_active_text())
-            self.cfg.userList.set(iter, dn['vnc_autostart_command'], self.entryVncAutostartCommand.get_text())
+            self.cfg.userList.set(
+                iter, dn['vnc_pass'], self.entryVncPassword.get_text())
+            self.cfg.userList.set(
+                iter, dn['vnc_pass_file'], self.entryVncPasswordFile.get_text())
+            self.cfg.userList.set(
+                iter, dn['vnc_command'], self.entryVncCommand.get_text())
+            self.cfg.userList.set(
+                iter, dn['vnc_client'], self.entryVncClient.get_text())
+            self.cfg.userList.set(
+                iter, dn['vnc_server'], self.entryVncServer.get_text())
+            self.cfg.userList.set(
+                iter, dn['vnc_client_window'], self.entryVncClientWindow.get_text())
+            self.cfg.userList.set(
+                iter, dn['vnc_server_window'], self.entryVncServerWindow.get_text())
+            self.cfg.userList.set(
+                iter, dn['console_host'], self.entryConsoleHost.get_text())
+            self.cfg.userList.set(
+                iter, dn['folder_user'], self.entryFolderUser.get_text())
+            self.cfg.userList.set(
+                iter, dn['vnc_gtk_encoding'], self.comboVncGtkEncoding.get_active_text())
+            self.cfg.userList.set(
+                iter, dn['vnc_gtk_color'], self.comboVncGtkColor.get_active_text())
+            self.cfg.userList.set(
+                iter, dn['dhcp'], self.comboDhcp.get_active_text())
+            self.cfg.userList.set(
+                iter, dn['vnc_autostart_command'], self.entryVncAutostartCommand.get_text())
 
-            self.cfg.userList.set(iter, dn['demo_vlc_fps'], self.comboDemoVlcFps.get_active_text())
-            self.cfg.userList.set(iter, dn['demo_vlc_vcodec'], self.comboDemoVlcVcodec.get_active_text())
-            self.cfg.userList.set(iter, dn['demo_vlc_scale_full'], self.comboDemoVlcScaleFull.get_active_text())
-            self.cfg.userList.set(iter, dn['demo_vlc_scale_window'], self.comboDemoVlcScaleWindow.get_active_text())
-            self.cfg.userList.set(iter, dn['demo_vlc_caching'], self.comboDemoVlcCaching.get_active_text())
-            self.cfg.userList.set(iter, dn['demo_vlc_client_command'], self.entryDemoVlcClientCommand.get_text())
+            self.cfg.userList.set(
+                iter, dn['demo_vlc_fps'], self.comboDemoVlcFps.get_active_text())
+            self.cfg.userList.set(
+                iter, dn['demo_vlc_vcodec'], self.comboDemoVlcVcodec.get_active_text())
+            self.cfg.userList.set(
+                iter, dn['demo_vlc_scale_full'], self.comboDemoVlcScaleFull.get_active_text())
+            self.cfg.userList.set(
+                iter, dn['demo_vlc_scale_window'], self.comboDemoVlcScaleWindow.get_active_text())
+            self.cfg.userList.set(
+                iter, dn['demo_vlc_caching'], self.comboDemoVlcCaching.get_active_text())
+            self.cfg.userList.set(
+                iter, dn['demo_vlc_client_command'], self.entryDemoVlcClientCommand.get_text())
 
             if self.buttonOverServer.get_active():
                 self.cfg.userList.set(iter, dn['over_server'], "True")
@@ -2406,12 +2570,15 @@ class userUi:
             if self.buttonVncGtkPointerGrab.get_active():
                 self.cfg.userList.set(iter, dn['vnc_gtk_pointer_grab'], "True")
             else:
-                self.cfg.userList.set(iter, dn['vnc_gtk_pointer_grab'], "False")
+                self.cfg.userList.set(
+                    iter, dn['vnc_gtk_pointer_grab'], "False")
 
             if self.buttonVncGtkKeyboardGrab.get_active():
-                self.cfg.userList.set(iter, dn['vnc_gtk_keyboard_grab'], "True")
+                self.cfg.userList.set(
+                    iter, dn['vnc_gtk_keyboard_grab'], "True")
             else:
-                self.cfg.userList.set(iter, dn['vnc_gtk_keyboard_grab'], "False")
+                self.cfg.userList.set(
+                    iter, dn['vnc_gtk_keyboard_grab'], "False")
 
             if self.buttonShowLocalSessions.get_active():
                 self.cfg.userList.set(iter, dn['show_local_sessions'], "True")
@@ -2451,21 +2618,24 @@ class userUi:
             self.cfg.userList.set(iter, dn['timeout'], timeout)
             self.cfg.userList.set(iter, dn['vncport'], vncport)
             self.cfg.userList.set(iter, dn['host_key'], host_key)
-            self.cfg.userList.set(iter, dn['ssh_key_root'], self.entrySshKeyRoot.get_text())
+            self.cfg.userList.set(
+                iter, dn['ssh_key_root'], self.entrySshKeyRoot.get_text())
             if self.client == "standalone":
                 self.cfg.userList.set(iter, dn['server_key'], host_key)
                 self.cfg.userList.set(iter, dn['server_port'], host_port)
                 self.cfg.userList.set(iter, dn['server_user'], user)
                 self.cfg.userList.set(iter, dn['server'], ip)
                 self.cfg.userList.set(iter, dn['host_user'], user)
-                self.cfg.userList.set(iter, dn['console_server'], self.entryConsoleHost.get_text())
+                self.cfg.userList.set(
+                    iter, dn['console_server'], self.entryConsoleHost.get_text())
             else:
                 self.cfg.userList.set(iter, dn['server_key'], server_key)
                 self.cfg.userList.set(iter, dn['server_port'], server_port)
                 self.cfg.userList.set(iter, dn['server_user'], server_user)
                 self.cfg.userList.set(iter, dn['server'], self.server)
                 self.cfg.userList.set(iter, dn['host_user'], host_user)
-                self.cfg.userList.set(iter, dn['console_server'], self.entryConsoleServer.get_text())
+                self.cfg.userList.set(
+                    iter, dn['console_server'], self.entryConsoleServer.get_text())
             if self.mode != "server":
                 self.cfg.userList.set(iter, dn['user'], user)
                 self.cfg.userList.set(iter, dn['host'], host)
@@ -2480,12 +2650,14 @@ class userUi:
 
             # Обновить сервер в списке
             if self.mode == "server":
-                thread_server_group = thread_gfunc(self.cfg, False, True, create_tree_server_group, self.cfg, iter)
+                thread_server_group = thread_gfunc(
+                    self.cfg, False, True, create_tree_server_group, self.cfg, iter)
                 thread_server_group.start()
 
         # Раскрыть и выделить в дереве позицию
         row = self.cfg.userList.get_path(iter)
-        self.treeView.scroll_to_cell(row, None, use_align=True, row_align=0.5, col_align=0.0)
+        self.treeView.scroll_to_cell(
+            row, None, use_align=True, row_align=0.5, col_align=0.0)
         self.treeView.expand_to_path(row)
         self.treeView.get_selection().unselect_all()
         self.treeView.get_selection().select_path(row)
@@ -2619,13 +2791,13 @@ class hwinfoUi:
         self.textview = Gtk.TextView()
         self.textview.set_editable(False)
         self.textview.set_sensitive(False)
-        color = self.textview.get_style().copy().base[Gtk.STATE_NORMAL]
-        self.textview.modify_base(Gtk.STATE_INSENSITIVE, color)
+        color = self.textview.get_style().copy().base[Gtk.StateFlags.NORMAL]
+        self.textview.modify_base(Gtk.StateFlags.INSENSITIVE, color)
 
         self.buffer = self.textview.get_buffer()
 
         self.sw = Gtk.ScrolledWindow()
-        self.sw.set_policy(Gtk.POLICY_ALWAYS, Gtk.POLICY_ALWAYS)
+        self.sw.set_policy(Gtk.PolicyType.ALWAYS, Gtk.PolicyType.ALWAYS)
         self.sw.add(self.textview)
 
         closeButton = image_button(self.cfg.pixbuf_action_close_16, _("Close"))
@@ -2639,13 +2811,16 @@ class hwinfoUi:
         cfg.table2.attach(frame, 0, 28, 0, 39)
         cfg.table2.attach(self.sw, 1, 28, 1, 39)
         cfg.table2.attach(frame2, 0, 28, 39, 42)
-        cfg.table2.attach(closeButton, 21, 27, 40, 42, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
+        cfg.table2.attach(closeButton, 21, 27, 40, 42,
+                          xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
 
         if mode == "log":
-            clearButton = image_button(self.cfg.pixbuf_list_clear_16, _("Clear"))
+            clearButton = image_button(
+                self.cfg.pixbuf_list_clear_16, _("Clear"))
             clearButton.connect("clicked", self.clear_log)
             clearButton.set_size_request(120, 26)
-            cfg.table2.attach(clearButton, 1, 7, 40, 42, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
+            cfg.table2.attach(clearButton, 1, 7, 40, 42,
+                              xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
             self.log()
         else:
             thread_hwinfo = thread_gfunc(self.cfg, True, True, self.hwinfo)
@@ -2663,7 +2838,7 @@ class hwinfoUi:
 
     def textview_changed(self, widget, event, data=None):
         adj = self.sw.get_vadjustment()
-        adj.set_value(adj.upper - adj.page_size)
+        adj.set_value(adj.props.upper - adj.props.page_size)
 
     def hwinfo(self):
         for line in self.user_list:
@@ -2679,13 +2854,16 @@ class hwinfoUi:
             if d['client'] == "nx":
                 host = ""
 
-            ssh = self.cfg.ssh_command(d['host_key'], d['host_port'], d['host_user'], d['ip'])
+            ssh = self.cfg.ssh_command(
+                d['host_key'], d['host_port'], d['host_user'], d['ip'])
             if (d['server'] not in self.cfg.localhost) and d['over_server'] == "True":
                 # туннель для SSH
                 local_port = ssh_tunnel(self.cfg, d['server_key'], d['server_port'], d['server_user'], d['server'],
                                         d['ip'], d['host_port'])
-                if local_port == "0": continue
-                ssh = self.cfg.ssh_command(d['host_key'], local_port, d['host_user'], "127.0.0.1")
+                if local_port == "0":
+                    continue
+                ssh = self.cfg.ssh_command(
+                    d['host_key'], local_port, d['host_user'], "127.0.0.1")
 
             bios = "dmidecode --type bios | grep -E \"BIOS Inf|Vendor|Version|Release\""
             baseboard = "dmidecode --type baseboard | grep -E \"Board Inf|Manufacturer|Name|Version\""
@@ -2709,8 +2887,10 @@ class hwinfoUi:
                 info = proc.stdout.readlines()
 
             # xdpyinfo | grep 'dimensions:'|awk '{print $2}
-            ssh = self.cfg.ssh_command(d['server_key'], d['server_port'], d['user'], d['server'])
-            command = "export DISPLAY=" + d['display'] + ".0; xrandr | grep \\\*"
+            ssh = self.cfg.ssh_command(
+                d['server_key'], d['server_port'], d['user'], d['server'])
+            command = "export DISPLAY=" + \
+                d['display'] + ".0; xrandr | grep \\\*"
             cmd = ssh + command
             proc = popen_sub(self.cfg, cmd.split())
             if proc == False:
@@ -2732,7 +2912,8 @@ class hwinfoUi:
                 for lineinfo in info:
                     lineinfo = lineinfo.replace('\"', '')
                     self.buffer.insert(self.buffer.get_end_iter(), lineinfo)
-                self.buffer.insert(self.buffer.get_end_iter(), "Current Resolution\n" + res)
+                self.buffer.insert(self.buffer.get_end_iter(),
+                                   "Current Resolution\n" + res)
                 self.buffer.insert(self.buffer.get_end_iter(),
                                    "\n__________________________________________________________\n")
             finally:
@@ -2761,21 +2942,23 @@ class processUi:
             str, str,
             str, str, str, str, str)
         tree = Gtk.TreeView(self.process_list)
-        tree.set_grid_lines(Gtk.TREE_VIEW_GRID_LINES_VERTICAL)
+        tree.set_grid_lines(Gtk.TreeViewGridLines.VERTICAL)
         tree.set_rules_hint(True)
-        create_columns(cfg, tree, [_("User"), "PID", _('Command'), _("Time"), "VmRss,Kb", "VmSize,Kb", "args"], True)
+        create_columns(cfg, tree, [_("User"), "PID", _('Command'), _(
+            "Time"), "VmRss,Kb", "VmSize,Kb", "args"], True)
 
         self.treeSelection = tree.get_selection()
-        self.treeSelection.set_mode(Gtk.SELECTION_MULTIPLE)
+        self.treeSelection.set_mode(Gtk.SelectionMode.MULTIPLE)
 
         sw = Gtk.ScrolledWindow()
-        sw.set_shadow_type(Gtk.SHADOW_ETCHED_IN)
-        sw.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
+        sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         sw.add(tree)
 
         self.create_process_list()
 
-        refreshButton = image_button(self.cfg.pixbuf_action_refresh_16, _("Refresh"))
+        refreshButton = image_button(
+            self.cfg.pixbuf_action_refresh_16, _("Refresh"))
         refreshButton.connect("clicked", self.create_process_list)
         refreshButton.set_size_request(120, 26)
 
@@ -2792,9 +2975,12 @@ class processUi:
         frame = Gtk.Frame()
         self.cfg.table2.attach(sw, 0, 28, 0, 39)
         self.cfg.table2.attach(frame, 0, 28, 39, 42)
-        self.cfg.table2.attach(refreshButton, 1, 8, 40, 42, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
-        self.cfg.table2.attach(killButton, 9, 16, 40, 42, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
-        self.cfg.table2.attach(closeButton, 21, 27, 40, 42, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
+        self.cfg.table2.attach(refreshButton, 1, 8, 40, 42,
+                               xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
+        self.cfg.table2.attach(
+            killButton, 9, 16, 40, 42, xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
+        self.cfg.table2.attach(closeButton, 21, 27, 40, 42,
+                               xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
 
         self.cfg.table2.show_all()
 
@@ -2821,9 +3007,10 @@ class processUi:
                 d[key] = value
 
             if ((server_key != d['server_key'] or server_port != d['server_port'] or
-                         server_user != d['server_user'] or server != d['server']) and
-                        server_key != "" and server_port != "" and server_user != "" and server != ""):
-                self.ps_os(users[:-1], server_key, server_port, server_user, server)
+                 server_user != d['server_user'] or server != d['server']) and
+                    server_key != "" and server_port != "" and server_user != "" and server != ""):
+                self.ps_os(users[:-1], server_key,
+                           server_port, server_user, server)
                 users = ""
             server_key = d['server_key']
             server_port = d['server_port']
@@ -2836,9 +3023,11 @@ class processUi:
         if server in self.cfg.localhost:
             ssh = ""
         else:
-            ssh = self.cfg.ssh_command(server_key, server_port, server_user, server)
+            ssh = self.cfg.ssh_command(
+                server_key, server_port, server_user, server)
 
-        cmd = ssh + self.cfg.ps_command + "-o user,comm,pid,start_time,rssize,vsz,args -u " + users + " --sort user,args"
+        cmd = ssh + self.cfg.ps_command + \
+            "-o user,comm,pid,start_time,rssize,vsz,args -u " + users + " --sort user,args"
         proc = popen_sub(self.cfg, cmd.split())
         if proc == False:
             return "0"
@@ -2889,7 +3078,7 @@ class settings:
         create_window2(self.cfg)
 
         self.notebookSettings = Gtk.Notebook()
-        self.notebookSettings.set_tab_pos(Gtk.POS_TOP)
+        self.notebookSettings.set_tab_pos(Gtk.PositionType.TOP)
         self.cfg.table2.attach(self.notebookSettings, 0, 28, 0, 40)
         self.notebookSettings.show()
         self.show_tabs = True
@@ -2898,12 +3087,14 @@ class settings:
         saveButton = image_button(self.cfg.pixbuf_list_save_16, _("Save"))
         saveButton.connect("clicked", self.callback, "save")
         saveButton.set_size_request(120, 26)
-        self.cfg.table2.attach(saveButton, 1, 7, 40, 42, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
+        self.cfg.table2.attach(
+            saveButton, 1, 7, 40, 42, xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
 
         closeButton = image_button(self.cfg.pixbuf_action_close_16, _("Close"))
         closeButton.connect("clicked", self.callback, "close")
         closeButton.set_size_request(120, 26)
-        self.cfg.table2.attach(closeButton, 21, 27, 40, 42, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
+        self.cfg.table2.attach(closeButton, 21, 27, 40, 42,
+                               xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
 
         ####################
         # vnc
@@ -2913,52 +3104,57 @@ class settings:
         self.notebookSettings.append_page(table, label)
 
         # vncBox
-        self.buttonVncBox = Gtk.CheckButton(_("Viewer") + " / " + _("Control") + " - " + _("Embed in interface"))
-        self.buttonVncBox.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncBox = Gtk.CheckButton(
+            _("Viewer") + " / " + _("Control") + " - " + _("Embed in interface"))
+        self.buttonVncBox.set_property('can-focus', True)
         if self.cfg.vncGtk == "y":
             self.buttonVncBox.set_active(True)
 
-        self.buttonVncInsert = Gtk.CheckButton(_("Do not clear the area, add/move to the beginning"))
-        self.buttonVncInsert.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncInsert = Gtk.CheckButton(
+            _("Do not clear the area, add/move to the beginning"))
+        self.buttonVncInsert.set_property('can-focus', True)
         if self.cfg.read_config("vnc", "vnc_thumbnails_insert") == "y":
             self.buttonVncInsert.set_active(True)
 
-        self.buttonVncBoxReduce = Gtk.CheckButton(_("Reduce(proportional) to the size of the area"))
-        self.buttonVncBoxReduce.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncBoxReduce = Gtk.CheckButton(
+            _("Reduce(proportional) to the size of the area"))
+        self.buttonVncBoxReduce.set_property('can-focus', True)
         if self.cfg.read_config("vnc", "vnc_thumbnails_reduce") == "y":
             self.buttonVncBoxReduce.set_active(True)
 
-        self.buttonVncScroll = Gtk.CheckButton(_("Automatic scrolling when adding/editing"))
-        self.buttonVncScroll.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncScroll = Gtk.CheckButton(
+            _("Automatic scrolling when adding/editing"))
+        self.buttonVncScroll.set_property('can-focus', True)
         if self.cfg.read_config("vnc", "vnc_thumbnails_scroll") == "y":
             self.buttonVncScroll.set_active(True)
 
-        self.buttonVncMinimize = Gtk.CheckButton(_("Minimize the open when adding a new"))
-        self.buttonVncMinimize.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonVncMinimize = Gtk.CheckButton(
+            _("Minimize the open when adding a new"))
+        self.buttonVncMinimize.set_property('can-focus', True)
         if self.cfg.read_config("vnc", "vnc_thumbnails_minimize") == "y":
             self.buttonVncMinimize.set_active(True)
 
         label = Gtk.Label(_("VNC"))
         self.scaleVncMinX = Gtk.HScale()
-        self.scaleVncMinX.set_value_pos(Gtk.POS_LEFT)
+        self.scaleVncMinX.set_value_pos(Gtk.PositionType.LEFT)
         self.scaleVncMinX.set_digits(0)
         self.scaleVncMinX.set_range(200, 640)
         self.scaleVncMinX.set_value(float(self.cfg.vncThumbnailsX))
 
         self.scaleVncMinY = Gtk.HScale()
-        self.scaleVncMinY.set_value_pos(Gtk.POS_LEFT)
+        self.scaleVncMinY.set_value_pos(Gtk.PositionType.LEFT)
         self.scaleVncMinY.set_digits(0)
         self.scaleVncMinY.set_range(160, 480)
         self.scaleVncMinY.set_value(float(self.cfg.vncThumbnailsY))
 
         self.scaleVncMaxX = Gtk.HScale()
-        self.scaleVncMaxX.set_value_pos(Gtk.POS_LEFT)
+        self.scaleVncMaxX.set_value_pos(Gtk.PositionType.LEFT)
         self.scaleVncMaxX.set_digits(0)
         self.scaleVncMaxX.set_range(640, 1920)
         self.scaleVncMaxX.set_value(float(self.cfg.vncGtkX))
 
         self.scaleVncMaxY = Gtk.HScale()
-        self.scaleVncMaxY.set_value_pos(Gtk.POS_LEFT)
+        self.scaleVncMaxY.set_value_pos(Gtk.PositionType.LEFT)
         self.scaleVncMaxY.set_digits(0)
         self.scaleVncMaxY.set_range(480, 1080)
         self.scaleVncMaxY.set_value(float(self.cfg.vncGtkY))
@@ -2968,17 +3164,17 @@ class settings:
         self.scaleVncMaxX.connect("change-value", self.callback, "vnc_max_x")
 
         self.buttonThumbUp = Gtk.CheckButton(_("Upstairs"))
-        self.buttonThumbUp.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonThumbUp.set_property('can-focus', True)
         if "up" in self.cfg.vncThumbnailsToolbar:
             self.buttonThumbUp.set_active(True)
 
         self.buttonThumbScreenshot = Gtk.CheckButton(_("Screenshot"))
-        self.buttonThumbScreenshot.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonThumbScreenshot.set_property('can-focus', True)
         if "screenshot" in self.cfg.vncThumbnailsToolbar:
             self.buttonThumbScreenshot.set_active(True)
 
         self.buttonThumbConnect = Gtk.CheckButton(_("Connect"))
-        self.buttonThumbConnect.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonThumbConnect.set_property('can-focus', True)
         if "connect" in self.cfg.vncThumbnailsToolbar:
             self.buttonThumbConnect.set_active(True)
 
@@ -2986,9 +3182,10 @@ class settings:
         self.labelVncShotFolder.set_alignment(0.0, 0.5)
         self.entryVncShotFolder = Gtk.Entry()
         self.entryVncShotFolder.set_text(self.cfg.vncShotFolder)
-        self.fileChooserShotFolder = image_button(self.cfg.pixbuf_list_folder_add_16)
+        self.fileChooserShotFolder = image_button(
+            self.cfg.pixbuf_list_folder_add_16)
         self.fileChooserShotFolder.connect("clicked", file_chooser_dialog, self.entryVncShotFolder,
-                                           _("Select the folder"), None, Gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
+                                           _("Select the folder"), None, Gtk.FileChooserAction.SELECT_FOLDER)
         # attach
         frame = Gtk.Frame()
         table.attach(frame, 0, 28, 0, 38)
@@ -2996,34 +3193,49 @@ class settings:
         frame = Gtk.Frame()
         frame.set_label_align(0.5, 0.5)
         table.attach(frame, 1, 27, 1, 22)
-        table.attach(self.buttonVncBox, 2, 26, 2, 4, yoptions=Gtk.SHRINK)
-        table.attach(self.buttonVncInsert, 2, 26, 4, 6, yoptions=Gtk.SHRINK)
-        table.attach(self.buttonVncBoxReduce, 2, 26, 6, 8, yoptions=Gtk.SHRINK)
-        table.attach(self.buttonVncScroll, 2, 26, 8, 10, yoptions=Gtk.SHRINK)
-        table.attach(self.buttonVncMinimize, 2, 26, 10, 12, yoptions=Gtk.SHRINK)
+        table.attach(self.buttonVncBox, 2, 26, 2, 4,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.buttonVncInsert, 2, 26, 4, 6,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.buttonVncBoxReduce, 2, 26, 6,
+                     8, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.buttonVncScroll, 2, 26, 8, 10,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.buttonVncMinimize, 2, 26, 10,
+                     12, yoptions=Gtk.AttachOptions.SHRINK)
         label = Gtk.Label(_("Min"))
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 2, 4, 13, 15, yoptions=Gtk.SHRINK)
-        table.attach(self.scaleVncMinX, 4, 26, 12, 14, yoptions=Gtk.SHRINK)
-        table.attach(self.scaleVncMinY, 4, 26, 14, 16, yoptions=Gtk.SHRINK)
+        table.attach(label, 2, 4, 13, 15, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.scaleVncMinX, 4, 26, 12, 14,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.scaleVncMinY, 4, 26, 14, 16,
+                     yoptions=Gtk.AttachOptions.SHRINK)
         label = Gtk.Label(_("Max"))
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 2, 4, 17, 19, yoptions=Gtk.SHRINK)
-        table.attach(self.scaleVncMaxX, 4, 26, 16, 18, yoptions=Gtk.SHRINK)
-        table.attach(self.scaleVncMaxY, 4, 26, 18, 20, yoptions=Gtk.SHRINK)
+        table.attach(label, 2, 4, 17, 19, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.scaleVncMaxX, 4, 26, 16, 18,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.scaleVncMaxY, 4, 26, 18, 20,
+                     yoptions=Gtk.AttachOptions.SHRINK)
 
-        frame = Gtk.Frame(_("Toolbar"))
+        frame = Gtk.Frame()
         frame.set_label_align(0.5, 0.5)
         table.attach(frame, 1, 27, 23, 31)
-        table.attach(self.buttonThumbConnect, 2, 14, 24, 26, yoptions=Gtk.SHRINK)
-        table.attach(self.buttonThumbScreenshot, 2, 14, 26, 28, yoptions=Gtk.SHRINK)
-        table.attach(self.buttonThumbUp, 14, 26, 24, 26, yoptions=Gtk.SHRINK)
+        table.attach(self.buttonThumbConnect, 2, 14, 24,
+                     26, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.buttonThumbScreenshot, 2, 14, 26,
+                     28, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.buttonThumbUp, 14, 26, 24, 26,
+                     yoptions=Gtk.AttachOptions.SHRINK)
 
         frame = Gtk.Frame()
         table.attach(frame, 1, 27, 35, 37)
-        table.attach(self.labelVncShotFolder, 2, 12, 35, 37, yoptions=Gtk.SHRINK)
-        table.attach(self.entryVncShotFolder, 12, 24, 35, 37, yoptions=Gtk.SHRINK)
-        table.attach(self.fileChooserShotFolder, 24, 26, 35, 37, yoptions=Gtk.SHRINK)
+        table.attach(self.labelVncShotFolder, 2, 12, 35,
+                     37, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.entryVncShotFolder, 12, 24, 35,
+                     37, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.fileChooserShotFolder, 24, 26, 35,
+                     37, yoptions=Gtk.AttachOptions.SHRINK)
 
         ####################
         # Locally
@@ -3036,15 +3248,17 @@ class settings:
             labelLocalIp = Gtk.Label(
                 "IP " + _("address") + " (" + _("found") + " " + self.cfg.localhost[len(self.cfg.localhost) - 1] + ")")
         else:
-            labelLocalIp = Gtk.Label("IP " + _("address") + " (" + _("not found") + ")")
+            labelLocalIp = Gtk.Label(
+                "IP " + _("address") + " (" + _("not found") + ")")
         labelLocalIp.set_alignment(0.0, 0.5)
         self.entryLocalIp = Gtk.Entry()
         self.entryLocalIp.set_text(self.cfg.localIp)
 
         vbox = Gtk.VBox(False, 0)
 
-        self.buttonDemoVlc = Gtk.RadioButton(None, _("Video streaming") + "(VLC)")
-        self.buttonDemoVlc.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoVlc = Gtk.RadioButton(
+            None, _("Video streaming") + "(VLC)")
+        self.buttonDemoVlc.set_property('can-focus', True)
         fixed = Gtk.Fixed()
         label = Gtk.Label(_("Server type"))
         fixed.put(label, 20, 0)
@@ -3052,7 +3266,7 @@ class settings:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonDemoVnc = Gtk.RadioButton(self.buttonDemoVlc, _("VNC"))
-        self.buttonDemoVnc.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoVnc.set_property('can-focus', True)
         if self.cfg.demoVlc != "y":
             self.buttonDemoVnc.set_active(True)
         fixed = Gtk.Fixed()
@@ -3060,15 +3274,16 @@ class settings:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonDemoDirect = Gtk.RadioButton(None, _("Direct"))
-        self.buttonDemoDirect.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoDirect.set_property('can-focus', True)
         fixed = Gtk.Fixed()
         label = Gtk.Label(_("Connection of clients"))
         fixed.put(label, 20, 0)
         fixed.put(self.buttonDemoDirect, 210, 0)
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
-        self.buttonDemoSsh = Gtk.RadioButton(self.buttonDemoDirect, _("VNC/HTTP over SSH"))
-        self.buttonDemoSsh.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoSsh = Gtk.RadioButton(
+            self.buttonDemoDirect, _("VNC/HTTP over SSH"))
+        self.buttonDemoSsh.set_property('can-focus', True)
         if self.cfg.demoSsh == "y":
             self.buttonDemoSsh.set_active(True)
         fixed = Gtk.Fixed()
@@ -3085,13 +3300,14 @@ class settings:
         ###
         ###
         self.buttonDemoVlcHttp = Gtk.RadioButton(None, "HTTP")
-        self.buttonDemoVlcHttp.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoVlcHttp.set_property('can-focus', True)
         fixed = Gtk.Fixed()
         fixed.put(self.buttonDemoVlcHttp, 210, 0)
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
-        self.buttonDemoVlcRtp = Gtk.RadioButton(self.buttonDemoVlcHttp, "RTP (multicast 239.0.0.1)")
-        self.buttonDemoVlcRtp.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoVlcRtp = Gtk.RadioButton(
+            self.buttonDemoVlcHttp, "RTP (multicast 239.0.0.1)")
+        self.buttonDemoVlcRtp.set_property('can-focus', True)
         if self.cfg.demoVlcRtp in self.cfg.true:
             self.buttonDemoVlcRtp.set_active(True)
         fixed = Gtk.Fixed()
@@ -3099,8 +3315,9 @@ class settings:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         ###
-        self.buttonDemoVlcAudio = Gtk.CheckButton(_("Audio") + " (" + _("only") + " PulseAudio)")
-        self.buttonDemoVlcAudio.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonDemoVlcAudio = Gtk.CheckButton(
+            _("Audio") + " (" + _("only") + " PulseAudio)")
+        self.buttonDemoVlcAudio.set_property('can-focus', True)
         # if ( self.cfg.demoVlcAudio in self.cfg.true ):
         #    self.buttonDemoVlcAudio.set_active(True)
         fixed = Gtk.Fixed()
@@ -3109,7 +3326,7 @@ class settings:
 
         label = Gtk.Label(_("Frames per second"))
         label.set_alignment(0, 0.5)
-        self.comboDemoVlcFps = Gtk.combo_box_new_text()
+        self.comboDemoVlcFps = Gtk.ComboBoxText()
         self.comboDemoVlcFps.set_size_request(175, 26)
         self.comboDemoVlcFps.append_text("5")
         self.comboDemoVlcFps.append_text("10")
@@ -3129,7 +3346,7 @@ class settings:
         ###
         label = Gtk.Label(_("Video codec"))
         label.set_alignment(0, 0.5)
-        self.comboDemoVlcVcodec = Gtk.combo_box_new_text()
+        self.comboDemoVlcVcodec = Gtk.ComboBoxText()
         self.comboDemoVlcVcodec.set_size_request(175, 26)
         self.comboDemoVlcVcodec.append_text("mp1v")
         self.comboDemoVlcVcodec.append_text("mp2v")
@@ -3151,7 +3368,7 @@ class settings:
         ###
         label = Gtk.Label(_("Resolution") + " (" + _("in full screen") + ")")
         label.set_alignment(0, 0.5)
-        self.comboDemoVlcScaleFull = Gtk.combo_box_new_text()
+        self.comboDemoVlcScaleFull = Gtk.ComboBoxText()
         self.comboDemoVlcScaleFull.set_row_separator_func(self.combo_separator)
         self.comboDemoVlcScaleFull.set_size_request(175, 26)
         for x in self.cfg.scale_list:
@@ -3169,8 +3386,9 @@ class settings:
         ###
         label = Gtk.Label(_("Resolution") + " (" + _("in window") + ")")
         label.set_alignment(0, 0.5)
-        self.comboDemoVlcScaleWindow = Gtk.combo_box_new_text()
-        self.comboDemoVlcScaleWindow.set_row_separator_func(self.combo_separator)
+        self.comboDemoVlcScaleWindow = Gtk.ComboBoxText()
+        self.comboDemoVlcScaleWindow.set_row_separator_func(
+            self.combo_separator)
         self.comboDemoVlcScaleWindow.set_size_request(175, 26)
         for x in self.cfg.scale_list:
             self.comboDemoVlcScaleWindow.append_text(x)
@@ -3187,7 +3405,7 @@ class settings:
         ###
         label = Gtk.Label(_("Caching"))
         label.set_alignment(0, 0.5)
-        self.comboDemoVlcCaching = Gtk.combo_box_new_text()
+        self.comboDemoVlcCaching = Gtk.ComboBoxText()
         self.comboDemoVlcCaching.set_size_request(175, 26)
         self.comboDemoVlcCaching.append_text("300")
         self.comboDemoVlcCaching.append_text("1000")
@@ -3213,26 +3431,33 @@ class settings:
         separator = Gtk.HSeparator()
         vbox.pack_start(separator, expand=False, fill=False, padding=1)
 
-        self.entryVncServer = label_entry(_("Server command"), self.cfg.vncServer, 24, 200, 20, 210, True)
-        vbox.pack_start(self.entryVncServer, expand=False, fill=False, padding=0)
+        self.entryVncServer = label_entry(
+            _("Server command"), self.cfg.vncServer, 24, 200, 20, 210, True)
+        vbox.pack_start(self.entryVncServer, expand=False,
+                        fill=False, padding=0)
 
         self.entryVncServerWindow = label_entry(_("Server command") + "(" + _("in window") + ")",
                                                 self.cfg.vncServerWindow, 24, 200, 20, 210, True)
-        vbox.pack_start(self.entryVncServerWindow, expand=False, fill=False, padding=0)
+        vbox.pack_start(self.entryVncServerWindow,
+                        expand=False, fill=False, padding=0)
 
         # connect
         self.buttonDemoVlc.connect("clicked", self.callback, "demo_vlc")
         self.callback(None, "demo_vlc")
         self.buttonDemoDirect.connect("clicked", self.callback, "demo_direct")
         self.callback(None, "demo_direct")
-        self.buttonDemoVlcHttp.connect("clicked", self.callback, "demo_vlc_http")
+        self.buttonDemoVlcHttp.connect(
+            "clicked", self.callback, "demo_vlc_http")
         self.callback(None, "demo_vlc_http")
 
-        self.buttonDemoVlcAudio.connect("clicked", self.callback, "demo_vlc_audio")
+        self.buttonDemoVlcAudio.connect(
+            "clicked", self.callback, "demo_vlc_audio")
         self.callback(None, "demo_vlc_audio")
 
-        self.comboDemoVlcVcodec.connect("changed", self.callback, "demo_vlc_vcodec")
-        self.comboDemoVlcCaching.connect("changed", self.callback, "demo_vlc_caching")
+        self.comboDemoVlcVcodec.connect(
+            "changed", self.callback, "demo_vlc_vcodec")
+        self.comboDemoVlcCaching.connect(
+            "changed", self.callback, "demo_vlc_caching")
 
         # attach
         frame = Gtk.Frame()
@@ -3240,13 +3465,15 @@ class settings:
 
         frame = Gtk.Frame()
         table.attach(frame, 1, 27, 2, 4)
-        table.attach(labelLocalIp, 2, 15, 2, 4, yoptions=Gtk.SHRINK)
-        table.attach(self.entryLocalIp, 15, 26, 2, 4, yoptions=Gtk.SHRINK)
+        table.attach(labelLocalIp, 2, 15, 2, 4,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.entryLocalIp, 15, 26, 2, 4,
+                     yoptions=Gtk.AttachOptions.SHRINK)
 
-        frame = Gtk.Frame(_("Demo") + " - " + _("Local") + " " + _("Server"))
+        frame = Gtk.Frame()
         frame.set_label_align(0.5, 0.5)
         table.attach(frame, 1, 27, 8, 37)
-        table.attach(vbox, 1, 26, 10, 35, yoptions=Gtk.SHRINK)
+        table.attach(vbox, 1, 26, 10, 35, yoptions=Gtk.AttachOptions.SHRINK)
 
         ###################
         # style
@@ -3275,28 +3502,31 @@ class settings:
         self.labelWindowX.set_alignment(0.0, 0.5)
         adj = Gtk.Adjustment(0.0, self.cfg.min_mainWindowX, self.cfg.screen_x - self.cfg.min_panedWindowX, 1.0, 5.0,
                              0.0)
-        self.spinWindowX = Gtk.SpinButton(adj, 0, 0)
+        self.spinWindowX = Gtk.SpinButton.new(adj, 0, 0)
         self.spinWindowX.set_wrap(True)
         self.spinWindowX.set_value(int(self.cfg.mainWindowX))
 
         self.labelWindowY = Gtk.Label(_("Main window height"))
         self.labelWindowY.set_alignment(0.0, 0.5)
-        adj = Gtk.Adjustment(0.0, self.cfg.min_mainWindowY, self.cfg.screen_y, 1.0, 5.0, 0.0)
-        self.spinWindowY = Gtk.SpinButton(adj, 0, 0)
+        adj = Gtk.Adjustment(0.0, self.cfg.min_mainWindowY,
+                             self.cfg.screen_y, 1.0, 5.0, 0.0)
+        self.spinWindowY = Gtk.SpinButton.new(adj, 0, 0)
         self.spinWindowY.set_wrap(True)
         self.spinWindowY.set_value(int(self.cfg.mainWindowY))
 
         self.labelPanedX = Gtk.Label(_("Secondary window width"))
         self.labelPanedX.set_alignment(0.0, 0.5)
-        adj = Gtk.Adjustment(0.0, self.cfg.min_panedWindowX, self.cfg.max_panedWindowX, 1.0, 5.0, 0.0)
-        self.spinPanedX = Gtk.SpinButton(adj, 0, 0)
+        adj = Gtk.Adjustment(0.0, self.cfg.min_panedWindowX,
+                             self.cfg.max_panedWindowX, 1.0, 5.0, 0.0)
+        self.spinPanedX = Gtk.SpinButton.new(adj, 0, 0)
         self.spinPanedX.set_wrap(True)
         self.spinPanedX.set_value(int(self.cfg.panedWindowX))
 
         self.labelTreeX = Gtk.Label(_("List width"))
         self.labelTreeX.set_alignment(0.0, 0.5)
-        adj = Gtk.Adjustment(0.0, self.cfg.min_treeX, self.cfg.max_treeX, 1.0, 5.0, 0.0)
-        self.spinTreeX = Gtk.SpinButton(adj, 0, 0)
+        adj = Gtk.Adjustment(0.0, self.cfg.min_treeX,
+                             self.cfg.max_treeX, 1.0, 5.0, 0.0)
+        self.spinTreeX = Gtk.SpinButton.new(adj, 0, 0)
         self.spinTreeX.set_wrap(True)
         self.spinTreeX.set_value(int(self.cfg.treeX))
 
@@ -3310,90 +3540,109 @@ class settings:
         self.entryGtkrc.set_text(self.cfg.gtkrc)
         self.fileChooserGtkrc = image_button(self.cfg.pixbuf_list_file_add_16)
         self.fileChooserGtkrc.connect("clicked", file_chooser_dialog, self.entryGtkrc,
-                                      _("Select the file") + ' "gtkrc"', None, Gtk.FILE_CHOOSER_ACTION_OPEN)
+                                      _("Select the file") + ' "gtkrc"', None, Gtk.FileChooserAction.OPEN)
 
         # tree
         dn = self.cfg.dn
         self.buttonTreeAlias = Gtk.CheckButton(_("Alias"))
-        self.buttonTreeAlias.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonTreeAlias.set_property('can-focus', True)
         if str(dn['alias']) in self.cfg.treeShow:
             self.buttonTreeAlias.set_active(True)
         self.buttonTreeUser = Gtk.CheckButton(_("User"))
-        self.buttonTreeUser.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonTreeUser.set_property('can-focus', True)
         if str(dn['user']) in self.cfg.treeShow:
             self.buttonTreeUser.set_active(True)
         self.buttonTreeHost = Gtk.CheckButton(_("Host"))
-        self.buttonTreeHost.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonTreeHost.set_property('can-focus', True)
         if str(dn['host']) in self.cfg.treeShow:
             self.buttonTreeHost.set_active(True)
         self.buttonTreeIp = Gtk.CheckButton(_("IP"))
-        self.buttonTreeIp.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonTreeIp.set_property('can-focus', True)
         if str(dn['ip']) in self.cfg.treeShow:
             self.buttonTreeIp.set_active(True)
         self.buttonTreeServer = Gtk.CheckButton(_("Server"))
-        self.buttonTreeServer.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonTreeServer.set_property('can-focus', True)
         if str(dn['server']) in self.cfg.treeShow:
             self.buttonTreeServer.set_active(True)
         self.buttonTreeTime = Gtk.CheckButton(_("Time"))
-        self.buttonTreeTime.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonTreeTime.set_property('can-focus', True)
         if str(dn['start_time']) in self.cfg.treeShow:
             self.buttonTreeTime.set_active(True)
 
         self.buttonTreeVncAutostart = Gtk.CheckButton(_("Autostart x11vnc"))
-        self.buttonTreeVncAutostart.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonTreeVncAutostart.set_property('can-focus', True)
         if "vnc_autostart" in self.cfg.treeShow:
             self.buttonTreeVncAutostart.set_active(True)
 
         self.buttonTreeDhcp = Gtk.CheckButton(_("Dhcp"))
-        self.buttonTreeDhcp.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonTreeDhcp.set_property('can-focus', True)
         if "dhcp" in self.cfg.treeShow:
             self.buttonTreeDhcp.set_active(True)
 
         #
-        self.buttonTreeInfo = Gtk.CheckButton(_("Show tooltip (brief information about the client)"))
-        self.buttonTreeInfo.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonTreeInfo = Gtk.CheckButton(
+            _("Show tooltip (brief information about the client)"))
+        self.buttonTreeInfo.set_property('can-focus', True)
         if self.cfg.treeInfo == "y":
             self.buttonTreeInfo.set_active(True)
 
-        self.buttonTreeInfoTooltip = Gtk.CheckButton(_("Show tooltip in the pop-up window"))
-        self.buttonTreeInfoTooltip.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonTreeInfoTooltip = Gtk.CheckButton(
+            _("Show tooltip in the pop-up window"))
+        self.buttonTreeInfoTooltip.set_property('can-focus', True)
         if self.cfg.treeInfoTooltip == "y":
             self.buttonTreeInfoTooltip.set_active(True)
 
         self.buttonGecosAlias = Gtk.CheckButton(_("Alias") + " = gecos")
-        self.buttonGecosAlias.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonGecosAlias.set_property('can-focus', True)
         if self.cfg.gecosAlias == "y":
             self.buttonGecosAlias.set_active(True)
 
         # attach
         frame = Gtk.Frame()
         table.attach(frame, 1, 27, 1, 11)
-        table.attach(self.labelWindowX, 2, 20, 2, 4, yoptions=Gtk.SHRINK)
-        table.attach(self.spinWindowX, 20, 26, 2, 4, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
-        table.attach(self.labelWindowY, 2, 20, 4, 6, yoptions=Gtk.SHRINK)
-        table.attach(self.spinWindowY, 20, 26, 4, 6, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
-        table.attach(self.labelPanedX, 2, 20, 6, 8, yoptions=Gtk.SHRINK)
-        table.attach(self.spinPanedX, 20, 26, 6, 8, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
-        table.attach(self.labelTreeX, 2, 20, 8, 10, yoptions=Gtk.SHRINK)
-        table.attach(self.spinTreeX, 20, 26, 8, 10, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
+        table.attach(self.labelWindowX, 2, 20, 2, 4,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.spinWindowX, 20, 26, 2, 4,
+                     xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.labelWindowY, 2, 20, 4, 6,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.spinWindowY, 20, 26, 4, 6,
+                     xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.labelPanedX, 2, 20, 6, 8,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.spinPanedX, 20, 26, 6, 8,
+                     xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.labelTreeX, 2, 20, 8, 10,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.spinTreeX, 20, 26, 8, 10,
+                     xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
 
         frame = Gtk.Frame()
         table.attach(frame, 1, 27, 11, 21)
-        table.attach(self.labelFontStatus, 2, 14, 12, 14, yoptions=Gtk.SHRINK)
-        table.attach(self.buttonFontStatus, 14, 27, 12, 14, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
-        table.attach(self.labelFontThumbnails, 2, 14, 14, 16, yoptions=Gtk.SHRINK)
-        table.attach(self.buttonFontThumbnails, 14, 27, 14, 16, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
-        table.attach(self.labelFontTree, 2, 14, 16, 18, yoptions=Gtk.SHRINK)
-        table.attach(self.buttonFontTree, 14, 27, 16, 18, xoptions=Gtk.SHRINK, yoptions=Gtk.SHRINK)
+        table.attach(self.labelFontStatus, 2, 14, 12, 14,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.buttonFontStatus, 14, 27, 12, 14,
+                     xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.labelFontThumbnails, 2, 14, 14,
+                     16, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.buttonFontThumbnails, 14, 27, 14, 16,
+                     xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.labelFontTree, 2, 14, 16, 18,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.buttonFontTree, 14, 27, 16, 18,
+                     xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.SHRINK)
 
         frame = Gtk.Frame()
         table.attach(frame, 1, 27, 21, 23)
-        table.attach(self.labelGtkrc, 2, 15, 21, 23, yoptions=Gtk.SHRINK)
-        table.attach(self.entryGtkrc, 15, 24, 21, 23, yoptions=Gtk.SHRINK)
-        table.attach(self.fileChooserGtkrc, 24, 26, 21, 23, yoptions=Gtk.SHRINK)
+        table.attach(self.labelGtkrc, 2, 15, 21, 23,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.entryGtkrc, 15, 24, 21, 23,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.fileChooserGtkrc, 24, 26, 21,
+                     23, yoptions=Gtk.AttachOptions.SHRINK)
 
         # tree
-        frame = Gtk.Frame(_("List"))
+        frame = Gtk.Frame()
         frame.set_label_align(0.5, 0.5)
         table.attach(frame, 1, 27, 24, 29)
         table.attach(self.buttonTreeInfo, 2, 26, 25, 27)
@@ -3425,11 +3674,12 @@ class settings:
         self.notebookSettings.append_page(table, label)
 
         vbox = Gtk.VBox(False, 1)
-        self.entryF=[]
+        self.entryF = []
         for i in range(self.cfg.CountCommands):
             self.entryF.append(Gtk.Entry())
             self.entryF[i].set_text(self.cfg.f[i])
-            vbox.pack_start(self.entryF[i], expand=False, fill=False, padding=0)
+            vbox.pack_start(
+                self.entryF[i], expand=False, fill=False, padding=0)
         # self.entryF2 = Gtk.Entry()
         # self.entryF2.set_text(self.cfg.f2)
         # vbox.pack_start(self.entryF2, expand=False, fill=False, padding=0)
@@ -3494,7 +3744,7 @@ class settings:
 
         frame = Gtk.Frame()
         table.attach(frame, 1, 27, 1, 37)
-        table.attach(vbox, 2, 26, 2, 36, yoptions=Gtk.SHRINK)
+        table.attach(vbox, 2, 26, 2, 36, yoptions=Gtk.AttachOptions.SHRINK)
 
         ###################
         # other
@@ -3507,7 +3757,7 @@ class settings:
         self.notebookSettings.append_page(table, label)
 
         self.buttonLogout = Gtk.CheckButton(_("Total command logout"))
-        self.buttonLogout.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonLogout.set_property('can-focus', True)
         if self.cfg.logoutCommandUse == "y":
             self.buttonLogout.set_active(True)
         self.entryLogout = Gtk.Entry()
@@ -3517,19 +3767,19 @@ class settings:
         self.labelCheckStatus.set_alignment(0.0, 0.5)
 
         adj = Gtk.Adjustment(0.0, 10.0, 60.0, 1.0, 5.0, 0.0)
-        self.spinStatusInterval = Gtk.SpinButton(adj, 0, 0)
+        self.spinStatusInterval = Gtk.SpinButton.new(adj, 0, 0)
         self.spinStatusInterval.set_wrap(True)
         self.spinStatusInterval.set_value(int(self.cfg.checkStatusInterval))
 
         self.buttonCheckDhcp = Gtk.CheckButton(_("Support of dynamic DHCP"))
-        self.buttonCheckDhcp.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonCheckDhcp.set_property('can-focus', True)
         if self.cfg.checkDhcp == "y":
             self.buttonCheckDhcp.set_active(True)
 
         self.buttonLtspInfo = Gtk.RadioButton(None, "ltspinfo")
-        self.buttonLtspInfo.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonLtspInfo.set_property('can-focus', True)
         self.buttonLtspSsh = Gtk.RadioButton(self.buttonLtspInfo, "ssh")
-        self.buttonLtspSsh.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonLtspSsh.set_property('can-focus', True)
         if self.cfg.ltspInfo == "ssh":
             self.buttonLtspSsh.set_active(True)
 
@@ -3539,7 +3789,7 @@ class settings:
         vbox.pack_start(label, expand=False, fill=False, padding=5)
 
         self.buttonHideHide = Gtk.CheckButton("! " + _("Hide these settings"))
-        self.buttonHideHide.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonHideHide.set_property('can-focus', True)
         if self.cfg.read_config("hide", "hide_hide") == "y":
             self.buttonHideHide.set_active(True)
         fixed = Gtk.Fixed()
@@ -3547,7 +3797,7 @@ class settings:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonHideSetting = Gtk.CheckButton("! " + _("Program settings"))
-        self.buttonHideSetting.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonHideSetting.set_property('can-focus', True)
         if self.cfg.read_config("hide", "hide_setting") == "y":
             self.buttonHideSetting.set_active(True)
         fixed = Gtk.Fixed()
@@ -3559,7 +3809,7 @@ class settings:
 
         self.buttonHideTreeAddRemove = Gtk.CheckButton(
             _("Add") + ", " + _("Remove") + ", " + _("Edit") + "/" + _("Client information"))
-        self.buttonHideTreeAddRemove.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonHideTreeAddRemove.set_property('can-focus', True)
         if self.cfg.read_config("hide", "hide_tree_add_remove") == "y":
             self.buttonHideTreeAddRemove.set_active(True)
         fixed = Gtk.Fixed()
@@ -3570,7 +3820,7 @@ class settings:
         vbox.pack_start(separator, expand=False, fill=False, padding=1)
 
         self.buttonHideViewer = Gtk.CheckButton(_("Viewer"))
-        self.buttonHideViewer.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonHideViewer.set_property('can-focus', True)
         if self.cfg.read_config("hide", "hide_viewer") == "y":
             self.buttonHideViewer.set_active(True)
         fixed = Gtk.Fixed()
@@ -3578,7 +3828,7 @@ class settings:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonHideControl = Gtk.CheckButton(_("Control"))
-        self.buttonHideControl.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonHideControl.set_property('can-focus', True)
         if self.cfg.read_config("hide", "hide_control") == "y":
             self.buttonHideControl.set_active(True)
         fixed = Gtk.Fixed()
@@ -3586,7 +3836,7 @@ class settings:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonHideThumbnails = Gtk.CheckButton(_("Thumbnails"))
-        self.buttonHideThumbnails.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonHideThumbnails.set_property('can-focus', True)
         if self.cfg.read_config("hide", "hide_thumbnails") == "y":
             self.buttonHideThumbnails.set_active(True)
         fixed = Gtk.Fixed()
@@ -3597,7 +3847,7 @@ class settings:
         vbox.pack_start(separator, expand=False, fill=False, padding=1)
 
         self.buttonHideMessage = Gtk.CheckButton(_("Send message"))
-        self.buttonHideMessage.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonHideMessage.set_property('can-focus', True)
         if self.cfg.read_config("hide", "hide_message") == "y":
             self.buttonHideMessage.set_active(True)
         fixed = Gtk.Fixed()
@@ -3605,7 +3855,7 @@ class settings:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonHideCommand = Gtk.CheckButton(_("Run command"))
-        self.buttonHideCommand.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonHideCommand.set_property('can-focus', True)
         if self.cfg.read_config("hide", "hide_command") == "y":
             self.buttonHideCommand.set_active(True)
         fixed = Gtk.Fixed()
@@ -3613,7 +3863,7 @@ class settings:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonHideSendFile = Gtk.CheckButton(_("Send file"))
-        self.buttonHideSendFile.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonHideSendFile.set_property('can-focus', True)
         if self.cfg.read_config("hide", "hide_send_file") == "y":
             self.buttonHideSendFile.set_active(True)
         fixed = Gtk.Fixed()
@@ -3624,7 +3874,7 @@ class settings:
         vbox.pack_start(separator, expand=False, fill=False, padding=1)
 
         self.buttonHideUtil = Gtk.CheckButton(_("Utilities"))
-        self.buttonHideUtil.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonHideUtil.set_property('can-focus', True)
         if self.cfg.read_config("hide", "hide_util") == "y":
             self.buttonHideUtil.set_active(True)
         fixed = Gtk.Fixed()
@@ -3633,7 +3883,7 @@ class settings:
 
         self.buttonHideSystem = Gtk.CheckButton(
             _("Logout") + ", " + _("Reboot") + ", " + _("Turn On") + ", " + _("Shutdown"))
-        self.buttonHideSystem.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonHideSystem.set_property('can-focus', True)
         if self.cfg.read_config("hide", "hide_system_util") == "y":
             self.buttonHideSystem.set_active(True)
         fixed = Gtk.Fixed()
@@ -3644,7 +3894,7 @@ class settings:
         vbox.pack_start(separator, expand=False, fill=False, padding=1)
 
         self.buttonHideDemo = Gtk.CheckButton(_("Demo"))
-        self.buttonHideDemo.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonHideDemo.set_property('can-focus', True)
         if self.cfg.read_config("hide", "hide_demo") == "y":
             self.buttonHideDemo.set_active(True)
         fixed = Gtk.Fixed()
@@ -3652,7 +3902,7 @@ class settings:
         vbox.pack_start(fixed, expand=False, fill=False, padding=0)
 
         self.buttonHideTimer = Gtk.CheckButton(_("Timers"))
-        self.buttonHideTimer.unset_flags(Gtk.CAN_FOCUS)
+        self.buttonHideTimer.set_property('can-focus', True)
         if self.cfg.read_config("hide", "hide_timer") == "y":
             self.buttonHideTimer.set_active(True)
         fixed = Gtk.Fixed()
@@ -3661,8 +3911,10 @@ class settings:
 
         frame = Gtk.Frame()
         table.attach(frame, 1, 27, 1, 6)
-        table.attach(self.buttonLogout, 2, 26, 1, 3, yoptions=Gtk.SHRINK)
-        table.attach(self.entryLogout, 2, 26, 3, 5, yoptions=Gtk.SHRINK)
+        table.attach(self.buttonLogout, 2, 26, 1, 3,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.entryLogout, 2, 26, 3, 5,
+                     yoptions=Gtk.AttachOptions.SHRINK)
 
         frame = Gtk.Frame()
         table.attach(frame, 1, 27, 6, 11)
@@ -3674,9 +3926,11 @@ class settings:
         table.attach(frame, 1, 27, 11, 15)
         label = Gtk.Label(_("Reboot/Shutdown"))
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 2, 14, 11, 13, yoptions=Gtk.SHRINK)
-        table.attach(self.buttonLtspSsh, 14, 24, 11, 13, yoptions=Gtk.SHRINK)
-        table.attach(self.buttonLtspInfo, 14, 24, 13, 15, yoptions=Gtk.SHRINK)
+        table.attach(label, 2, 14, 11, 13, yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.buttonLtspSsh, 14, 24, 11, 13,
+                     yoptions=Gtk.AttachOptions.SHRINK)
+        table.attach(self.buttonLtspInfo, 14, 24, 13, 15,
+                     yoptions=Gtk.AttachOptions.SHRINK)
 
         frame = Gtk.Frame()
         table.attach(frame, 1, 27, 15, 37)
@@ -3687,7 +3941,8 @@ class settings:
 
     def writeAllConfig(self, data=None):
 
-        self.cfg.write_config("local", "local_ip", self.entryLocalIp.get_text())
+        self.cfg.write_config("local", "local_ip",
+                              self.entryLocalIp.get_text())
 
         if self.buttonDemoVlc.get_active():
             res = "y"
@@ -3707,11 +3962,16 @@ class settings:
             res = "n"
         self.cfg.write_config("vnc", "demo_vlc_audio", res)
 
-        self.cfg.write_config("vnc", "demo_vlc_fps", self.comboDemoVlcFps.get_active_text())
-        self.cfg.write_config("vnc", "demo_vlc_vcodec", self.comboDemoVlcVcodec.get_active_text())
-        self.cfg.write_config("vnc", "demo_vlc_scale_full", self.comboDemoVlcScaleFull.get_active_text())
-        self.cfg.write_config("vnc", "demo_vlc_scale_window", self.comboDemoVlcScaleWindow.get_active_text())
-        self.cfg.write_config("vnc", "demo_vlc_caching", self.comboDemoVlcCaching.get_active_text())
+        self.cfg.write_config("vnc", "demo_vlc_fps",
+                              self.comboDemoVlcFps.get_active_text())
+        self.cfg.write_config("vnc", "demo_vlc_vcodec",
+                              self.comboDemoVlcVcodec.get_active_text())
+        self.cfg.write_config("vnc", "demo_vlc_scale_full",
+                              self.comboDemoVlcScaleFull.get_active_text())
+        self.cfg.write_config("vnc", "demo_vlc_scale_window",
+                              self.comboDemoVlcScaleWindow.get_active_text())
+        self.cfg.write_config("vnc", "demo_vlc_caching",
+                              self.comboDemoVlcCaching.get_active_text())
 
         if self.buttonDemoSsh.get_active():
             res = "y"
@@ -3719,13 +3979,18 @@ class settings:
             res = "n"
         self.cfg.write_config("vnc", "demo_ssh", res)
 
-        self.cfg.write_config("vnc", "vnc_server", self.entryVncServer.get_text())
-        self.cfg.write_config("vnc", "vnc_server_window", self.entryVncServerWindow.get_text())
+        self.cfg.write_config("vnc", "vnc_server",
+                              self.entryVncServer.get_text())
+        self.cfg.write_config("vnc", "vnc_server_window",
+                              self.entryVncServerWindow.get_text())
 
         res = ""
-        if self.buttonThumbConnect.get_active(): res = res + "connect"
-        if self.buttonThumbScreenshot.get_active(): res = res + ",screenshot"
-        if self.buttonThumbUp.get_active(): res = res + ",up"
+        if self.buttonThumbConnect.get_active():
+            res = res + "connect"
+        if self.buttonThumbScreenshot.get_active():
+            res = res + ",screenshot"
+        if self.buttonThumbUp.get_active():
+            res = res + ",up"
         self.cfg.write_config("vnc", "vnc_thumbnails_toolbar", res)
 
         # radio button
@@ -3736,7 +4001,8 @@ class settings:
         self.cfg.write_config("system", "ltspinfo", res)
 
         for i in range(self.cfg.CountCommands):
-            self.cfg.write_config("command", "f"+str(i+1), self.entryF[i].get_text())
+            self.cfg.write_config("command", "f"+str(i+1),
+                                  self.entryF[i].get_text())
             # self.cfg.f[i]=self.entryF[i].get_text()
         # self.cfg.write_config("command", "f1", self.entryF1.get_text())
         # self.cfg.write_config("command", "f2", self.entryF2.get_text())
@@ -3765,7 +4031,8 @@ class settings:
         else:
             res = "n"
         self.cfg.write_config("system", "logout_command_use", res)
-        self.cfg.write_config("system", "logout_command", self.entryLogout.get_text())
+        self.cfg.write_config("system", "logout_command",
+                              self.entryLogout.get_text())
 
         font = self.buttonFontStatus.get_font_name()
         list = font.split()
@@ -3793,15 +4060,23 @@ class settings:
 
         dn = self.cfg.dn
         res = ""
-        if self.buttonTreeAlias.get_active(): res = res + str(dn['alias'])
-        if self.buttonTreeUser.get_active(): res = res + "," + str(dn['user'])
-        if self.buttonTreeHost.get_active(): res = res + "," + str(dn['host'])
-        if self.buttonTreeIp.get_active(): res = res + "," + str(dn['ip'])
-        if self.buttonTreeServer.get_active(): res = res + "," + str(dn['server'])
-        if self.buttonTreeTime.get_active(): res = res + "," + str(dn['start_time'])
+        if self.buttonTreeAlias.get_active():
+            res = res + str(dn['alias'])
+        if self.buttonTreeUser.get_active():
+            res = res + "," + str(dn['user'])
+        if self.buttonTreeHost.get_active():
+            res = res + "," + str(dn['host'])
+        if self.buttonTreeIp.get_active():
+            res = res + "," + str(dn['ip'])
+        if self.buttonTreeServer.get_active():
+            res = res + "," + str(dn['server'])
+        if self.buttonTreeTime.get_active():
+            res = res + "," + str(dn['start_time'])
         #
-        if self.buttonTreeVncAutostart.get_active(): res = res + ",vnc_autostart"
-        if self.buttonTreeDhcp.get_active(): res = res + ",dhcp"
+        if self.buttonTreeVncAutostart.get_active():
+            res = res + ",vnc_autostart"
+        if self.buttonTreeDhcp.get_active():
+            res = res + ",dhcp"
         self.cfg.write_config("tree", "tree_show", res)
 
         window_x = int(self.spinWindowX.get_value())
@@ -3810,11 +4085,14 @@ class settings:
             paned_x = self.cfg.min_panedWindowX
             window_x = self.cfg.screen_x - self.cfg.min_panedWindowX
         self.cfg.write_config("window", "main_window_x", str(window_x))
-        self.cfg.write_config("window", "main_window_y", str(int(self.spinWindowY.get_value())))
+        self.cfg.write_config("window", "main_window_y",
+                              str(int(self.spinWindowY.get_value())))
         self.cfg.write_config("window", "paned_window_x", str(paned_x))
-        self.cfg.write_config("window", "tree_x", str(int(self.spinTreeX.get_value())))
+        self.cfg.write_config("window", "tree_x", str(
+            int(self.spinTreeX.get_value())))
 
-        self.cfg.write_config("tree", "check_status_interval", str(int(self.spinStatusInterval.get_value())))
+        self.cfg.write_config("tree", "check_status_interval", str(
+            int(self.spinStatusInterval.get_value())))
         if self.buttonCheckDhcp.get_active():
             res = "y"
         else:
@@ -3869,13 +4147,18 @@ class settings:
             res = "n"
         self.cfg.write_config("vnc", "vnc_thumbnails_scroll", res)
 
-        self.cfg.write_config("vnc", "vnc_thumbnails_x", str(int(self.scaleVncMinX.get_value())))
-        self.cfg.write_config("vnc", "vnc_thumbnails_y", str(int(self.scaleVncMinY.get_value())))
+        self.cfg.write_config("vnc", "vnc_thumbnails_x", str(
+            int(self.scaleVncMinX.get_value())))
+        self.cfg.write_config("vnc", "vnc_thumbnails_y", str(
+            int(self.scaleVncMinY.get_value())))
 
-        self.cfg.write_config("vnc", "vnc_gtk_x", str(int(self.scaleVncMaxX.get_value())))
-        self.cfg.write_config("vnc", "vnc_gtk_y", str(int(self.scaleVncMaxY.get_value())))
+        self.cfg.write_config("vnc", "vnc_gtk_x", str(
+            int(self.scaleVncMaxX.get_value())))
+        self.cfg.write_config("vnc", "vnc_gtk_y", str(
+            int(self.scaleVncMaxY.get_value())))
 
-        self.cfg.write_config("vnc", "vnc_shot_folder", self.entryVncShotFolder.get_text())
+        self.cfg.write_config("vnc", "vnc_shot_folder",
+                              self.entryVncShotFolder.get_text())
 
         self.cfg.write_config("window", "gtkrc", self.entryGtkrc.get_text())
 

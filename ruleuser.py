@@ -4,7 +4,7 @@
 ###################################################################################################
 # RuleUser
 # ruleuser.py
-# 
+#
 # Copyright (C) 2012,2013 Andrey Burbovskiy <xak-altsp@yandex.ru>
 # Copyright (C) 2017 Артем Проскурнев (Artem Proskurnev) <tema@proskurnev.name>
 # Поддерживается в Школе №830 г. Москва
@@ -33,6 +33,11 @@
 ###################################################################################################
 
 from __future__ import with_statement
+
+from vnc import *
+from timers import timers
+from window2 import *
+from config import *
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -90,10 +95,6 @@ python_version = sys.version_info[0:2]
 #     gtkvnc = False
 
 # program modules
-from config import *
-from window2 import *
-from timers import timers
-from vnc import *
 
 locale_path = os.path.expanduser("locale")
 gettext.bindtextdomain('ruleuser', locale_path)
@@ -154,7 +155,7 @@ class Program:
         self.window = self.cfg.window
         self.cfg.maximized = False
         self.cfg.fullscreen = False
-        # self.cfg.bg_color = self.window.get_style().copy().bg[Gtk.STATE_NORMAL]
+        #~ self.cfg.bg_color = self.window.StyleContext.get_style().copy().bg[Gtk.StateFlags.NORMAL]
         self.window.set_title(" RuleUser ")
         self.window.connect('check-resize', self.window_resize_event)
         self.window.connect("window-state-event", self.window_state_event)
@@ -198,7 +199,8 @@ class Program:
                 self.cfg.status(_("The screenshot is saved to a file") + " " + label_text + "_" + time.strftime(
                     "%d.%m.%Y_%H:%M:%S") + ".png")
             else:
-                self.cfg.status(_("The screenshot folder") + " " + _("not found") + " - " + self.cfg.vncShotFolder)
+                self.cfg.status(_("The screenshot folder") + " " +
+                                _("not found") + " - " + self.cfg.vncShotFolder)
                 return
 
         if data1 == "screenshot_all":
@@ -214,18 +216,21 @@ class Program:
                 pix = vnc.get_pixbuf()
                 if os.path.exists(self.cfg.vncShotFolder):
                     pix.save(
-                        self.cfg.vncShotFolder + "/" + label_text + "_" + time.strftime("%d.%m.%Y_%H:%M:%S") + ".png",
+                        self.cfg.vncShotFolder + "/" + label_text + "_" +
+                        time.strftime("%d.%m.%Y_%H:%M:%S") + ".png",
                         "png", {})
                     self.cfg.status(_("The screenshot is saved to a file") + " " + label_text + "_" + time.strftime(
                         "%d.%m.%Y_%H:%M:%S") + ".png")
                 else:
-                    self.cfg.status(_("The screenshot folder") + " " + _("not found") + " - " + self.cfg.vncShotFolder)
+                    self.cfg.status(_("The screenshot folder") + " " +
+                                    _("not found") + " - " + self.cfg.vncShotFolder)
                     return
 
         if data1 == "remove_tree_item":
             remove_tree_item(self.cfg, self.cfg.treeView)
         if data1 == "edit_tree_item":
-            userUi(self.cfg, "edit", get_selected_tree(self.cfg, self.cfg.treeView, "edit"))
+            userUi(self.cfg, "edit", get_selected_tree(
+                self.cfg, self.cfg.treeView, "edit"))
         if data1 == "create_standalone":
             userUi(self.cfg, "standalone")
         if data1 == "create_group":
@@ -234,7 +239,8 @@ class Program:
             userUi(self.cfg, "server")
 
         if data1 == "client_info":
-            userUi(self.cfg, "client_info", get_selected_tree(self.cfg, self.cfg.treeView, "first"))
+            userUi(self.cfg, "client_info", get_selected_tree(
+                self.cfg, self.cfg.treeView, "first"))
 
         if data1 == "settings":
             settings(self.cfg)
@@ -265,7 +271,8 @@ class Program:
                 folderUi(self.cfg, user_list)
 
         if data1 == "log":
-            hwinfoUi(self.cfg, get_selected_tree(self.cfg, self.cfg.treeView), "log")
+            hwinfoUi(self.cfg, get_selected_tree(
+                self.cfg, self.cfg.treeView), "log")
 
         if data1 == "run":
             if self.view_message_box(state="state") == False:
@@ -274,7 +281,8 @@ class Program:
             if user_list != []:
                 if self.cfg.messageBox.get_active_text() != "":
                     if message_dialog(self.window, _("Run command") + " ?\n", user_list, True) == True:
-                        run_command(self.cfg, user_list, self.cfg.messageBox.get_active_text(), _("Run command"))
+                        run_command(
+                            self.cfg, user_list, self.cfg.messageBox.get_active_text(), _("Run command"))
                 else:
                     entry_error(self.cfg, self.cfg.messageBox)
 
@@ -290,11 +298,13 @@ class Program:
                         d[key] = value
                     if d['client'] != "standalone":
                         name = get_name(d)
-                        self.cfg.status(name + ' "' + _("Run as root") + '" ' + _("only for standalone clients"))
+                        self.cfg.status(
+                            name + ' "' + _("Run as root") + '" ' + _("only for standalone clients"))
                         return
                 if self.cfg.messageBox.get_active_text() != "":
                     if message_dialog(self.window, _("Run as root") + " ?\n", user_list, True) == True:
-                        run_command(self.cfg, user_list, self.cfg.messageBox.get_active_text(), _("Run as root"))
+                        run_command(
+                            self.cfg, user_list, self.cfg.messageBox.get_active_text(), _("Run as root"))
                 else:
                     entry_error(self.cfg, self.cfg.messageBox)
 
@@ -305,7 +315,8 @@ class Program:
             if user_list != []:
                 if self.cfg.messageBox.get_active_text() != "":
                     if message_dialog(self.window, _("Send message") + " ?\n", user_list, True) == True:
-                        run_command(self.cfg, user_list, self.cfg.messageBox.get_active_text(), _("Send message"))
+                        run_command(
+                            self.cfg, user_list, self.cfg.messageBox.get_active_text(), _("Send message"))
                 else:
                     entry_error(self.cfg, self.cfg.messageBox)
 
@@ -316,7 +327,8 @@ class Program:
             if user_list != []:
                 if self.cfg.messageBox.get_active_text() != "":
                     if message_dialog(self.window, _("Send file") + " ?\n", user_list, True) == True:
-                        send_file(self.cfg, user_list, self.cfg.messageBox.get_active_text())
+                        send_file(self.cfg, user_list,
+                                  self.cfg.messageBox.get_active_text())
                 else:
                     entry_error(self.cfg, self.cfg.messageBox)
 
@@ -340,7 +352,8 @@ class Program:
                         d[key] = value
                     if d['client'] != "standalone":
                         name = get_name(d)
-                        self.cfg.status(name + ' "' + _("Console") + "(root)" + '" ' + _("only for standalone clients"))
+                        self.cfg.status(
+                            name + ' "' + _("Console") + "(root)" + '" ' + _("only for standalone clients"))
                         return
                 run_command(self.cfg, user_list, "", "console_root")
 
@@ -397,20 +410,26 @@ class Program:
             if self.cfg.vnc_active or self.cfg.vnc_local_active:
                 return
             if self.cfg.vncGtk == "y" and self.cfg.gtkvnc != False:
-                user_list = get_selected_tree(self.cfg, self.cfg.treeView, "first")
+                user_list = get_selected_tree(
+                    self.cfg, self.cfg.treeView, "first")
                 if user_list == []:
                     return
                 (new, param) = self.thumbnails_vnc_pre(user_list, mode)
                 if new:
-                    thread = thread_gfunc(self.cfg, True, True, self.thumbnails_vnc, user_list, param)
+                    thread = thread_gfunc(
+                        self.cfg, True, True, self.thumbnails_vnc, user_list, param)
                     thread.start()
-                    GObject.timeout_add(1000 + len(user_list) * 200, self.thumbnails_vnc_post, param)
-                    GObject.timeout_add(7000 + len(user_list) * 200, self.thumbnails_vnc_active)
+                    GObject.timeout_add(
+                        1000 + len(user_list) * 200, self.thumbnails_vnc_post, param)
+                    GObject.timeout_add(
+                        7000 + len(user_list) * 200, self.thumbnails_vnc_active)
             else:
                 if mode == "view":
-                    create_vnc_viewer(self.cfg, get_selected_tree(self.cfg, self.cfg.treeView, "first"), "-viewonly")
+                    create_vnc_viewer(self.cfg, get_selected_tree(
+                        self.cfg, self.cfg.treeView, "first"), "-viewonly")
                 else:
-                    create_vnc_viewer(self.cfg, get_selected_tree(self.cfg, self.cfg.treeView, "first"), "")
+                    create_vnc_viewer(self.cfg, get_selected_tree(
+                        self.cfg, self.cfg.treeView, "first"), "")
 
         if data1 == "thumbnails":
             if self.cfg.vnc_active or self.cfg.vnc_local_active:
@@ -422,10 +441,13 @@ class Program:
                 return
             (new, param) = self.thumbnails_vnc_pre(user_list, "thumbnails")
             if new:
-                thread = thread_gfunc(self.cfg, True, True, self.thumbnails_vnc, user_list, param)
+                thread = thread_gfunc(
+                    self.cfg, True, True, self.thumbnails_vnc, user_list, param)
                 thread.start()
-                GObject.timeout_add(1000 + len(user_list) * 200, self.thumbnails_vnc_post, param)
-                GObject.timeout_add(7000 + len(user_list) * 200, self.thumbnails_vnc_active)
+                GObject.timeout_add(1000 + len(user_list)
+                                    * 200, self.thumbnails_vnc_post, param)
+                GObject.timeout_add(7000 + len(user_list)
+                                    * 200, self.thumbnails_vnc_active)
             # thread = threading.Thread(target=self.thumbnails_vnc)
             # thread.start()
             # self.thumbnails_vnc()
@@ -434,14 +456,14 @@ class Program:
 
     def window_state_event(self, widget=None, event=None):
         state = event.changed_mask
-        if state == Gdk.WINDOW_STATE_MAXIMIZED or state == Gdk.WINDOW_STATE_FULLSCREEN:
+        if state == Gdk.WindowState.MAXIMIZED or state == Gdk.WindowState.FULLSCREEN:
             new_state = event.new_window_state
-            if new_state == Gdk.WINDOW_STATE_MAXIMIZED:
+            if new_state == Gdk.WindowState.MAXIMIZED:
                 self.cfg.maximized = True
             else:
                 self.cfg.maximized = False
             if (
-                    new_state == Gdk.WINDOW_STATE_FULLSCREEN or new_state == Gdk.WINDOW_STATE_MAXIMIZED | Gdk.WINDOW_STATE_FULLSCREEN):
+                    new_state == Gdk.WindowState.FULLSCREEN or new_state == Gdk.WindowState.MAXIMIZED | Gdk.WindowState.FULLSCREEN):
                 self.cfg.fullscreen = True
             else:
                 self.cfg.fullscreen = False
@@ -454,19 +476,19 @@ class Program:
     ##############################################
 
     def window_key_press_event(self, widget=None, event=None):
-        if event.keyval == Gtk.keysyms.F1:
+        if event.keyval == Gdk.KEY_F1:
             about_dialog()
-        if event.keyval == Gtk.keysyms.F2:
+        if event.keyval == Gdk.KEY_F2:
             self.view_list()
-        if event.keyval == Gtk.keysyms.F3:
+        if event.keyval == Gdk.KEY_F3:
             self.view_vnc_minimize()
-        if event.keyval == Gtk.keysyms.F4:
+        if event.keyval == Gdk.KEY_F4:
             self.view_vnc_close()
-        if event.keyval == Gtk.keysyms.F9:
+        if event.keyval == Gdk.KEY_F9:
             self.view_message_box()
-        if event.keyval == Gtk.keysyms.F10:
+        if event.keyval == Gdk.KEY_F10:
             self.view_status()
-        if event.keyval == Gtk.keysyms.F11:
+        if event.keyval == Gdk.KEY_F11:
             self.view_fullscreen()
 
     ##############################################
@@ -481,7 +503,8 @@ class Program:
             self.cfg.screen_x = self.cfg.mainWindowX + self.cfg.panedWindowX
 
         if self.cfg.table2.get_children() == []:
-            self.window.set_size_request(self.cfg.min_mainWindowX, self.cfg.min_mainWindowY)
+            self.window.set_size_request(
+                self.cfg.min_mainWindowX, self.cfg.min_mainWindowY)
 
     ##############################################
 
@@ -514,14 +537,17 @@ class Program:
         # Ползунок разделения не передвинуть
         if self.cfg.table2.get_children() != []:
             if self.cfg.panedWindow.get_position() < self.cfg.window_x - self.cfg.panedWindowX - self.cfg.phandle_size or self.cfg.panedWindow.get_position() > self.cfg.window_x - self.cfg.panedWindowX - self.cfg.phandle_size:
-                self.cfg.panedWindow.set_position(self.cfg.window_x - self.cfg.panedWindowX - self.cfg.phandle_size)
+                self.cfg.panedWindow.set_position(
+                    self.cfg.window_x - self.cfg.panedWindowX - self.cfg.phandle_size)
         else:
             if self.cfg.panedWindow.get_position() < self.cfg.window_x - self.cfg.phandle_size:
-                self.cfg.panedWindow.set_position(self.cfg.window_x - self.cfg.phandle_size)
+                self.cfg.panedWindow.set_position(
+                    self.cfg.window_x - self.cfg.phandle_size)
         # Тащить за собой ползунок panedTree если нет миниатюр
         if self.table_vnc.get_children() == [] and self.cfg.vnc_active == False:
             if self.panedTree.get_position() < self.cfg.panedWindow.get_position() - self.cfg.phandle_size:
-                self.panedTree.set_position(self.cfg.panedWindow.get_position() - self.cfg.phandle_size)
+                self.panedTree.set_position(
+                    self.cfg.panedWindow.get_position() - self.cfg.phandle_size)
         # Переместить миниатюры
         self.thumbnails_reorder()
 
@@ -537,11 +563,13 @@ class Program:
                 vnc_item = line[3]
                 if str(vbox).find(str(data)) != -1:
                     # Поиск в дереве row(path) по alias,user
-                    row = find_tree(self.cfg, self.cfg.userList, client_id=client_id)
+                    row = find_tree(self.cfg, self.cfg.userList,
+                                    client_id=client_id)
                     if row == False:
                         return
                     # Раскрыть и выделить
-                    self.cfg.treeView.scroll_to_cell(row, None, use_align=True, row_align=0.5, col_align=0.0)
+                    self.cfg.treeView.scroll_to_cell(
+                        row, None, use_align=True, row_align=0.5, col_align=0.0)
                     self.cfg.treeView.expand_to_path(row)
                     self.treeSelection.unselect_all()
                     self.treeSelection.select_path(row)
@@ -566,11 +594,11 @@ class Program:
                     # Если размер изменен
                     if ((self.cfg.vnc_box[num][13] == "custom" and mode != "all_minimize") or
                             (self.cfg.vnc_box[num][13] == "custom" and mode == "all_minimize" and
-                                         self.cfg.vnc_box[num][2] == resize_vbox[2])):
+                             self.cfg.vnc_box[num][2] == resize_vbox[2])):
                         pass
                     elif ((self.cfg.vnc_box[num][13] == "max" and mode != "all_minimize") or
-                              (self.cfg.vnc_box[num][13] == "max" and mode == "all_minimize" and
-                                           self.cfg.vnc_box[num][2] == resize_vbox[2])):
+                          (self.cfg.vnc_box[num][13] == "max" and mode == "all_minimize" and
+                           self.cfg.vnc_box[num][2] == resize_vbox[2])):
                         self.cfg.vnc_box[num][4] = self.cfg.vnc_box[num][8]
                         self.cfg.vnc_box[num][5] = self.cfg.vnc_box[num][9]
                     else:
@@ -585,48 +613,55 @@ class Program:
                             # Кнопка просмотр/управления
                             if self.cfg.vnc_box[num][12] != "view":
                                 self.cfg.vnc_box[num][12] = "view"
-                                self.thumbnails_button(self.cfg.vnc_box[num], _("Viewer") + "/" + _("Control"))
+                                self.thumbnails_button(self.cfg.vnc_box[num], _(
+                                    "Viewer") + "/" + _("Control"))
                     # Кнопка размера
                     if mode == "all_minimize" or (mode == "resize" and resize_vbox[2] == self.cfg.vnc_box[num][2]):
-                        self.thumbnails_button(self.cfg.vnc_box[num], _("Size"))
+                        self.thumbnails_button(
+                            self.cfg.vnc_box[num], _("Size"))
 
             for num in range(len(self.cfg.vnc_box)):
                 if num == 0:
                     self.cfg.vnc_box[num][27] = 0
                     self.cfg.vnc_box[num][28] = y
-                    y = self.cfg.vnc_box[num][28] + self.cfg.vnc_box[num][5] + self.cfg.tt_border
+                    y = self.cfg.vnc_box[num][28] + \
+                        self.cfg.vnc_box[num][5] + self.cfg.tt_border
                 else:
                     if (self.cfg.vnc_box[num - 1][27] + self.cfg.vnc_box[num - 1][4] + self.cfg.vnc_box[num][
-                        4] + self.cfg.tt_border < self.thumbnails_table_size()[0]):
+                            4] + self.cfg.tt_border < self.thumbnails_table_size()[0]):
                         self.cfg.vnc_box[num][27] = self.cfg.vnc_box[num - 1][27] + self.cfg.vnc_box[num - 1][
                             4] + self.cfg.tt_border
                         self.cfg.vnc_box[num][28] = self.cfg.vnc_box[num - 1][28]
                         if y < self.cfg.vnc_box[num][28] + self.cfg.vnc_box[num][5] + self.cfg.tt_border:
-                            y = self.cfg.vnc_box[num][28] + self.cfg.vnc_box[num][5] + self.cfg.tt_border
+                            y = self.cfg.vnc_box[num][28] + \
+                                self.cfg.vnc_box[num][5] + self.cfg.tt_border
                     else:
                         self.cfg.vnc_box[num][27] = 0
                         self.cfg.vnc_box[num][28] = y
-                        y = self.cfg.vnc_box[num][28] + self.cfg.vnc_box[num][5] + self.cfg.tt_border
+                        y = self.cfg.vnc_box[num][28] + \
+                            self.cfg.vnc_box[num][5] + self.cfg.tt_border
 
             for num in range(len(self.cfg.vnc_box)):
                 if self.cfg.vnc_box[num][0] != "empty":
                     # Изменить размер
                     if (mode == "resize" or mode == "all_minimize") and resize_vbox[2] == self.cfg.vnc_box[num][2]:
-                        self.cfg.vnc_box[num][2].set_size_request(self.cfg.vnc_box[num][4], self.cfg.vnc_box[num][5])
+                        self.cfg.vnc_box[num][2].set_size_request(
+                            self.cfg.vnc_box[num][4], self.cfg.vnc_box[num][5])
                     # Переместить
                     if self.cfg.vnc_box[num] != self.cfg.thumbnails_resize_item:
                         alloc = self.cfg.vnc_box[num][2].get_allocation()
                         if (alloc.x - self.cfg.tt_border != self.cfg.vnc_box[num][27] or alloc.y - self.cfg.tt_border !=
-                            self.cfg.vnc_box[num][28]):
+                                self.cfg.vnc_box[num][28]):
                             self.table_vnc.move(self.cfg.vnc_box[num][2], self.cfg.vnc_box[num][27],
                                                 self.cfg.vnc_box[num][28])
                 # Прокрутка
                 if ((mode == "resize" or mode == "all_minimize") and self.cfg.read_config("vnc",
                                                                                           "vnc_thumbnails_scroll") == "y" and
                         ((resize_vbox[2] and resize_vbox[2] == self.cfg.vnc_box[num][2]) or (
-                                not resize_vbox[2] and num == 0)) and
+                            not resize_vbox[2] and num == 0)) and
                         (self.cfg.vnc_box[num][0] == "empty" or self.cfg.vnc_box[num][13] != "custom")):
-                    GObject.timeout_add(100, self.thumbnails_scroll, self.cfg.vnc_box[num][28])
+                    GObject.timeout_add(
+                        100, self.thumbnails_scroll, self.cfg.vnc_box[num][28])
                     # Проверка
                 # for num in range(len(self.cfg.vnc_box)):
                 #	print num, self.cfg.vnc_box[num][1], "width="+str(self.cfg.vnc_box[num][4]), "height="+str(self.cfg.vnc_box[num][5]),\
@@ -637,7 +672,7 @@ class Program:
 
     def thumbnails_scroll(self, y):
         adj = self.swVnc.get_vadjustment()
-        adj.set_value(min(y, adj.upper - adj.page_size))
+        adj.set_value(min(y, adj.props.upper - adj.props.page_size))
         return False
 
     ##############################################
@@ -648,13 +683,16 @@ class Program:
                 if label == _("Size"):
                     if p[13] == "custom":
                         image = w.get_icon_widget()
-                        image.set_from_pixbuf(self.cfg.pixbuf_action_window_min_16)
+                        image.set_from_pixbuf(
+                            self.cfg.pixbuf_action_window_min_16)
                     elif p[13] == "min":
                         image = w.get_icon_widget()
-                        image.set_from_pixbuf(self.cfg.pixbuf_action_window_max_16)
+                        image.set_from_pixbuf(
+                            self.cfg.pixbuf_action_window_max_16)
                     else:
                         image = w.get_icon_widget()
-                        image.set_from_pixbuf(self.cfg.pixbuf_action_window_min_16)
+                        image.set_from_pixbuf(
+                            self.cfg.pixbuf_action_window_min_16)
                 elif label == _("Viewer") + "/" + _("Control"):
                     if p[12] == "view":
                         w.set_active(False)
@@ -718,7 +756,8 @@ class Program:
                 self.cfg.status(p[1] + ": " + _("not found"))
                 return
             # Раскрыть и выделить
-            self.cfg.treeView.scroll_to_cell(row, None, use_align=True, row_align=0.5, col_align=0.0)
+            self.cfg.treeView.scroll_to_cell(
+                row, None, use_align=True, row_align=0.5, col_align=0.0)
             self.cfg.treeView.expand_to_path(row)
             self.treeSelection.unselect_all()
             self.treeSelection.select_path(row)
@@ -752,7 +791,8 @@ class Program:
 
     def vnc_item_toolbar_drag_begin(self, widget, drag_context):
         alloc = widget.get_allocation()
-        pixbuf = Gdk.Pixbuf(Gdk.COLORSPACE_RGB, False, 8, alloc.width, alloc.height)
+        pixbuf = Gdk.Pixbuf(GdkPixbuf.Colorspace.RGB, False,
+                            8, alloc.width, alloc.height)
         snapshot = pixbuf.get_from_drawable(widget.window, widget.get_colormap(), alloc.x, alloc.y, 0, 0, alloc.width,
                                             alloc.height)
         drag_context.set_icon_pixbuf(snapshot, 0, 0)
@@ -804,22 +844,24 @@ class Program:
 
         toolbar = Gtk.Toolbar()
 
-        TARGETS = [('TEXT', 0, 0)]
-        toolbar.connect("drag_data_get", self.vnc_item_toolbar_drag_data_get, p)
+        TARGETS = Gtk.TargetEntry.new('TEXT', 0, 0)
+        toolbar.connect("drag_data_get",
+                        self.vnc_item_toolbar_drag_data_get, p)
         toolbar.connect('drag_begin', self.vnc_item_toolbar_drag_begin)
-        toolbar.drag_source_set(Gdk.BUTTON1_MASK, TARGETS, Gdk.ACTION_DEFAULT)
+        toolbar.drag_source_set(
+            Gdk.ModifierType.BUTTON1_MASK, [TARGETS], Gdk.DragAction.DEFAULT)
 
         toolbar.set_size_request(-1, self.cfg.tt_size)
-        toolbar.set_orientation(Gtk.ORIENTATION_HORIZONTAL)
-        toolbar.set_style(Gtk.TOOLBAR_ICONS)
+        toolbar.set_orientation(Gtk.Orientation.HORIZONTAL)
+        toolbar.set_style(Gtk.ToolbarStyle.ICONS)
         toolbar.set_border_width(0)
-        toolbar.set_tooltips(True)
+        #~ toolbar.set_tooltips(True)
 
         label = Gtk.Label(" " + name)
         label.set_alignment(0, 0.5)
         label.modify_font(Pango.FontDescription(self.cfg.fontThumbnails))
         item = Gtk.ToolItem()
-        item.set_expand(Gtk.EXPAND)
+        item.set_expand(Gtk.AttachOptions.EXPAND)
         item.add(label)
         toolbar.insert(item, -1)
 
@@ -827,23 +869,28 @@ class Program:
             button = toolbar_button(self.cfg.pixbuf_action_control_16, self.cfg.tooltips,
                                     _("Viewer") + "/" + _("Control"), True)
             button.set_label(_("Viewer") + "/" + _("Control"))
-            button.connect("clicked", self.thumbnails_vnc_event_button, p, "control")
+            button.connect(
+                "clicked", self.thumbnails_vnc_event_button, p, "control")
             if mode == "control":
                 button.set_active(True)
             toolbar.insert(button, -1)
 
         if "screenshot" in self.cfg.vncThumbnailsToolbar:
-            button = toolbar_button(self.cfg.pixbuf_action_screenshot_16, self.cfg.tooltips, _("Screenshot"))
+            button = toolbar_button(
+                self.cfg.pixbuf_action_screenshot_16, self.cfg.tooltips, _("Screenshot"))
             button.set_label(_("Screenshot"))
-            button.connect("clicked", self.thumbnails_vnc_event_button, p, "screenshot")
+            button.connect(
+                "clicked", self.thumbnails_vnc_event_button, p, "screenshot")
             toolbar.insert(button, -1)
 
         item = Gtk.SeparatorToolItem()
         toolbar.insert(item, -1)
 
         if "up" in self.cfg.vncThumbnailsToolbar:
-            button = toolbar_button(self.cfg.pixbuf_action_window_up_16, self.cfg.tooltips, _("Upstairs"))
-            button.connect("clicked", self.thumbnails_vnc_event_button, p, "up")
+            button = toolbar_button(
+                self.cfg.pixbuf_action_window_up_16, self.cfg.tooltips, _("Upstairs"))
+            button.connect(
+                "clicked", self.thumbnails_vnc_event_button, p, "up")
             button.set_label(_("Upstairs"))
             toolbar.insert(button, -1)
 
@@ -856,10 +903,12 @@ class Program:
             image.set_from_pixbuf(self.cfg.pixbuf_action_window_min_16)
         button.set_icon_widget(image)
         button.set_label(_("Size"))
-        button.connect("clicked", self.thumbnails_vnc_event_button, p, "resize")
+        button.connect(
+            "clicked", self.thumbnails_vnc_event_button, p, "resize")
         toolbar.insert(button, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_action_window_close_16, self.cfg.tooltips, _("Close"))
+        button = toolbar_button(
+            self.cfg.pixbuf_action_window_close_16, self.cfg.tooltips, _("Close"))
         button.connect("clicked", self.thumbnails_vnc_event_button, p, "close")
         button.set_label(_("Close"))
         toolbar.insert(button, -1)
@@ -870,8 +919,10 @@ class Program:
         vnc.realize()
         vbox.show_all()
 
-        button = toolbar_button(self.cfg.pixbuf_action_window_connect_16, self.cfg.tooltips, _("Connect"))
-        button.connect("clicked", self.thumbnails_vnc_event_button, p, "connect")
+        button = toolbar_button(
+            self.cfg.pixbuf_action_window_connect_16, self.cfg.tooltips, _("Connect"))
+        button.connect(
+            "clicked", self.thumbnails_vnc_event_button, p, "connect")
         button.set_label(_("Connect"))
         toolbar.insert(button, 0)
         if "connect" in self.cfg.vncThumbnailsToolbar:
@@ -897,17 +948,17 @@ class Program:
 
         if self.cfg.gtkvnc_depth:
             if color == "default":
-                vnc.set_depth("VNC_DISPLAY_DEPTH_COLOR_DEFAULT")
+                vnc.set_depth(GtkVnc.DisplayDepthColor.DEFAULT)
             elif color == "full":
-                vnc.set_depth("VNC_DISPLAY_DEPTH_COLOR_FULL")
+                vnc.set_depth(GtkVnc.DisplayDepthColor.FULL)
             elif color == "medium":
-                vnc.set_depth("VNC_DISPLAY_DEPTH_COLOR_MEDIUM")
+                vnc.set_depth(GtkVnc.DisplayDepthColor.MEDIUM)
             elif color == "low":
-                vnc.set_depth("VNC_DISPLAY_DEPTH_COLOR_LOW")
+                vnc.set_depth(GtkVnc.DisplayDepthColor.LOW)
             elif color == "ultra-low":
-                vnc.set_depth("VNC_DISPLAY_DEPTH_COLOR_ULTRA_LOW")
+                vnc.set_depth(GtkVnc.DisplayDepthColor.ULTRA_LOW)
             else:
-                vnc.set_depth("VNC_DISPLAY_DEPTH_COLOR_DEFAULT")
+                vnc.set_depth(GtkVnc.DisplayDepthColor.DEFAULT)
 
         if self.cfg.gtkvnc_encoding:
             if encoding == "zrle":
@@ -917,7 +968,7 @@ class Program:
             elif encoding == "raw":
                 vnc.set_encoding("VNC_DISPLAY_ENCODING_RAW")
 
-        vnc.set_credential(GtkVnc.CREDENTIAL_PASSWORD, password)
+        vnc.set_credential(GtkVnc.DisplayCredential.PASSWORD, password)
 
         vnc.connect("vnc-initialized", self.vnc_item_init, p)
         vnc.connect("vnc-disconnected", self.vnc_item_disconnect, p)
@@ -956,23 +1007,25 @@ class Program:
                 frame = Gtk.Frame()
                 p[2].pack_start(frame, expand=True, fill=True, padding=0)
                 label = Gtk.Label(label_error)
-                label.modify_font(Pango.FontDescription(self.cfg.fontThumbnails))
+                label.modify_font(Pango.FontDescription(
+                    self.cfg.fontThumbnails))
                 frame.add(label)
                 frame.show_all()
             toolbar = p[2].get_children()[0]
             for w in toolbar.get_children():
                 if type(w) == Gtk.ToolButton or type(w) == Gtk.ToggleToolButton:
                     if (w.get_label() != _("Connect") and
-                                w.get_label() != _("Upstairs") and
-                                w.get_label() != _("Size") and
-                                w.get_label() != _("Close")):
+                        w.get_label() != _("Upstairs") and
+                        w.get_label() != _("Size") and
+                            w.get_label() != _("Close")):
                         w.set_sensitive(False)
                     if "connect" not in self.cfg.vncThumbnailsToolbar:
                         if w.get_label() == _("Connect"):
                             w.show_all()
                     if p[12] != "view":
                         p[12] = "view"
-                        self.thumbnails_button(p, _("Viewer") + "/" + _("Control"))
+                        self.thumbnails_button(
+                            p, _("Viewer") + "/" + _("Control"))
 
     ##############################################
 
@@ -1048,7 +1101,8 @@ class Program:
                 col = 0
                 row += 1
             # Отдельный поток на каждую миниатюру, без курсора
-            thread = thread_gfunc(self.cfg, False, True, self.thumbnails_vnc_item, vbox, z, param, item)
+            thread = thread_gfunc(
+                self.cfg, False, True, self.thumbnails_vnc_item, vbox, z, param, item)
             thread.start()
             # sleep, иначе некоторые не открываются
             time.sleep(0.1)
@@ -1058,7 +1112,8 @@ class Program:
         # sleep, иначе зависание(P5/P6). Курсор ожидания.
         time.sleep(2 + len(user_list) * 0.1)
         self.cfg.vnc_active_open = False
-        self.cfg.debug("---thumbnails_vnc count---: " + str(self.cfg.vnc_count))
+        self.cfg.debug("---thumbnails_vnc count---: " +
+                       str(self.cfg.vnc_count))
         self.cfg.debug("---thumbnails_vnc end---")
 
     ##############################################
@@ -1069,7 +1124,8 @@ class Program:
     ##############################################
 
     def thumbnails_table_size(self):
-        x = self.cfg.panedWindow.get_position() - self.panedTree.get_position() - self.cfg.slider_size - 2 * self.cfg.tt_border - 20
+        x = self.cfg.panedWindow.get_position() - self.panedTree.get_position() - \
+            self.cfg.slider_size - 2 * self.cfg.tt_border - 20
         y = self.cfg.window_y - self.widget_view()
         return x, y
 
@@ -1095,9 +1151,11 @@ class Program:
             new_window_y = self.cfg.window_y
             vbox_alloc = p[2].get_allocation()
             if p[4] > self.thumbnails_table_size()[0]:
-                new_window_x = self.panedTree.get_position() + self.cfg.slider_size + 2 * self.cfg.tt_border + 20 + p[4]
+                new_window_x = self.panedTree.get_position() + self.cfg.slider_size + 2 * \
+                    self.cfg.tt_border + 20 + p[4]
             if p[5] + vbox_alloc.y - self.cfg.tt_border > self.thumbnails_table_size()[1]:
-                new_window_y = self.widget_view() + p[5] + vbox_alloc.y - self.cfg.tt_border
+                new_window_y = self.widget_view(
+                ) + p[5] + vbox_alloc.y - self.cfg.tt_border
             if new_window_x != self.cfg.window_x or new_window_y != self.cfg.window_y:
                 self.window.resize(new_window_x, new_window_y)
 
@@ -1112,8 +1170,9 @@ class Program:
 
             # Нельзя передвинуть правее области просмотра, меньше мин размера, больше макс рамера.
             if (x - vbox_alloc.x - int(self.cfg.tt_border * 0.5) > self.thumbnails_table_size()[0] - vbox_alloc.x + int(
-                        self.cfg.tt_border * 0.5)):
-                thumb_x = self.thumbnails_table_size()[0] - vbox_alloc.x + int(self.cfg.tt_border * 0.5)
+                    self.cfg.tt_border * 0.5)):
+                thumb_x = self.thumbnails_table_size(
+                )[0] - vbox_alloc.x + int(self.cfg.tt_border * 0.5)
                 frame_x = thumb_x + self.cfg.tt_border
             elif p[6] < x - vbox_alloc.x - int(self.cfg.tt_border * 0.5) < p[8]:
                 thumb_x = x - vbox_alloc.x - int(self.cfg.tt_border * 0.5)
@@ -1162,9 +1221,10 @@ class Program:
         if p and p[2] and not p[25] and not p[26]:
             frame = Gtk.Frame()
             frame.set_border_width(0)
-            frame.modify_bg(Gtk.STATE_NORMAL, Gdk.color_parse("gray"))
+            frame.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse("gray"))
             vbox_alloc = p[2].get_allocation()
-            frame.set_size_request(vbox_alloc.width + self.cfg.tt_border, vbox_alloc.height + self.cfg.tt_border)
+            frame.set_size_request(
+                vbox_alloc.width + self.cfg.tt_border, vbox_alloc.height + self.cfg.tt_border)
             self.table_vnc.put(frame, vbox_alloc.x - int(self.cfg.tt_border * 1.5),
                                vbox_alloc.y - int(self.cfg.tt_border * 1.5))
             frame.show_all()
@@ -1177,7 +1237,8 @@ class Program:
             image.set_from_pixbuf(self.cfg.pixbuf_action_resize_12)
             ebox.add(image)
             ebox.connect("button-press-event", self.thumbnails_resize_press, p)
-            ebox.connect("button-release-event", self.thumbnails_resize_release, p)
+            ebox.connect("button-release-event",
+                         self.thumbnails_resize_release, p)
             self.table_vnc.put(ebox, vbox_alloc.x + vbox_alloc.width - int(self.cfg.tt_border * 0.5) - 9,
                                vbox_alloc.y + vbox_alloc.height - int(self.cfg.tt_border * 0.5) - 9)
             ebox.show_all()
@@ -1197,11 +1258,11 @@ class Program:
             x_button, y_button = p[26].get_pointer()
             button_alloc = p[26].get_allocation()
             if (((0 < x_button < button_alloc.width and 0 < y_button < button_alloc.height) or
-                     (0 < x_frame < frame_alloc.width and 0 < y_frame < frame_alloc.height)) and
-                        vbox_alloc.x == frame_alloc.x + int(
-                                self.cfg.tt_border * 0.5) and vbox_alloc.y == frame_alloc.y + int(
+                 (0 < x_frame < frame_alloc.width and 0 < y_frame < frame_alloc.height)) and
+                vbox_alloc.x == frame_alloc.x + int(
+                self.cfg.tt_border * 0.5) and vbox_alloc.y == frame_alloc.y + int(
                     self.cfg.tt_border * 0.5) and
-                        vbox_alloc.width == frame_alloc.width - self.cfg.tt_border and vbox_alloc.height == frame_alloc.height - self.cfg.tt_border):
+                    vbox_alloc.width == frame_alloc.width - self.cfg.tt_border and vbox_alloc.height == frame_alloc.height - self.cfg.tt_border):
                 return True
         if p[25]:
             p[25].destroy()
@@ -1314,11 +1375,11 @@ class Program:
             # Если сдвинут разделитель
             self.thumbnails_reorder("all")
             if ((
-                        window_x < new_window_x or window_y < new_window_y) and self.cfg.maximized == False and self.cfg.fullscreen == False and size == "max"):
+                    window_x < new_window_x or window_y < new_window_y) and self.cfg.maximized == False and self.cfg.fullscreen == False and size == "max"):
                 # Если размер меньше необходимого
                 self.window.resize(new_window_x, new_window_y)
         elif ((
-                      window_x < new_window_x or window_y < new_window_y) and self.cfg.maximized == False and self.cfg.fullscreen == False):
+                window_x < new_window_x or window_y < new_window_y) and self.cfg.maximized == False and self.cfg.fullscreen == False):
             # Если размер меньше необходимого
             self.window.resize(new_window_x, new_window_y)
         self.cfg.debug("--thumbnails_vnc_post end--")
@@ -1431,10 +1492,12 @@ class Program:
                             # Кнопка просмотр/управления
                             if mode == "view" and p[12] != "view":
                                 p[12] = "view"
-                                self.thumbnails_button(p, _("Viewer") + "/" + _("Control"))
+                                self.thumbnails_button(
+                                    p, _("Viewer") + "/" + _("Control"))
                             if mode == "control" and p[12] != "control":
                                 p[12] = "control"
-                                self.thumbnails_button(p, _("Viewer") + "/" + _("Control"))
+                                self.thumbnails_button(
+                                    p, _("Viewer") + "/" + _("Control"))
                         else:
                             if p[13] != "min" and p == self.cfg.vnc_box[0]:
                                 p[13] = "min"
@@ -1480,7 +1543,7 @@ class Program:
         # размеры окна
         if size == "max" and new == False:
             if ((
-                        window_x < new_max_window_x or window_y < new_max_window_y) and self.cfg.maximized == False and self.cfg.fullscreen == False):
+                    window_x < new_max_window_x or window_y < new_max_window_y) and self.cfg.maximized == False and self.cfg.fullscreen == False):
                 self.window.resize(new_window_x, new_window_y)
 
         # параметры
@@ -1505,38 +1568,45 @@ class Program:
 
         if not line_vnc_box:
             if self.cfg.read_config("hide", "hide_viewer") == "n":
-                item = menu_image_button(self.cfg.pixbuf_action_viewer_16, _("Viewer"))
+                item = menu_image_button(
+                    self.cfg.pixbuf_action_viewer_16, _("Viewer"))
                 item.connect('activate', self.callback, "view")
                 menu.append(item)
 
             if self.cfg.read_config("hide", "hide_control") == "n":
-                item = menu_image_button(self.cfg.pixbuf_action_control_16, _("Control"))
+                item = menu_image_button(
+                    self.cfg.pixbuf_action_control_16, _("Control"))
                 item.connect('activate', self.callback, "control")
                 menu.append(item)
 
             if self.cfg.read_config("hide", "hide_thumbnails") == "n":
-                item = menu_image_button(self.cfg.pixbuf_action_thumbnails_16, _("Thumbnails"))
+                item = menu_image_button(
+                    self.cfg.pixbuf_action_thumbnails_16, _("Thumbnails"))
                 item.connect('activate', self.callback, "thumbnails")
                 menu.append(item)
 
         # снимок экрана только на миниатюре
         if line_vnc_box:
-            item = menu_image_button(self.cfg.pixbuf_action_screenshot_16, _("Screenshot"))
+            item = menu_image_button(
+                self.cfg.pixbuf_action_screenshot_16, _("Screenshot"))
             item.connect('activate', self.callback, "screenshot", line_vnc_box)
             menu.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_action_screenshot_16, _("All screenshots"))
+            item = menu_image_button(
+                self.cfg.pixbuf_action_screenshot_16, _("All screenshots"))
             item.connect('activate', self.callback, "screenshot_all")
             menu.append(item)
 
             item = Gtk.SeparatorMenuItem()
             menu.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_action_window_min_16, _("Minimize all"))
+            item = menu_image_button(
+                self.cfg.pixbuf_action_window_min_16, _("Minimize all"))
             item.connect('activate', self.view_vnc_minimize)
             menu.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_action_close_16, _("Close all"))
+            item = menu_image_button(
+                self.cfg.pixbuf_action_close_16, _("Close all"))
             item.connect('activate', self.view_vnc_close)
             menu.append(item)
 
@@ -1544,17 +1614,20 @@ class Program:
         menu.append(item)
 
         if self.cfg.read_config("hide", "hide_message") == "n":
-            item = menu_image_button(self.cfg.pixbuf_action_send_message_16, _("Send message"))
+            item = menu_image_button(
+                self.cfg.pixbuf_action_send_message_16, _("Send message"))
             item.connect('activate', self.callback, "send_message")
             menu.append(item)
 
         if self.cfg.read_config("hide", "hide_command") == "n":
-            item = menu_image_button(self.cfg.pixbuf_action_run_16, _("Run command"))
+            item = menu_image_button(
+                self.cfg.pixbuf_action_run_16, _("Run command"))
             item.connect('activate', self.callback, "run")
             menu.append(item)
 
         if self.cfg.read_config("hide", "hide_send_file") == "n":
-            item = menu_image_button(self.cfg.pixbuf_list_file_send_16, _("Send file"))
+            item = menu_image_button(
+                self.cfg.pixbuf_list_file_send_16, _("Send file"))
             item.connect("activate", self.callback, "send_file")
             menu.append(item)
 
@@ -1573,26 +1646,31 @@ class Program:
             item.connect('activate', self.callback, "console_server")
             menu.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_console_16, _("Console(host)"))
+            item = menu_image_button(
+                self.cfg.pixbuf_console_16, _("Console(host)"))
             item.connect('activate', self.callback, "console_host")
             menu.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_console_root_16, _("Console") + "(root)")
+            item = menu_image_button(
+                self.cfg.pixbuf_console_root_16, _("Console") + "(root)")
             item.connect('activate', self.callback, "console_root")
             menu.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_run_root_16, _("Run as root"))
+            item = menu_image_button(
+                self.cfg.pixbuf_run_root_16, _("Run as root"))
             item.connect('activate', self.callback, "run_root")
             menu.append(item)
 
             item = Gtk.SeparatorMenuItem()
             menu.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_process_16, _("View process"))
+            item = menu_image_button(
+                self.cfg.pixbuf_process_16, _("View process"))
             item.connect('activate', self.callback, "process")
             menu.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_hwinfo_16, _("Hardware Info"))
+            item = menu_image_button(
+                self.cfg.pixbuf_hwinfo_16, _("Hardware Info"))
             item.connect('activate', self.callback, "hwinfo")
             menu.append(item)
 
@@ -1603,18 +1681,21 @@ class Program:
             item.connect('activate', self.callback, "lock")
             menu.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_unlock_16, _("Unlock screen"))
+            item = menu_image_button(
+                self.cfg.pixbuf_unlock_16, _("Unlock screen"))
             item.connect('activate', self.callback, "unlock")
             menu.append(item)
 
             item = Gtk.SeparatorMenuItem()
             menu.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_block_16, _("Lock the input"))
+            item = menu_image_button(
+                self.cfg.pixbuf_block_16, _("Lock the input"))
             item.connect('activate', self.callback, "block")
             menu.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_unblock_16, _("Unlock the input"))
+            item = menu_image_button(
+                self.cfg.pixbuf_unblock_16, _("Unlock the input"))
             item.connect('activate', self.callback, "unblock")
             menu.append(item)
 
@@ -1639,11 +1720,13 @@ class Program:
             item.connect("button-press-event", self.callback, "wake_on_lan")
             menu_system.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_shutdown_16, _("Shutdown"))
+            item = menu_image_button(
+                self.cfg.pixbuf_shutdown_16, _("Shutdown"))
             item.connect("button-press-event", self.callback, "shutdown")
             menu_system.append(item)
 
-        menu.popup(None, None, self.context_menu_pos, event.button, event.time, event)
+        menu.popup(None, None, self.context_menu_pos,
+                   event, event.button, event.time)
         menu.show_all()
 
     ##############################################
@@ -1660,7 +1743,7 @@ class Program:
     def status_changed(self, widget, event, data=None):
         # Устанавливает видимым последнее(нижнее) сообщение status()
         adj = self.swStatus.get_vadjustment()
-        adj.set_value(adj.upper - adj.page_size)
+        adj.set_value(adj.props.upper - adj.props.page_size)
 
     ##############################################
 
@@ -1674,13 +1757,13 @@ class Program:
 
     def tree_cell_data_func(self, column, renderer, model, iter, data):
         if self.cfg.tree_motion_select_row == model.get_path(iter):
-            # renderer.set_property("weight", Pango.WEIGHT_BOLD)
-            # renderer.set_property("underline", pango.UNDERLINE_LOW)
+            renderer.set_property("weight", Pango.Weight.BOLD)
+            # renderer.set_property("underline", Pango.Underline.LOW)
             # renderer.set_property("foreground", "blue")
             pass
         else:
-            # renderer.set_property("weight", Pango.WEIGHT_NORMAL)
-            # renderer.set_property("underline", Pango.UNDERLINE_NONE)
+            renderer.set_property("weight", Pango.Weight.NORMAL)
+            # renderer.set_property("underline", Pango.Underline.NONE)
             # renderer.set_property("foreground", "black")
             pass
 
@@ -1688,7 +1771,8 @@ class Program:
         model = treeView.get_model()
         # motion select
         if treeView.get_path_at_pos(int(event.x), int(event.y)):
-            (row, col, x, y) = treeView.get_path_at_pos(int(event.x), int(event.y))
+            (row, col, x, y) = treeView.get_path_at_pos(
+                int(event.x), int(event.y))
             self.cfg.tree_motion_select_row = row
         else:
             self.cfg.tree_motion_select_row = None
@@ -1696,7 +1780,8 @@ class Program:
         info = ""
         if self.cfg.treeInfo == "y":
             if treeView.get_path_at_pos(int(event.x), int(event.y)):
-                (row, col, x, y) = treeView.get_path_at_pos(int(event.x), int(event.y))
+                (row, col, x, y) = treeView.get_path_at_pos(
+                    int(event.x), int(event.y))
                 if len(row) != 1:
                     user = model[row][1]
                     host = model[row][2]
@@ -1740,9 +1825,10 @@ class Program:
                 tree_selection_enable(self.cfg.treeView, False)
                 # Обратно включить
                 # Можно через button-release-event, но после popup-menu надо лишнее нажатие кнопки
-                GObject.timeout_add(10, tree_selection_enable, self.cfg.treeView, True)
+                GObject.timeout_add(10, tree_selection_enable,
+                                    self.cfg.treeView, True)
         # Действия
-        if event.type == Gdk._2BUTTON_PRESS and self.cfg.read_config("hide", "hide_tree_add_remove") == "n":
+        if event.type == Gdk.EventType._2BUTTON_PRESS and self.cfg.read_config("hide", "hide_tree_add_remove") == "n":
             self.callback(None, "edit_tree_item")
         if event.button == 3:
             self.context_menu(event)
@@ -1757,20 +1843,22 @@ class Program:
         self.cfg.panedWindow.pack1(self.vboxMain, resize=False, shrink=True)
         self.cfg.panedWindow.pack2(self.cfg.table2, resize=False, shrink=True)
         self.cfg.window.add(self.cfg.panedWindow)
-        self.cfg.panedWindow.connect("notify::position", self.paned_window_event)
+        self.cfg.panedWindow.connect(
+            "notify::position", self.paned_window_event)
 
         #################
         # status
         #################
         self.swStatus = Gtk.ScrolledWindow()
-        # self.swStatus.set_policy(Gtk.POLICY_NEVER, Gtk.POLICY_ALWAYS)
+        self.swStatus.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
         self.textviewStatus = Gtk.TextView(buffer=self.cfg.bufferStatus)
         self.textviewStatus.connect('size-allocate', self.status_changed)
         self.textviewStatus.set_property('editable', False)
         self.textviewStatus.set_cursor_visible(False)
-        # self.textviewStatus.modify_base(Gtk.STATE_NORMAL, Gdk.color_parse("light gray"))
-        # self.textviewStatus.modify_base(Gtk.STATE_NORMAL, self.cfg.bg_color)
-        self.textviewStatus.modify_font(Pango.FontDescription(self.cfg.fontStatus))
+        # self.textviewStatus.modify_base(Gtk.StateFlags.NORMAL, Gdk.color_parse("light gray"))
+        #~ self.textviewStatus.modify_base(Gtk.StateFlags.NORMAL, self.cfg.bg_color)
+        self.textviewStatus.modify_font(
+            Pango.FontDescription(self.cfg.fontStatus))
         self.swStatus.set_border_width(0)
         self.swStatus.add(self.textviewStatus)
         # Похож по цвету на Gtk.StatusBar
@@ -1778,30 +1866,36 @@ class Program:
         self.viewportStatus = Gtk.Viewport()
         self.viewportStatus.add(self.swStatus)
 
-        self.cfg.bufferStatus.insert(self.cfg.bufferStatus.get_end_iter(), "\n")
+        self.cfg.bufferStatus.insert(
+            self.cfg.bufferStatus.get_end_iter(), "\n")
         self.cfg.status(_("Starting"))
 
         self.cfg.treeView = Gtk.TreeView(self.cfg.userList)
         self.cfg.treeView.set_rules_hint(True)
         self.cfg.treeView.set_enable_tree_lines(True)
-        # self.cfg.treeView.set_grid_lines(Gtk.TREE_VIEW_GRID_LINES_VERTICAL)
+        # self.cfg.treeView.set_grid_lines(Gtk.TreeViewGridLines.VERTICAL)
         self.cfg.treeView.set_headers_visible(True)
         self.cfg.treeView.set_headers_clickable(False)
         self.cfg.treeView.modify_font(Pango.FontDescription(self.cfg.fontTree))
-        # self.cfg.treeView.modify_base(Gtk.STATE_SELECTED, Gdk.color_parse("black"))
+        # self.cfg.treeView.modify_base(Gtk.StateFlags.SELECTED, Gdk.color_parse("black"))
         self.cfg.treeView.connect("button-press-event", self.tree_button_press)
-        self.cfg.treeView.connect("motion-notify-event", self.tree_motion_event)
-        # self.cfg.treeView.set_events(Gdk.POINTER_MOTION_MASK)
+        self.cfg.treeView.connect(
+            "motion-notify-event", self.tree_motion_event)
+        self.cfg.treeView.set_events(Gdk.EventMask.POINTER_MOTION_MASK)
 
         # drag and drop
-        # TARGETS = [('TREE_MAIN', Gtk.TARGET_SAME_WIDGET, 0), ('TEXT', 0, 0)]
-        # self.cfg.treeView.enable_model_drag_source(Gdk.BUTTON1_MASK, TARGETS,
-        #                                            Gdk.ACTION_DEFAULT | Gdk.ACTION_MOVE)
-        # self.cfg.treeView.enable_model_drag_dest(TARGETS, Gdk.ACTION_DEFAULT)
-        # self.cfg.treeView.connect("drag_data_received", tree_drag_data_received, self.cfg)
-        # self.cfg.treeView.connect("drag_data_get", tree_drag_data_get, self.cfg)
-        # self.cfg.treeView.connect("leave-notify-event", self.tree_leave)
-        # self.cfg.treeView.connect("drag_motion", tree_drag_data_motion)
+        TARGETS = [('TREE_MAIN', Gtk.TargetFlags.SAME_WIDGET, 0),
+                   ('TEXT', 0, 0)]
+        self.cfg.treeView.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK, TARGETS,
+                                                   Gdk.DragAction.DEFAULT | Gdk.DragAction.MOVE)
+        self.cfg.treeView.enable_model_drag_dest(
+            TARGETS, Gdk.DragAction.DEFAULT)
+        self.cfg.treeView.connect(
+            "drag_data_received", tree_drag_data_received, self.cfg)
+        self.cfg.treeView.connect(
+            "drag_data_get", tree_drag_data_get, self.cfg)
+        self.cfg.treeView.connect("leave-notify-event", self.tree_leave)
+        self.cfg.treeView.connect("drag_motion", tree_drag_data_motion)
 
         d = {}
         for x in range(len(self.cfg.z)):
@@ -1868,58 +1962,67 @@ class Program:
         cell.set_property("visible", True)
 
         self.treeSelection = self.cfg.treeView.get_selection()
-        # self.treeSelection.set_mode(Gtk.SELECTION_MULTIPLE)
+        self.treeSelection.set_mode(Gtk.SelectionMode.MULTIPLE)
         self.sw = Gtk.ScrolledWindow()
-        # self.sw.set_shadow_type(Gtk.SHADOW_ETCHED_IN)
-        # self.sw.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
+        self.sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        self.sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.sw.add(self.cfg.treeView)
 
         ######################
         # fast messages and commands
         ######################
-        # self.cfg.messageBox = Gtk.ComboBoxEntry(self.cfg.messageList, column=0)
+        self.cfg.messageBox = Gtk.ComboBox.new_with_model_and_entry(
+            self.cfg.messageList)
         #
-        # self.fileButton = image_button(self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips, _("Select the file"))
-        # self.fileButton.connect("clicked", file_chooser_dialog, self.cfg.messageBox, _("Select the file"))
+        self.fileButton = image_button(
+            self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips, _("Select the file"))
+        self.fileButton.connect(
+            "clicked", file_chooser_dialog, self.cfg.messageBox, _("Select the file"))
 
-        # ebox = Gtk.EventBox()
-        # ebox.add(self.cfg.messageBox)
+        ebox = Gtk.EventBox()
+        ebox.add(self.cfg.messageBox)
         # if Gtk.pygtk_version < (2, 12, 0):
         #     self.cfg.tooltips.set_tip(ebox, _("The input field of the messages, commands and file selection"))
         # else:
-        #     self.cfg.messageBox.set_tooltip_text(_("The input field of the messages, commands and file selection"))
+        self.cfg.messageBox.set_tooltip_text(
+            _("The input field of the messages, commands and file selection"))
 
-        # self.hbox_entry = Gtk.HBox(False, 0)
-        # self.hbox_entry.pack_start(ebox, expand=True, fill=True, padding=0)
-        # self.hbox_entry.pack_start(self.fileButton, expand=False, fill=False, padding=0)
+        self.hbox_entry = Gtk.HBox(False, 0)
+        self.hbox_entry.pack_start(ebox, expand=True, fill=True, padding=0)
+        self.hbox_entry.pack_start(
+            self.fileButton, expand=False, fill=False, padding=0)
 
         ################
         # main toolbar
         ################
         self.toolbarMain = Gtk.Toolbar()
-        # self.toolbarMain.set_orientation(Gtk.ORIENTATION_HORIZONTAL)
-        # self.toolbarMain.set_style(Gtk.TOOLBAR_ICONS)
+        self.toolbarMain.set_orientation(Gtk.Orientation.HORIZONTAL)
+        self.toolbarMain.set_style(Gtk.ToolbarStyle.ICONS)
         self.toolbarMain.set_border_width(0)
-        # self.toolbarMain.set_tooltips(True)
+        #~ self.toolbarMain.set_tooltips(True)
 
-        button = toolbar_button(self.cfg.pixbuf_action_refresh, self.cfg.tooltips, _("Refresh"))
+        button = toolbar_button(
+            self.cfg.pixbuf_action_refresh, self.cfg.tooltips, _("Refresh"))
         button.connect('clicked', self.callback, "refresh")
         self.toolbarMain.insert(button, -1)
 
         item = Gtk.SeparatorToolItem()
         self.toolbarMain.insert(item, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_action_viewer, self.cfg.tooltips, _("Viewer"))
+        button = toolbar_button(
+            self.cfg.pixbuf_action_viewer, self.cfg.tooltips, _("Viewer"))
         button.connect('clicked', self.callback, "view")
         if self.cfg.read_config("hide", "hide_viewer") == "n":
             self.toolbarMain.insert(button, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_action_control, self.cfg.tooltips, _("Control"))
+        button = toolbar_button(
+            self.cfg.pixbuf_action_control, self.cfg.tooltips, _("Control"))
         button.connect('clicked', self.callback, "control")
         if self.cfg.read_config("hide", "hide_control") == "n":
             self.toolbarMain.insert(button, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_action_thumbnails, self.cfg.tooltips, _("Thumbnails"))
+        button = toolbar_button(
+            self.cfg.pixbuf_action_thumbnails, self.cfg.tooltips, _("Thumbnails"))
         button.connect('clicked', self.callback, "thumbnails")
         if self.cfg.read_config("hide", "hide_thumbnails") == "n":
             self.toolbarMain.insert(button, -1)
@@ -1927,24 +2030,27 @@ class Program:
         item = Gtk.SeparatorToolItem()
         self.toolbarMain.insert(item, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_action_vnc_servers, self.cfg.tooltips, _("Demo"))
+        button = toolbar_button(
+            self.cfg.pixbuf_action_vnc_servers, self.cfg.tooltips, _("Demo"))
         button.connect('clicked', self.callback, "demo")
         if self.cfg.read_config("hide", "hide_demo") == "n":
             self.toolbarMain.insert(button, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_action_timers, self.cfg.tooltips, _("Timers"))
+        button = toolbar_button(
+            self.cfg.pixbuf_action_timers, self.cfg.tooltips, _("Timers"))
         button.connect('clicked', self.callback, "timers")
         if self.cfg.read_config("hide", "hide_timer") == "n":
             self.toolbarMain.insert(button, -1)
 
-        button = toolbar_button(self.cfg.pixbuf_action_user_info, self.cfg.tooltips, _("Client information"))
+        button = toolbar_button(
+            self.cfg.pixbuf_action_user_info, self.cfg.tooltips, _("Client information"))
         button.connect('clicked', self.callback, "client_info")
         if self.cfg.read_config("hide", "hide_tree_add_remove") == "n":
             self.toolbarMain.insert(button, -1)
 
         item = Gtk.SeparatorToolItem()
         item.set_draw(False)
-        # item.set_expand(Gtk.EXPAND)
+        item.set_expand(Gtk.AttachOptions.EXPAND)
         self.toolbarMain.insert(item, -1)
 
         # toolbar menu util
@@ -1967,7 +2073,8 @@ class Program:
         item.connect('activate', self.callback, "console_host")
         button.append(item)
 
-        item = menu_image_button(self.cfg.pixbuf_console_root, _("Console") + "(root)")
+        item = menu_image_button(
+            self.cfg.pixbuf_console_root, _("Console") + "(root)")
         item.connect('activate', self.callback, "console_root")
         button.append(item)
 
@@ -2004,12 +2111,14 @@ class Program:
         item.connect('activate', self.callback, "block")
         button.append(item)
 
-        item = menu_image_button(self.cfg.pixbuf_unblock, _("Unlock the input"))
+        item = menu_image_button(
+            self.cfg.pixbuf_unblock, _("Unlock the input"))
         item.connect('activate', self.callback, "unblock")
         button.append(item)
 
         # toolbar menu logout
-        button = menu_tool_button(self.cfg.pixbuf_menu_system, self.cfg.tooltips)
+        button = menu_tool_button(
+            self.cfg.pixbuf_menu_system, self.cfg.tooltips)
         if self.cfg.read_config("hide", "hide_system_util") == "n":
             self.toolbarMain.insert(button, -1)
 
@@ -2033,12 +2142,13 @@ class Program:
         # tree toolbar
         #################
         self.toolbarTree = Gtk.Toolbar()
-        # self.toolbarTree.set_orientation(Gtk.ORIENTATION_HORIZONTAL)
-        # self.toolbarTree.set_style(Gtk.TOOLBAR_ICONS)
+        self.toolbarTree.set_orientation(Gtk.Orientation.HORIZONTAL)
+        self.toolbarTree.set_style(Gtk.ToolbarStyle.ICONS)
         self.toolbarTree.set_border_width(0)
-        # self.toolbarTree.set_tooltips(True)
+        #~ self.toolbarTree.set_tooltips(True)
 
-        button = toolbar_button(self.cfg.pixbuf_list_hide1_16, self.cfg.tooltips, _("Show/Hide the list"))
+        button = toolbar_button(
+            self.cfg.pixbuf_list_hide1_16, self.cfg.tooltips, _("Show/Hide the list"))
         button.connect('clicked', self.view_list)
         self.toolbarTree.insert(button, -1)
 
@@ -2047,38 +2157,48 @@ class Program:
 
         # toolbar menu
         if self.cfg.read_config("hide", "hide_tree_add_remove") == "n":
-            button = menu_tool_button(self.cfg.pixbuf_list_add_16, self.cfg.tooltips, _("Add"))
+            button = menu_tool_button(
+                self.cfg.pixbuf_list_add_16, self.cfg.tooltips, _("Add"))
             button.show_all()
             self.toolbarTree.insert(button, -1)
 
-            item = menu_image_button(self.cfg.pixbuf_list_add_16, _("Add standalone client"))
+            item = menu_image_button(
+                self.cfg.pixbuf_list_add_16, _("Add standalone client"))
             item.connect('activate', self.callback, "create_standalone")
             button.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_list_add_16, _("Add group"))
+            item = menu_image_button(
+                self.cfg.pixbuf_list_add_16, _("Add group"))
             item.connect('activate', self.callback, "create_group")
             button.append(item)
 
-            item = menu_image_button(self.cfg.pixbuf_list_add_16, _("Add server"))
+            item = menu_image_button(
+                self.cfg.pixbuf_list_add_16, _("Add server"))
             item.connect('activate', self.callback, "create_server")
             button.append(item)
 
-            button = toolbar_button(self.cfg.pixbuf_list_remove_16, self.cfg.tooltips, _("Remove"))
+            button = toolbar_button(
+                self.cfg.pixbuf_list_remove_16, self.cfg.tooltips, _("Remove"))
             button.connect('clicked', self.callback, "remove_tree_item")
             self.toolbarTree.insert(button, -1)
 
-            button = toolbar_button(self.cfg.pixbuf_list_edit_16, self.cfg.tooltips, _("Edit"))
+            button = toolbar_button(
+                self.cfg.pixbuf_list_edit_16, self.cfg.tooltips, _("Edit"))
             button.connect('clicked', self.callback, "edit_tree_item")
             self.toolbarTree.insert(button, -1)
 
-            button_up = image_button(self.cfg.pixbuf_list_arrow_up_16, None, self.cfg.tooltips, _("Move above"))
-            # button_up.props.relief = Gtk.RELIEF_NONE
+            button_up = image_button(
+                self.cfg.pixbuf_list_arrow_up_16, None, self.cfg.tooltips, _("Move above"))
+            button_up.props.relief = Gtk.ReliefStyle.NONE
             button_up.set_size_request(24, 12)
-            button_up.connect("clicked", tree_move, self.cfg, self.cfg.treeView, "up")
-            button_down = image_button(self.cfg.pixbuf_list_arrow_down_16, None, self.cfg.tooltips, _("Move below"))
-            # button_down.props.relief = Gtk.RELIEF_NONE
+            button_up.connect("clicked", tree_move, self.cfg,
+                              self.cfg.treeView, "up")
+            button_down = image_button(
+                self.cfg.pixbuf_list_arrow_down_16, None, self.cfg.tooltips, _("Move below"))
+            button_down.props.relief = Gtk.ReliefStyle.NONE
             button_down.set_size_request(24, 12)
-            button_down.connect("clicked", tree_move, self.cfg, self.cfg.treeView, "down")
+            button_down.connect("clicked", tree_move,
+                                self.cfg, self.cfg.treeView, "down")
             vbox = Gtk.VBox(False, 0)
             vbox.pack_start(button_up, expand=True, fill=False, padding=0)
             vbox.pack_start(button_down, expand=True, fill=False, padding=0)
@@ -2088,29 +2208,33 @@ class Program:
 
         self.tree_info = Gtk.Label()
         item = Gtk.ToolItem()
-        # item.set_expand(Gtk.EXPAND)
+        item.set_expand(Gtk.AttachOptions.EXPAND)
         item.add(self.tree_info)
         self.toolbarTree.insert(item, -1)
 
         if self.cfg.read_config("hide", "hide_message") == "n":
             # menu
-            button = toolbar_button(self.cfg.pixbuf_action_send_message_16, self.cfg.tooltips, _("Send message"))
+            button = toolbar_button(
+                self.cfg.pixbuf_action_send_message_16, self.cfg.tooltips, _("Send message"))
             button.connect('clicked', self.callback, "send_message")
             self.toolbarTree.insert(button, -1)
 
         if self.cfg.read_config("hide", "hide_command") == "n":
-            button = toolbar_button(self.cfg.pixbuf_action_run_16, self.cfg.tooltips, _("Run command"))
+            button = toolbar_button(
+                self.cfg.pixbuf_action_run_16, self.cfg.tooltips, _("Run command"))
             button.connect('clicked', self.callback, "run")
             self.toolbarTree.insert(button, -1)
 
         if self.cfg.read_config("hide", "hide_send_file") == "n":
-            button = toolbar_button(self.cfg.pixbuf_list_file_send_16, self.cfg.tooltips, _("Send file"))
+            button = toolbar_button(
+                self.cfg.pixbuf_list_file_send_16, self.cfg.tooltips, _("Send file"))
             button.connect("clicked", self.callback, "send_file")
             self.toolbarTree.insert(button, -1)
 
         self.close_button_gtkvnc = toolbar_button(self.cfg.pixbuf_action_close_16, self.cfg.tooltips,
                                                   _("Thumbnails") + " - " + _("Close all"))
-        self.close_button_gtkvnc.connect('clicked', self.callback, "close_gtkvnc")
+        self.close_button_gtkvnc.connect(
+            'clicked', self.callback, "close_gtkvnc")
         self.toolbarTree.insert(self.close_button_gtkvnc, -1)
 
         ############################
@@ -2120,7 +2244,8 @@ class Program:
         self.panedTree.add1(self.sw)
 
         self.swVnc = Gtk.ScrolledWindow()
-        # self.swVnc.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
+        self.swVnc.set_policy(Gtk.PolicyType.AUTOMATIC,
+                              Gtk.PolicyType.AUTOMATIC)
         self.panedTree.add2(self.swVnc)
 
         self.table_vnc = Gtk.Fixed()
@@ -2129,9 +2254,11 @@ class Program:
         ebox.add(self.table_vnc)
         ebox.connect("motion-notify-event", self.table_vnc_motion_event)
 
-        TARGETS = [('TEXT', 0, 0)]
-        # self.table_vnc.drag_dest_set(Gtk.DEST_DEFAULT_ALL, TARGETS, Gdk.ACTION_DEFAULT)
-        self.table_vnc.connect("drag_data_received", self.table_vnc_drag_data_received)
+        TARGETS = Gtk.TargetEntry.new('TEXT', 0, 0)
+        self.table_vnc.drag_dest_set(Gtk.DestDefaults.ALL, [
+                                     TARGETS], Gdk.DragAction.DEFAULT)
+        self.table_vnc.connect("drag_data_received",
+                               self.table_vnc_drag_data_received)
         self.table_vnc.connect('drag_motion', self.table_vnc_drag_data_motion)
         self.table_vnc.connect('drag_drop', self.table_vnc_drag_data_drop)
 
@@ -2140,8 +2267,10 @@ class Program:
         self.panedTree.connect("notify::position", self.paned_tree_event)
 
         #
-        # self.fileButton = image_button(self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips, _("Select the file"))
-        # self.fileButton.connect("clicked", file_chooser_dialog, self.cfg.messageBox, _("Select the file"))
+        self.fileButton = image_button(
+            self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips, _("Select the file"))
+        self.fileButton.connect(
+            "clicked", file_chooser_dialog, self.cfg.messageBox, _("Select the file"))
 
         ##########
         # menu
@@ -2163,37 +2292,44 @@ class Program:
         self.itemTools.set_submenu(self.menuTools)
         self.menuBar.append(self.itemTools)
 
-        item = menu_image_button(self.cfg.pixbuf_action_refresh_16, _("Refresh"))
+        item = menu_image_button(
+            self.cfg.pixbuf_action_refresh_16, _("Refresh"))
         item.connect("activate", self.callback, "refresh")
         self.menuTools.append(item)
 
         if self.cfg.read_config("hide", "hide_viewer") == "n":
-            item = menu_image_button(self.cfg.pixbuf_action_viewer_16, _("Viewer"))
+            item = menu_image_button(
+                self.cfg.pixbuf_action_viewer_16, _("Viewer"))
             item.connect('activate', self.callback, "view")
             self.menuTools.append(item)
 
         if self.cfg.read_config("hide", "hide_control") == "n":
-            item = menu_image_button(self.cfg.pixbuf_action_control_16, _("Control"))
+            item = menu_image_button(
+                self.cfg.pixbuf_action_control_16, _("Control"))
             item.connect('activate', self.callback, "control")
             self.menuTools.append(item)
 
         if self.cfg.read_config("hide", "hide_thumbnails") == "n":
-            item = menu_image_button(self.cfg.pixbuf_action_thumbnails_16, _("Thumbnails"))
+            item = menu_image_button(
+                self.cfg.pixbuf_action_thumbnails_16, _("Thumbnails"))
             item.connect('activate', self.callback, "thumbnails")
             self.menuTools.append(item)
 
         if self.cfg.read_config("hide", "hide_demo") == "n":
-            item = menu_image_button(self.cfg.pixbuf_status_direct_16, _("Demo"))
+            item = menu_image_button(
+                self.cfg.pixbuf_status_direct_16, _("Demo"))
             item.connect("activate", self.callback, "demo")
             self.menuTools.append(item)
 
         if self.cfg.read_config("hide", "hide_timer") == "n":
-            item = menu_image_button(self.cfg.pixbuf_status_timer_16, _("Timers"))
+            item = menu_image_button(
+                self.cfg.pixbuf_status_timer_16, _("Timers"))
             item.connect("activate", self.callback, "timers")
             self.menuTools.append(item)
 
         if self.cfg.read_config("hide", "hide_tree_add_remove") == "n":
-            item = menu_image_button(self.cfg.pixbuf_action_user_info_16, _("Client information"))
+            item = menu_image_button(
+                self.cfg.pixbuf_action_user_info_16, _("Client information"))
             item.connect("activate", self.callback, "client_info")
             self.menuTools.append(item)
 
@@ -2229,7 +2365,8 @@ class Program:
         self.itemHideToolbarTree.connect("activate", self.view_toolbar_tree)
         self.menuView.append(self.itemHideToolbarTree)
 
-        self.itemHideMessageBox = Gtk.CheckMenuItem(_("Input field") + "\t\t\t\t\tF9")
+        self.itemHideMessageBox = Gtk.CheckMenuItem(
+            _("Input field") + "\t\t\t\t\tF9")
         self.itemHideMessageBox.set_active(True)
         self.itemHideMessageBox.connect("activate", self.view_message_box)
         self.menuView.append(self.itemHideMessageBox)
@@ -2242,14 +2379,16 @@ class Program:
         item = Gtk.SeparatorMenuItem()
         self.menuView.append(item)
 
-        self.itemFullscreen = Gtk.CheckMenuItem(_("Full screen") + "\t\t\t\t\tF11")
+        self.itemFullscreen = Gtk.CheckMenuItem(
+            _("Full screen") + "\t\t\t\t\tF11")
         self.itemFullscreen.connect("activate", self.view_fullscreen)
         self.menuView.append(self.itemFullscreen)
 
         item = Gtk.SeparatorMenuItem()
         self.menuView.append(item)
 
-        self.itemHideList = Gtk.CheckMenuItem(_("Show/Hide the list") + "\t\t\tF2")
+        self.itemHideList = Gtk.CheckMenuItem(
+            _("Show/Hide the list") + "\t\t\tF2")
         self.itemHideList.set_active(True)
         self.itemHideList.connect("activate", self.view_list)
         self.menuView.append(self.itemHideList)
@@ -2284,15 +2423,21 @@ class Program:
         ###########
         # attach
         ###########
-        self.vboxMain.pack_start(self.menuBar, expand=False, fill=False, padding=0)
-        self.vboxMain.pack_start(self.toolbarMain, expand=False, fill=False, padding=0)
-        self.vboxMain.pack_start(self.panedTree, expand=True, fill=True, padding=0)
+        self.vboxMain.pack_start(
+            self.menuBar, expand=False, fill=False, padding=0)
+        self.vboxMain.pack_start(
+            self.toolbarMain, expand=False, fill=False, padding=0)
+        self.vboxMain.pack_start(
+            self.panedTree, expand=True, fill=True, padding=0)
         if (self.cfg.read_config("hide", "hide_command") == "n" or self.cfg.read_config("hide",
                                                                                         "hide_tree_add_remove") == "n"):
-            self.vboxMain.pack_start(self.toolbarTree, expand=False, fill=False, padding=0)
-        # if self.cfg.read_config("hide", "hide_command") == "n":
-        #     self.vboxMain.pack_start(self.hbox_entry, expand=False, fill=False, padding=0)
-        self.vboxMain.pack_start(self.viewportStatus, expand=False, fill=False, padding=0)
+            self.vboxMain.pack_start(
+                self.toolbarTree, expand=False, fill=False, padding=0)
+        if self.cfg.read_config("hide", "hide_command") == "n":
+            self.vboxMain.pack_start(
+                self.hbox_entry, expand=False, fill=False, padding=0)
+        self.vboxMain.pack_start(
+            self.viewportStatus, expand=False, fill=False, padding=0)
 
         # таймеры
         self.timers_start()
@@ -2332,7 +2477,7 @@ class Program:
         # Высота всех виджетов, для определения размера миниатюр
         window_border = 5 + 2 * self.cfg.tt_border
         height = window_border + self.menuBar.get_allocation().height + self.toolbar_main_height + \
-                 self.toolbar_tree_height + self.message_box_height + self.status_height
+            self.toolbar_tree_height + self.message_box_height + self.status_height
         return height
 
     ##############################################
@@ -2415,7 +2560,8 @@ class Program:
     ##############################################
 
     def view_vnc_close(self, widget=None):
-        self.panedTree.set_position(self.cfg.panedWindow.get_position() - self.cfg.phandle_size)
+        self.panedTree.set_position(
+            self.cfg.panedWindow.get_position() - self.cfg.phandle_size)
 
     # self.close_gtkvnc()
 
@@ -2436,7 +2582,8 @@ class Program:
         else:
             if self.panedTree.get_position() == 0:
                 if self.cfg.vnc_box == []:
-                    self.panedTree.set_position(self.cfg.panedWindow.get_position() - self.cfg.phandle_size)
+                    self.panedTree.set_position(
+                        self.cfg.panedWindow.get_position() - self.cfg.phandle_size)
                 else:
                     self.panedTree.set_position(self.cfg.treeX)
             else:
@@ -2495,7 +2642,7 @@ class Program:
 
     def table_vnc_drag_data_motion(self, widget, drag_context, x, y, time):
         if drag_context.get_source_widget() == self.cfg.treeView:
-            drag_context.drag_status(Gdk.ACTION_LINK, time)
+            drag_context.drag_status(Gdk.DragAction.LINK, time)
         elif type(drag_context.get_source_widget()) == Gtk.Toolbar:
             # При наведении на миниатюру
             p_target = None
@@ -2505,13 +2652,13 @@ class Program:
                     p_target = p[2]
                     break
             if p_target:
-                drag_context.drag_status(Gdk.ACTION_MOVE, time)
+                drag_context.drag_status(Gdk.DragAction.MOVE, time)
                 self.thumbnails_motion_event(widget=p_target)
             else:
-                drag_context.drag_status(Gdk.ACTION_PRIVATE, time)
+                drag_context.drag_status(Gdk.DragAction.PRIVATE, time)
                 return True
         else:
-            drag_context.drag_status(Gdk.ACTION_PRIVATE, time)
+            drag_context.drag_status(Gdk.DragAction.PRIVATE, time)
             return True
 
     def table_vnc_drag_data_received(self, widget, drag_context, x, y, selection, target_type, time):

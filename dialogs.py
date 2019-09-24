@@ -4,7 +4,7 @@
 ###################################################################################################
 # RuleUser
 # dialogs.py
-# 
+#
 # Copyright (C) 2012,2013 Andrey Burbovskiy <xak-altsp@yandex.ru>
 # Copyright (C) 2017 Артем Проскурнев (Artem Proskurnev) <tema@proskurnev.name>
 # Поддерживается в Школе №830 г. Москва
@@ -32,6 +32,9 @@
 #
 ###################################################################################################
 
+import gi
+from gi.repository import GdkPixbuf
+
 from util import *
 
 _ = gettext.gettext
@@ -55,11 +58,12 @@ def message_dialog(window, text, list, buttons_ok=None, list_type="list"):
         for item in list:
             text = text + "\n" + item
 
-    dialog = Gtk.MessageDialog(window, 0, Gtk.MESSAGE_INFO, Gtk.BUTTONS_NONE, text)
+    dialog = Gtk.MessageDialog(
+        window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.NONE, text)
     if buttons_ok:
-        dialog.add_button(_("Ok"), Gtk.BUTTONS_OK)
-    dialog.add_button(_("Cancel"), Gtk.BUTTONS_CANCEL)
-    if dialog.run() == Gtk.BUTTONS_OK:
+        dialog.add_button(_("Ok"), Gtk.ButtonsType.OK)
+    dialog.add_button(_("Cancel"), Gtk.ButtonsType.CANCEL)
+    if dialog.run() == Gtk.ButtonsType.OK:
         dialog.destroy()
         return True
     else:
@@ -67,19 +71,23 @@ def message_dialog(window, text, list, buttons_ok=None, list_type="list"):
         return False
 
 
-####################################################################################################            
+####################################################################################################
 
 def about_dialog(data=None):
     about = Gtk.AboutDialog()
     about.set_name("RuleUser")
-    about.set_comments(_("Computer management and monitoring users") + "\n"+_("Developed specially for ALT Linux School") + "\n"+_("Поддерживается в Школе №830 г. Москва"))
+    about.set_comments(_("Computer management and monitoring users") + "\n"+_(
+        "Developed specially for ALT Linux School") + "\n"+_("Поддерживается в Школе №830 г. Москва"))
 
     about.set_version("1.1.0")
-    about.set_copyright("\n(c) 2013 " + _("Andrey Burbovskiy") + "\n"+"Email: xak-altsp@yandex.ru""\n(c) 2017 " + _("Артем Проскурнев") + "\n"+"Email: tema@proskurnev.name")
+    about.set_copyright("\n(c) 2013 " + _("Andrey Burbovskiy") + "\n" +
+                        "Email: xak-altsp@yandex.ru""\n(c) 2017 " + _("Артем Проскурнев") + "\n"+"Email: tema@proskurnev.name")
     about.set_website("http://www.altlinux.org/LTSP/")
-    about.set_authors(["Тестирование:" + "\n" + "	Александр Шеметов berkut_174@altlinux.org" + "\n"])
+    about.set_authors(
+        ["Тестирование:" + "\n" + "	Александр Шеметов berkut_174@mail.ru" + "\n"])
     about.set_license("GPLv3")
-    about.set_logo(GdkPixbuf.Pixbuf.new_from_file(os.path.expanduser("icons/ruleuser2_48.png")))
+    about.set_logo(GdkPixbuf.Pixbuf.new_from_file(
+        os.path.expanduser("icons/ruleuser2_48.png")))
     about.run()
     about.destroy()
 

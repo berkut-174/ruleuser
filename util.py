@@ -158,19 +158,19 @@ def cursor_wait(cfg, wait, widget=None):
     if not widget:
         widget = cfg.window
     if wait:
-        if not cfg.cursor_wait_status and widget.window:
+        if not cfg.cursor_wait_status and widget.get_window():
             # pixbuf = GdkPixbuf.Pixbuf.new_from_file("/home/admin/.vnc/icons/cursor_watch.gif")
             # widget.window.set_cursor(Gdk.Cursor(widget.get_display(), pixbuf, 30, 30))
             Gdk.threads_enter()
-            Gdk.display_get_default().sync()
-            widget.window.set_cursor(Gdk.Cursor(Gdk.WATCH))
+            Gdk.Display.get_default().sync()
+            widget.get_window().set_cursor(Gdk.Cursor(Gdk.CursorType.WATCH))
             Gdk.threads_leave()
             cfg.cursor_wait_status = True
     else:
-        if cfg.cursor_wait_status and widget.window:
+        if cfg.cursor_wait_status and widget.props.window:
             Gdk.threads_enter()
-            Gdk.display_get_default().sync()
-            widget.window.set_cursor(None)
+            Gdk.Display.get_default().sync()
+            widget.get_window().set_cursor(None)
             Gdk.threads_leave()
             cfg.cursor_wait_status = False
 
@@ -314,8 +314,8 @@ def get_workspace(cfg=None):
     p = Gdk.atom_intern('_NET_WORKAREA', False)
     # x = w.property_get(p)[2][2:4][0] - 10
     # y = w.property_get(p)[2][2:4][1] - 30
-    x = 400 - 10
-    y = 600 - 30
+    x = 400
+    y = 600
     if cfg:
         if cfg.maximized:
             y += 10

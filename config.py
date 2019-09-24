@@ -150,7 +150,7 @@ class cfg:
         self.config.read(configFile)
 
         #
-        self.window = Gtk.Window()
+        self.window = Gtk.Window(Gtk.WindowType.TOPLEVEL)
         self.window.set_icon(GdkPixbuf.Pixbuf.new_from_file(
             icon_path + "ruleuser_16.png"))
         #
@@ -444,17 +444,17 @@ class cfg:
         #
         # Основной список
         self.userList = Gtk.TreeStore(*([str] * 100 + [GdkPixbuf.Pixbuf] * 10))
-        # self.userList.set_default_sort_func(None)
+        #~ self.userList.set_default_sort_func(None)
         #
         # тоже что и userList + картинки
         self.demoList = Gtk.TreeStore(*([str] * 100 + [GdkPixbuf.Pixbuf] * 5))
-        # self.demoList.set_default_sort_func(None)
+        #~ self.demoList.set_default_sort_func(None)
 
         #
         # number,action,start,command,icon,user_list[[],[]],timer_id
         self.timersList = Gtk.TreeStore(
             str, str, str, str, GdkPixbuf.Pixbuf, GObject.TYPE_PYOBJECT, int)
-        # self.timersList.set_default_sort_func(None)
+        #~ self.timersList.set_default_sort_func(None)
         #
         self.messageList = Gtk.ListStore(str)
 
@@ -490,8 +490,8 @@ class cfg:
         self.window.set_size_request(
             self.min_mainWindowX, self.min_mainWindowY)
 
-        # self.fontDefault = self.read_config("tree", "font_default")
-        # Gtk.settings_get_default().props.gtk_font_name = self.fontDefault
+        self.fontDefault = self.read_config("tree", "font_default")
+        Gtk.Settings.get_default().props.gtk_font_name = self.fontDefault
 
         # IP адрес
         self.localIp = ""
@@ -595,8 +595,8 @@ class cfg:
         # gtk icon theme
         # settings = Gtk.settings_get_default()
         # settings.set_string_property("gtk-icon-theme-name", "", "")
-        # self.icon_theme = Gtk.icon_theme_get_default()
-        # self.icon_theme.prepend_search_path(icon_path)
+        self.icon_theme = Gtk.IconTheme.get_default()
+        self.icon_theme.prepend_search_path(icon_path)
         # self.list_icons = self.icon_theme.list_icons()
         # self.icon_theme.load_icon(icon_name,16,0)
 
