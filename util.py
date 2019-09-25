@@ -312,8 +312,8 @@ def nmap_os(cfg, ip, port=None, timeout="100", closed=None, ssh_key=None, ssh_po
 def get_workspace(cfg=None):
     w = Gdk.get_default_root_window()
     p = Gdk.atom_intern('_NET_WORKAREA', False)
-    # x = w.property_get(p)[2][2:4][0] - 10
-    # y = w.property_get(p)[2][2:4][1] - 30
+    #~ x = w.property_get(p)[2][2:4][0] - 10
+    #~ y = w.property_get(p)[2][2:4][1] - 30
     x = 400
     y = 600
     if cfg:

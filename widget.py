@@ -58,7 +58,7 @@ def toolbar_button(pixbuf=None, tooltips=None, tooltip=None, toggle=None):
     button.set_icon_widget(image)
     button.set_property('can-focus', True)
     if tooltips and tooltip:
-        # if Gtk.pygtk_version < (2, 12, 0):
+        # if GObject.pygobject_version < (2, 12, 0):
         #     button.set_tooltip(tooltips, tooltip)
         # else:
         button.set_tooltip_text(tooltip)
@@ -88,7 +88,7 @@ def image_button(pixbuf=None, label=None, tooltips=None, tooltip=None, toggle=No
     image.set_from_pixbuf(pixbuf)
     button.set_image(image)
     if tooltips and tooltip:
-        # if Gtk.pygtk_version < (2, 12, 0):
+        # if GObject.pygobject_version < (2, 12, 0):
         #     tooltips.set_tip(button, tooltip)
         # else:
         button.set_tooltip_text(tooltip)
@@ -104,7 +104,7 @@ class menu_tool_button(Gtk.ToolButton):
         image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
         self.set_icon_widget(image)
-        # if Gtk.pygtk_version < (2, 12, 0):
+        # if GObject.pygobject_version < (2, 12, 0):
         #     self.set_tooltip(tooltips, tooltip)
         # else:
         self.set_tooltip_text("")
@@ -139,7 +139,7 @@ class label_entry(Gtk.Fixed):
         self.entry.set_max_length(length)
         self.entry.set_text(entry_text)
         self.entry.set_property('width-chars', width)
-        # ~ self.entry_base_color = self.entry.get_style().copy().base[Gtk.StateFlags.NORMAL]
+        #~ self.entry_base_color = self.entry.get_style().copy().base[Gtk.StateFlags.NORMAL]
         self.set_editable(editable)
         if visibility == False:
             self.entry.set_visibility(False)
@@ -418,9 +418,9 @@ class file_browser(Gtk.VBox):
             row = rows[0]
             self.treeView.scroll_to_cell(
                 row, None, use_align=True, row_align=0.5, col_align=0.0)
-            self.treeView.expand_to_path(row)
+            self.treeView.expand_to_path(Gtk.TreePath(row))
             self.treeSelection.unselect_all()
-            self.treeSelection.select_path(row)
+            self.treeSelection.select_path(Gtk.TreePath(row))
             model, rows = self.treeSelection.get_selected_rows()
         list = []
         for row in rows:
@@ -506,7 +506,7 @@ class file_browser(Gtk.VBox):
         if row == False:
             return
         col = self.treeView.get_column(0)
-        cell = col.get_cell_renderers()[1]
+        cell = col.get_cells()[1]
         cell.set_property('editable', True)
         self.file = self.current_folder + "Новая папка"
         self.treeView.set_cursor_on_cell(row, col, cell, start_editing=True)
@@ -519,7 +519,7 @@ class file_browser(Gtk.VBox):
             return
         row = rows[0]
         col = self.treeView.get_column(0)
-        cell = col.get_cell_renderers()[1]
+        cell = col.get_cells()[1]
         cell.set_property('editable', True)
         self.file = f_list[0]
         self.treeView.set_cursor_on_cell(row, col, cell, start_editing=True)
@@ -714,14 +714,14 @@ def entry_error(cfg, entry):
 ####################################################################################################
 
 def entry_error_t(cfg, entry):
-    base_color = entry.child.get_style().copy().base[Gtk.StateFlags.NORMAL]
+    #~ base_color = entry.child.get_style().copy().base[Gtk.StateFlags.NORMAL]
     for i in range(3):
         Gdk.threads_enter()
-        entry.child.modify_base(Gtk.StateFlags.NORMAL, Gdk.color_parse("gray"))
+        #~ entry.child.modify_base(Gtk.StateFlags.NORMAL, Gdk.color_parse("gray"))
         Gdk.threads_leave()
         time.sleep(0.3)
         Gdk.threads_enter()
-        entry.child.modify_base(Gtk.StateFlags.NORMAL, base_color)
+        #~ entry.child.modify_base(Gtk.StateFlags.NORMAL, base_color)
         Gdk.threads_leave()
         time.sleep(0.3)
     cfg.entry_error_busy = False

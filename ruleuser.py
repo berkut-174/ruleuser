@@ -69,13 +69,13 @@ if os.getuid() == 0:
 
 python_version = sys.version_info[0:2]
 
-# if python_version < (2, 5):
-#     print('Python 2.5.0 or later required"')
-#     raise SystemExit
+if python_version < (2, 5):
+    print('Python 2.5.0 or later required"')
+    raise SystemExit
 
-# if Gtk.pygtk_version < (2, 4, 0):
-#     print('PyGtk 2.4.0 or later required')
-#     raise SystemExit
+if GObject.pygobject_version < (2, 4, 0):
+    print('PyGtk 2.4.0 or later required')
+    raise SystemExit
 
 # gtkvnc
 # try:
@@ -122,10 +122,7 @@ class Program:
         else:
             self.cfg.debug_enable = False
 
-        # if Gtk.pygtk_version < (2, 12, 0):
-        #     self.cfg.tooltips = Gtk.Tooltips()
-        # else:
-            self.cfg.tooltips = Gtk.Tooltip()
+        self.cfg.tooltips = Gtk.Tooltip()
 
         self.cfg.gtkvnc = False
         self.cfg.gtkvnc_depth = False
@@ -155,7 +152,7 @@ class Program:
         self.window = self.cfg.window
         self.cfg.maximized = False
         self.cfg.fullscreen = False
-        #~ self.cfg.bg_color = self.window.StyleContext.get_style().copy().bg[Gtk.StateFlags.NORMAL]
+        #~ self.cfg.bg_color = self.window.get_style().copy().bg[Gtk.StateFlags.NORMAL]
         self.window.set_title(" RuleUser ")
         self.window.connect('check-resize', self.window_resize_event)
         self.window.connect("window-state-event", self.window_state_event)
@@ -570,9 +567,9 @@ class Program:
                     # Раскрыть и выделить
                     self.cfg.treeView.scroll_to_cell(
                         row, None, use_align=True, row_align=0.5, col_align=0.0)
-                    self.cfg.treeView.expand_to_path(row)
+                    self.cfg.treeView.expand_to_path(Gtk.TreePath(row))
                     self.treeSelection.unselect_all()
-                    self.treeSelection.select_path(row)
+                    self.treeSelection.select_path(Gtk.TreePath(row))
                     self.context_menu(event, line)
 
     ##############################################
@@ -758,9 +755,9 @@ class Program:
             # Раскрыть и выделить
             self.cfg.treeView.scroll_to_cell(
                 row, None, use_align=True, row_align=0.5, col_align=0.0)
-            self.cfg.treeView.expand_to_path(row)
+            self.cfg.treeView.expand_to_path(Gtk.TreePath(row))
             self.treeSelection.unselect_all()
-            self.treeSelection.select_path(row)
+            self.treeSelection.select_path(Gtk.TreePath(row))
             user_list = get_selected_tree(self.cfg, self.cfg.treeView, "first")
             z = check_user_list(self.cfg, user_list, "vnc")
             if z == []:
@@ -1725,8 +1722,7 @@ class Program:
             item.connect("button-press-event", self.callback, "shutdown")
             menu_system.append(item)
 
-        menu.popup(None, None, self.context_menu_pos,
-                   event, event.button, event.time)
+        menu.popup(None, None, None, event, event.button, event.time)
         menu.show_all()
 
     ##############################################
@@ -1794,13 +1790,13 @@ class Program:
         if self.cfg.treeInfoTooltip == "y":
             if self.tree_info.get_text() != "":
                 self.tree_info.set_text("")
-            if Gtk.pygtk_version < (2, 12, 0):
+            # if GObject.pygobject_version < (2, 12, 0):
                 # Отображается под treeView
                 # self.cfg.tooltips.set_tip(treeView, info)
                 # self.cfg.tooltips.enable()
-                self.tree_info.set_text(info)
-            else:
-                treeView.set_tooltip_text(info)
+                # self.tree_info.set_text(info)
+            # else:
+            treeView.set_tooltip_text(info)
         else:
             self.tree_info.set_text(info)
 
@@ -1971,8 +1967,10 @@ class Program:
         ######################
         # fast messages and commands
         ######################
-        self.cfg.messageBox = Gtk.ComboBox.new_with_model_and_entry(
-            self.cfg.messageList)
+        self.cfg.messageBox = Gtk.ComboBoxText.new_with_entry()
+        for message in self.cfg.messageList:
+            self.cfg.messageBox.append_text(message[0])
+        self.cfg.messageBox.set_active(0)
         #
         self.fileButton = image_button(
             self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips, _("Select the file"))
@@ -1981,7 +1979,7 @@ class Program:
 
         ebox = Gtk.EventBox()
         ebox.add(self.cfg.messageBox)
-        # if Gtk.pygtk_version < (2, 12, 0):
+        # if GObject.pygobject_version < (2, 12, 0):
         #     self.cfg.tooltips.set_tip(ebox, _("The input field of the messages, commands and file selection"))
         # else:
         self.cfg.messageBox.set_tooltip_text(

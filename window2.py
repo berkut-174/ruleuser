@@ -256,12 +256,15 @@ class timersUi:
 
         # combobox
         textBox = Gtk.ListStore(str)
-        self.entryBox = Gtk.ComboBox.new_with_model_and_entry(textBox)
         textBox.append([""])
         for i in range(self.cfg.CountCommands):
             if self.cfg.read_config("command", "f" + str(i + 1)) != "":
                 textBox.append(
                     [self.cfg.read_config("command", "f" + str(i + 1))])
+        self.entryBox = Gtk.ComboBoxText.new_with_entry()
+        for line in textBox:
+            self.entryBox.append_text(line[0])
+        self.entryBox.set_active(0)
 
         # filechooser
 
@@ -428,7 +431,7 @@ class timersUi:
                     return
             model[timer_path][5].append(z)
             model.append(timer_iter, ["", z[0], "", "", None, "", 0])
-        self.treeTimer.expand_to_path(timer_path)
+        self.treeTimer.expand_to_path(Gtk.TreePath(timer_path))
         save_timersList(self.cfg)
 
     def edit_timer(self, data=None):
@@ -455,7 +458,7 @@ class timersUi:
         self.sbHour.set_value(int(hour))
         self.sbMin.set_value(int(minute))
         self.sbSec.set_value(int(second))
-        self.treeTimer.expand_to_path(rows[0])
+        self.treeTimer.expand_to_path(Gtk.TreePath(rows[0]))
 
     def clear_timer(self, data=None):
         self.sbHour.set_value(0)
@@ -759,8 +762,10 @@ class demoUi:
             if text != "":
                 demoEntryList.append([text])
 
-        self.cfg.demoEntryBox = Gtk.ComboBox.new_with_model_and_entry(
-            demoEntryList)
+        self.cfg.demoEntryBox = Gtk.ComboBoxText.new_with_entry()
+        for demotext in demoEntryList:
+            self.cfg.demoEntryBox.append_text(demotext[0])
+        self.cfg.demoEntryBox.set_active(0)
         fileButton = image_button(
             self.cfg.pixbuf_list_file_add_16, None, self.cfg.tooltips, _("Select the file"))
         fileButton.connect("clicked", file_chooser_dialog,
@@ -883,7 +888,7 @@ class demoUi:
 
         # раскрыть
         if dest_path:
-            self.treeDemo.expand_to_path(dest_path)
+            self.treeDemo.expand_to_path(Gtk.TreePath(dest_path))
 
         # выделить
         if temp_select_iter != []:
@@ -1178,7 +1183,7 @@ class demoUi:
             if temp_row_iter != []:
                 # раскрыть
                 if expand:
-                    treeView.expand_to_path(dest_path)
+                    treeView.expand_to_path(Gtk.TreePath(dest_path))
 
                 # выделить
                 if temp_select_iter != []:
@@ -1222,9 +1227,9 @@ class demoUi:
             # Раскрыть и выделить
             self.cfg.treeView.scroll_to_cell(
                 row, None, use_align=True, row_align=0.5, col_align=0.0)
-            self.cfg.treeView.expand_to_path(row)
+            self.cfg.treeView.expand_to_path(Gtk.TreePath(row))
             self.cfg.treeView.get_selection().unselect_all()
-            self.cfg.treeView.get_selection().select_path(row)
+            self.cfg.treeView.get_selection().select_path(Gtk.TreePath(row))
             userUi(self.cfg, "edit", get_selected_tree(
                 self.cfg, self.cfg.treeView, "edit"))
 
@@ -1290,7 +1295,7 @@ class userUi:
             self.cfg.userList.set(iter, 0, _("New group"))
             self.cfg.userList.set(iter, 100, self.cfg.pixbuf_status_group_16)
             col = self.treeView.get_column(0)
-            cell = col.get_cell_renderers()[1]
+            cell = col.get_cells()[1]
             cell.set_property('editable', True)
             self.treeView.set_cursor_on_cell(
                 row, col, cell, start_editing=True)
@@ -1300,7 +1305,7 @@ class userUi:
             model, rows = self.treeView.get_selection().get_selected_rows()
             row = rows[0]
             col = self.treeView.get_column(0)
-            cell = col.get_cell_renderers()[1]
+            cell = col.get_cells()[1]
             cell.set_property('editable', True)
             self.treeView.set_cursor_on_cell(
                 row, col, cell, start_editing=True)
@@ -2658,9 +2663,9 @@ class userUi:
         row = self.cfg.userList.get_path(iter)
         self.treeView.scroll_to_cell(
             row, None, use_align=True, row_align=0.5, col_align=0.0)
-        self.treeView.expand_to_path(row)
+        self.treeView.expand_to_path(Gtk.TreePath(row))
         self.treeView.get_selection().unselect_all()
-        self.treeView.get_selection().select_path(row)
+        self.treeView.get_selection().select_path(Gtk.TreePath(row))
 
     def callback(self, widget=None, data1=None, data2=None):
         if data1 == "vnc_autostart":
@@ -2791,8 +2796,8 @@ class hwinfoUi:
         self.textview = Gtk.TextView()
         self.textview.set_editable(False)
         self.textview.set_sensitive(False)
-        color = self.textview.get_style().copy().base[Gtk.StateFlags.NORMAL]
-        self.textview.modify_base(Gtk.StateFlags.INSENSITIVE, color)
+        #~ color = self.textview.get_style().copy().base[Gtk.StateFlags.NORMAL]
+        #~ self.textview.modify_base(Gtk.StateFlags.INSENSITIVE, color)
 
         self.buffer = self.textview.get_buffer()
 

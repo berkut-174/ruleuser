@@ -444,9 +444,9 @@ def get_selected_tree(cfg, treeView=None, mode=None, rows=None):
             else:
                 row = (row[0], 0)
         treeView.scroll_to_cell(row, None, use_align=True, row_align=0.5, col_align=0.0)
-        treeView.expand_to_path(row)
+        treeView.expand_to_path(Gtk.TreePath(row))
         treeView.get_selection().unselect_all()
-        treeView.get_selection().select_path(row)
+        treeView.get_selection().select_path(Gtk.TreePath(row))
         model, rows = treeView.get_selection().get_selected_rows()
 
     # группы и сервера
@@ -635,7 +635,7 @@ def tree_drag_data_received(treeView, context, x, y, selection, info, etime, cfg
     if temp_row_iter != []:
         # раскрыть
         if expand:
-            treeView.expand_to_path(dest_path)
+            treeView.expand_to_path(Gtk.TreePath(dest_path))
 
         # выделить
         if temp_select_iter != []:
@@ -792,7 +792,7 @@ def tree_move(widget, cfg, treeView, action):
         for select_iter in temp_select_iter:
             if len(model.get_path(select_iter)) == 2:
                 parent_path = (model.get_path(select_iter)[0],)
-                treeView.expand_to_path(parent_path)
+                treeView.expand_to_path(Gtk.TreePath(parent_path))
             treeView.get_selection().select_iter(select_iter)
 
     # сохранить

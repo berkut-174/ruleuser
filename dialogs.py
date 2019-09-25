@@ -75,16 +75,18 @@ def message_dialog(window, text, list, buttons_ok=None, list_type="list"):
 
 def about_dialog(data=None):
     about = Gtk.AboutDialog()
-    about.set_name("RuleUser")
+    about.set_program_name("RuleUser")
     about.set_comments(_("Computer management and monitoring users") + "\n"+_(
         "Developed specially for ALT Linux School") + "\n"+_("Поддерживается в Школе №830 г. Москва"))
 
-    about.set_version("1.1.0")
-    about.set_copyright("\n(c) 2013 " + _("Andrey Burbovskiy") + "\n" +
-                        "Email: xak-altsp@yandex.ru""\n(c) 2017 " + _("Артем Проскурнев") + "\n"+"Email: tema@proskurnev.name")
+    about.set_version("2.0.0")
+    about.set_copyright("Copyright © 2013-2016 Andrey Burbovskiy" + "\n" +
+                        "Copyright © 2017 Artem Proskurnev")
     about.set_website("http://www.altlinux.org/LTSP/")
-    about.set_authors(
-        ["Тестирование:" + "\n" + "	Александр Шеметов berkut_174@mail.ru" + "\n"])
+    about.set_authors(["Andrey Burbovskiy <xak-altsp@yandex.ru>",
+                       "Artem Proskurnev <tema@proskurnev.name>"])
+    about.add_credit_section(
+        'Тестирование', ["Alexander Shemetov <berkut_174@mail.ru>"])
     about.set_license("GPLv3")
     about.set_logo(GdkPixbuf.Pixbuf.new_from_file(
         os.path.expanduser("icons/ruleuser2_48.png")))
