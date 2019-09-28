@@ -1,8 +1,9 @@
 [Desktop Entry]
 Name=RuleUser
-Name[ru]=RuleUser
-Comment=
-Comment[ru]=
+Comment=Management computers and monitoring users in network
+Comment[ru]=Управление компьютерами и мониторинг пользователей в сети
+GenericName=Remote computers management
+GenericName[ru]=Удалённое управление компьютерами
 Exec=/usr/bin/ruleuser
 Icon=/usr/share/ruleuser/icons/ruleuser_32.png
 Terminal=false
