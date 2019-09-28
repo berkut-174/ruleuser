@@ -1326,12 +1326,12 @@ class userUi:
             show_local_sessions = "False"
             dynamic_user = "False"
             #
-            server_key = os.path.expanduser("~/.ssh/id_dsa")
+            server_key = os.path.expanduser("~/.ssh/id_ed25519")
             server_port = "22"
             server_user = ""
             console_server = "mc"
             #
-            host_key = os.path.expanduser("~/.ssh/id_dsa")
+            host_key = os.path.expanduser("~/.ssh/id_ed25519")
             host_port = "22"
             host_user = "root"
             console_host = "mc"
@@ -1348,7 +1348,7 @@ class userUi:
             over_server = "False"
             #
             vnc_autostart = "True"
-            vnc_autostart_command = "x11vnc -noxdamage -defer 3000"
+            vnc_autostart_command = "x11vnc -noxdamage -defer 3000 -loop"
             #
             vnc_pass = ""
             vnc_gtk_encoding = "default"
@@ -1463,9 +1463,9 @@ class userUi:
             show_local_sessions = "False"
             dynamic_user = "False"
             #
-            server_key = os.path.expanduser("~/.ssh/id_dsa")
+            server_key = os.path.expanduser("~/.ssh/id_ed25519")
             #
-            host_key = os.path.expanduser("~/.ssh/id_dsa")
+            host_key = os.path.expanduser("~/.ssh/id_ed25519")
             host_port = "22"
             host_user = ""
             console_host = "mc"
@@ -1482,7 +1482,7 @@ class userUi:
             over_server = "False"
             #
             vnc_autostart = "True"
-            vnc_autostart_command = "x11vnc -noxdamage -defer 3000"
+            vnc_autostart_command = "x11vnc -noxdamage -defer 3000 -loop"
             #
             vnc_pass = ""
             vnc_gtk_encoding = "default"
